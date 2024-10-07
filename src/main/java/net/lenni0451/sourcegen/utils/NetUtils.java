@@ -1,0 +1,40 @@
+package net.lenni0451.sourcegen.utils;
+
+import net.lenni0451.commons.httpclient.HttpClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+public class NetUtils {
+
+    private static final HttpClient HTTP_CLIENT = new HttpClient()
+            .setHeader("User-Agent", "Mozilla/5.0");
+
+    public static byte[] get(final String url) throws IOException {
+        return HTTP_CLIENT.get(url).execute().getContent();
+    }
+
+    public static void download(final String url, final File out) throws IOException {
+        try (InputStream download = HTTP_CLIENT.get(url).setStreamedResponse(true).execute().getInputStream()) {
+            try (FileOutputStream fos = new FileOutputStream(out)) {
+                download.transferTo(fos);
+            }
+        }
+    }
+
+    public static JSONObject getJsonObject(final String url) throws IOException {
+        String response = new String(get(url), StandardCharsets.UTF_8);
+        return new JSONObject(response);
+    }
+
+    public static JSONArray getJsonArray(final String url) throws IOException {
+        String response = new String(get(url), StandardCharsets.UTF_8);
+        return new JSONArray(response);
+    }
+
+}
