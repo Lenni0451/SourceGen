@@ -4,5 +4,5 @@
 /bin/
 build/
 out/
-/run/
+/run/*/
 *.iml
