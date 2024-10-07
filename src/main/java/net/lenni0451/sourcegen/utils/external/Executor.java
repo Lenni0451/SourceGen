@@ -1,9 +1,8 @@
 package net.lenni0451.sourcegen.utils.external;
 
-import net.lenni0451.commons.io.IOUtils;
+import net.lenni0451.commons.threading.ThreadUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collections;
 import java.util.Map;
 
@@ -30,8 +29,28 @@ public class Executor {
         pb.directory(runDir);
         pb.environment().putAll(env);
         Process process = pb.start();
-        byte[] stdout = IOUtils.readAll(process.getInputStream());
-        String out = new String(stdout);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        Thread readerThread = readStream(process.getInputStream(), stdout);
+        while (process.isAlive()) {
+            if (!ThreadUtils.sleep(200)) throw new IOException("Thread was interrupted");
+        }
+        if (readerThread.isAlive()) {
+            //If the reader thread is still alive, give it some time to finish
+            if (ThreadUtils.sleep(200)) {
+                if (readerThread.isAlive()) {
+                    //If the reader thread is still alive, interrupt it
+                    //This sometimes happens and I don't know why
+                    //Before I added this, the program would just hang here forever
+                    System.out.println("Reader thread is not finished after process has exited!");
+                    System.out.println("Command: " + String.join(" ", cmd));
+                    System.out.println("Interrupting thread to continue...");
+                    readerThread.interrupt();
+                }
+            } else {
+                throw new IOException("Thread was interrupted");
+            }
+        }
+        String out = stdout.toString();
         if (process.exitValue() != 0) {
             System.out.println();
             System.out.println("Process exited with error code " + process.exitValue());
@@ -41,6 +60,24 @@ public class Executor {
             System.exit(process.exitValue());
         }
         return out;
+    }
+
+    private static Thread readStream(final InputStream is, final OutputStream os) {
+        Thread reader = new Thread(() -> {
+            try {
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, length);
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
+                System.exit(-1);
+            }
+        });
+        reader.setDaemon(true);
+        reader.start();
+        return reader;
     }
 
 }

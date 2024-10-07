@@ -30,6 +30,11 @@ public class MinecraftMojangMappings implements GeneratorTarget {
     private static final File[] UNWANTED_SOURCE_FILES = {new File(REPO_DIR, "assets"), new File(REPO_DIR, "data"), new File(REPO_DIR, "META-INF"), new File(REPO_DIR, "pack.png"), new File(REPO_DIR, "pack.mcmeta")};
 
     @Override
+    public String getName() {
+        return "Minecraft (Mojang Mappings)";
+    }
+
+    @Override
     public void addSteps(List<GeneratorStep> steps) {
         steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, REPO_BRANCH));
         steps.add(new IterateMinecraftVersions(REPO_DIR, REPO_BRANCH, (versionSteps, versionName, releaseTime, manifest) -> {

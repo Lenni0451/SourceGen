@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface GeneratorTarget {
 
+    String getName();
+
     void addSteps(final List<GeneratorStep> steps);
 
     default void execute() throws IOException {
