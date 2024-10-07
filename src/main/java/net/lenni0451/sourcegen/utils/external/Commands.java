@@ -1,7 +1,5 @@
 package net.lenni0451.sourcegen.utils.external;
 
-import net.lenni0451.commons.arrays.ArrayUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -27,6 +25,10 @@ public class Commands {
 
         public void clone(final String repoURL) throws IOException {
             Executor.execute(new File("."), "git", "clone", repoURL, this.gitDir.getAbsolutePath());
+        }
+
+        public void fetchAll() throws IOException {
+            Executor.execute(this.gitDir, "git", "fetch", "--all");
         }
 
         public void checkout(final String branch) throws IOException {
@@ -72,12 +74,12 @@ public class Commands {
 
         public static void decompileStandalone(final File input, final File output) throws IOException {
             String[] args = {input.getAbsolutePath(), output.getAbsolutePath()};
-            Executor.execute(CURRENT_DIR, ArrayUtils.add(BASE_COMMAND, BASE_COMMAND.length, DEFAULT_OPTIONS, args));
+            Executor.execute(CURRENT_DIR, BASE_COMMAND, DEFAULT_OPTIONS, args);
         }
 
         public static void decompile(final File input, final File library, final File output) throws IOException {
             String[] args = {"-", library.getAbsolutePath(), input.getAbsolutePath(), output.getAbsolutePath()};
-            Executor.execute(CURRENT_DIR, ArrayUtils.add(BASE_COMMAND, BASE_COMMAND.length, DEFAULT_OPTIONS, args));
+            Executor.execute(CURRENT_DIR, BASE_COMMAND, DEFAULT_OPTIONS, args);
         }
 
     }

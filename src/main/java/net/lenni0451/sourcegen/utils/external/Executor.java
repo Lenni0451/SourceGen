@@ -9,6 +9,18 @@ import java.util.Map;
 
 public class Executor {
 
+    public static String execute(final File runDir, final String[]... cmdParts) throws IOException {
+        int length = 0;
+        for (String[] cmdPart : cmdParts) length += cmdPart.length;
+        String[] cmd = new String[length];
+        int index = 0;
+        for (String[] cmdPart : cmdParts) {
+            System.arraycopy(cmdPart, 0, cmd, index, cmdPart.length);
+            index += cmdPart.length;
+        }
+        return execute(runDir, cmd);
+    }
+
     public static String execute(final File runDir, final String... cmd) throws IOException {
         return execute(runDir, Collections.emptyMap(), cmd);
     }
