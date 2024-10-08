@@ -29,16 +29,16 @@ repositories {
 
 dependencies {
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
-    compileOnly "org.jetbrains:annotations:25.0.0"
+    compileOnly "org.jetbrains:annotations:26.0.0"
     compileOnly(annotationProcessor("org.projectlombok:lombok:1.18.34"))
 
     include "org.json:json:20240303"
-    include "org.ow2.asm:asm:9.7"
-    include "org.ow2.asm:asm-tree:9.7"
+    include "org.ow2.asm:asm:9.7.1"
+    include "org.ow2.asm:asm-tree:9.7.1"
     include "net.lenni0451.commons:main:1.6.1-SNAPSHOT"
     include "net.lenni0451.commons:httpclient:1.6.1-SNAPSHOT"
-    include "net.lenni0451.classtransform:core:1.13.1"
-    include "net.lenni0451.classtransform:additionalclassprovider:1.13.1"
+    include "net.lenni0451.classtransform:core:1.14.0"
+    include "net.lenni0451.classtransform:additionalclassprovider:1.14.0"
     include "net.sf.jopt-simple:jopt-simple:5.0.4"
 }
 
