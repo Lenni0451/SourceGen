@@ -38,7 +38,7 @@ dependencies {
     include "net.lenni0451.commons:main:1.6.1-SNAPSHOT"
     include "net.lenni0451.commons:httpclient:1.6.1-SNAPSHOT"
     include "net.lenni0451.classtransform:core:1.14.0"
-    include "net.lenni0451.classtransform:additionalclassprovider:1.13.1"
+    include "net.lenni0451.classtransform:additionalclassprovider:1.14.0"
     include "net.sf.jopt-simple:jopt-simple:5.0.4"
 }
 
