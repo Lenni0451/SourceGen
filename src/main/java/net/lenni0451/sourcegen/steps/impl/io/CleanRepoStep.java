@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.impl.io;
 
+import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 
 import java.io.File;
@@ -22,7 +23,7 @@ public class CleanRepoStep implements GeneratorStep {
     public void run() throws IOException {
         for (File file : this.repoDir.listFiles()) {
             if (file.getName().equals(".git")) continue;
-            file.delete();
+            FileUtils.recursiveDelete(file);
         }
     }
 

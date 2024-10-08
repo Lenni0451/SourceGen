@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.impl.io;
 
+import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 
 import java.io.File;
@@ -19,8 +20,8 @@ public class CleanupStep implements GeneratorStep {
 
     @Override
     public void run() {
-        for (File file : files) {
-            file.delete();
+        for (File file : this.files) {
+            FileUtils.recursiveDelete(file);
         }
     }
 
