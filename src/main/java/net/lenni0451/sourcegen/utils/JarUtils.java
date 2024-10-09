@@ -1,13 +1,14 @@
 package net.lenni0451.sourcegen.utils;
 
-import net.lenni0451.commons.Sneaky;
 import net.lenni0451.commons.io.FileSystemZip;
 import net.lenni0451.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class JarUtils {
@@ -15,13 +16,12 @@ public class JarUtils {
     public static Map<String, byte[]> read(final File file) throws IOException {
         Map<String, byte[]> entries = new HashMap<>();
         try (ZipFile zipFile = new ZipFile(file)) {
-            zipFile.stream().forEach(entry -> {
-                try {
-                    entries.put(entry.getName(), IOUtils.readAll(zipFile.getInputStream(entry)));
-                } catch (Throwable t) {
-                    Sneaky.sneak(t);
-                }
-            });
+            Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
+            while (enumeration.hasMoreElements()) {
+                ZipEntry entry = enumeration.nextElement();
+                if (entry.isDirectory()) continue;
+                entries.put(entry.getName(), IOUtils.readAll(zipFile.getInputStream(entry)));
+            }
         }
         return entries;
     }
