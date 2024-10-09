@@ -1,6 +1,5 @@
 package net.lenni0451.sourcegen.steps.impl.target;
 
-import net.lenni0451.commons.collections.Maps;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.NetUtils;
@@ -18,14 +17,6 @@ import java.util.function.Predicate;
 public class IterateCosmicReachVersions implements GeneratorStep {
 
     private static final String INDEX_URL = "https://raw.githubusercontent.com/CRModders/CosmicArchive/refs/heads/main/versions.json";
-    private static final Map<String, Date> SPECIAL_CASES = Maps.hashMap(
-            "0.0.1", new Date(1709851000L * 1000L),
-            "0.0.2", new Date(1709852000L * 1000L),
-            "0.0.3", new Date(1709853000L * 1000L),
-            "0.0.4", new Date(1709854000L * 1000L),
-            "0.0.5", new Date(1709855000L * 1000L),
-            "0.0.6", new Date(1709856000L * 1000L)
-    );
 
     private final VersionType type;
     private final File repoDir;
@@ -71,12 +62,12 @@ public class IterateCosmicReachVersions implements GeneratorStep {
             if (client == null && server == null) continue;
             cosmicReachVersions.add(new CosmicReachVersion(
                     version.getString("id"),
-                    SPECIAL_CASES.getOrDefault(version.getString("id"), new Date(version.getLong("releaseTime") * 1000L)),
+                    new Date(version.getLong("releaseTime") * 1000L),
                     client != null ? client.getString("url") : null,
                     server != null ? server.getString("url") : null
             ));
         }
-        cosmicReachVersions.sort(Comparator.comparing(o -> o.releaseTime));
+        Collections.reverse(cosmicReachVersions);
         cosmicReachVersions.removeIf(version -> !this.type.matches(version));
         return cosmicReachVersions;
     }
