@@ -1,14 +1,16 @@
 package net.lenni0451.sourcegen;
 
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
-import net.lenni0451.sourcegen.targets.impl.MinecraftMojangMappings;
+import net.lenni0451.sourcegen.targets.impl.CosmicReachTarget;
+import net.lenni0451.sourcegen.targets.impl.MinecraftMojangMappingsTarget;
 
 import java.util.List;
 
 public class Main {
 
     private static final List<GeneratorTarget> TARGETS = List.of(
-            new MinecraftMojangMappings()
+            new MinecraftMojangMappingsTarget(),
+            new CosmicReachTarget()
     );
 
     public static void main(String[] args) throws Throwable {

@@ -19,7 +19,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
-public class MinecraftMojangMappings implements GeneratorTarget {
+public class MinecraftMojangMappingsTarget implements GeneratorTarget {
 
     private static final String REPO_URL = "https://github.com/Lenni0451/MinecraftSources";
     private static final String REPO_BRANCH = "mojang";
