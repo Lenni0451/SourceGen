@@ -2,6 +2,7 @@ package net.lenni0451.sourcegen.utils.external;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
@@ -32,11 +33,11 @@ public class Commands {
         }
 
         public void checkout(final String branch) throws IOException {
-            Executor.execute(this.gitDir, "git", "checkout", branch);
+            Executor.execute(this.gitDir, "git", "checkout", "-b", branch);
         }
 
         public String latestCommitMessage(final String branch) throws IOException {
-            String response = Executor.execute(this.gitDir, "git", "log", "--pretty=format:\"%s\"", "-b", branch);
+            String response = Executor.execute(this.gitDir, Collections.emptyMap(), new int[]{0, 128}, "git", "log", "--pretty=format:\"%s\"", "-b", branch);
             return response.split("\n")[0].replace("\"", "");
         }
 

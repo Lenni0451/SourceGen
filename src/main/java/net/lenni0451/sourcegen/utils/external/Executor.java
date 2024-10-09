@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.utils.external;
 
+import net.lenni0451.commons.arrays.ArrayUtils;
 import net.lenni0451.commons.threading.ThreadUtils;
 
 import java.io.*;
@@ -25,6 +26,10 @@ public class Executor {
     }
 
     public static String execute(final File runDir, final Map<String, String> env, final String... cmd) throws IOException {
+        return execute(runDir, env, new int[]{0}, cmd);
+    }
+
+    public static String execute(final File runDir, final Map<String, String> env, final int[] allowedExitCodes, final String... cmd) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(cmd);
         pb.directory(runDir);
         pb.environment().putAll(env);
@@ -51,13 +56,14 @@ public class Executor {
             }
         }
         String out = stdout.toString();
-        if (process.exitValue() != 0) {
+        int exitCode = process.exitValue();
+        if (!ArrayUtils.contains(allowedExitCodes, exitCode)) {
             System.out.println();
-            System.out.println("Process exited with error code " + process.exitValue());
+            System.out.println("Process exited with error code " + exitCode);
             System.out.println("Command: " + String.join(" ", cmd));
             System.out.println("Output:");
             System.out.println(out);
-            System.exit(process.exitValue());
+            System.exit(exitCode);
         }
         return out;
     }
