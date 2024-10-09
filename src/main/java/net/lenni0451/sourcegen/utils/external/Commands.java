@@ -70,8 +70,8 @@ public class Commands {
             Executor.execute(CURRENT_DIR, BASE_COMMAND, DEFAULT_OPTIONS, args);
         }
 
-        public static void decompile(final File input, final File library, final File output) throws IOException {
-            String[] args = {"-", library.getAbsolutePath(), input.getAbsolutePath(), output.getAbsolutePath()};
+        public static void decompileWithLib(final File input, final File library, final File output) throws IOException {
+            String[] args = {"-e=" + library.getAbsolutePath(), input.getAbsolutePath(), output.getAbsolutePath()};
             Executor.execute(CURRENT_DIR, BASE_COMMAND, DEFAULT_OPTIONS, args);
         }
 

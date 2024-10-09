@@ -24,7 +24,7 @@ public class DecompileWithLibStep implements GeneratorStep {
 
     @Override
     public void run() throws Exception {
-        Commands.Vineflower.decompile(this.input, this.library, this.output);
+        Commands.Vineflower.decompileWithLib(this.input, this.library, this.output);
     }
 
 }
