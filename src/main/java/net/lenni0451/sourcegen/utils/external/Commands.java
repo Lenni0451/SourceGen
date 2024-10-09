@@ -59,14 +59,6 @@ public class Commands {
 
     }
 
-    public static class Reconstruct {
-
-        public static void applyMappings(final File input, final File mappings, final File output) throws IOException {
-            Executor.execute(new File("."), "java", "-jar", RECONSTRUCT_JAR.getAbsolutePath(), "-agree", "-input", input.getAbsolutePath(), "-mapping", mappings.getAbsolutePath(), "--output", output.getAbsolutePath());
-        }
-
-    }
-
     public static class Vineflower {
 
         private static final String[] BASE_COMMAND = {"java", "-jar", VINEFLOWER_JAR.getAbsolutePath()};

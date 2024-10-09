@@ -3,7 +3,7 @@ package net.lenni0451.sourcegen.targets.impl;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.DecompileStandaloneStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.FixLocalVariablesStep;
-import net.lenni0451.sourcegen.steps.impl.decompile.ReconstructStep;
+import net.lenni0451.sourcegen.steps.impl.decompile.RemapStep;
 import net.lenni0451.sourcegen.steps.impl.git.CommitChangesStep;
 import net.lenni0451.sourcegen.steps.impl.git.PrepareRepoStep;
 import net.lenni0451.sourcegen.steps.impl.git.PushRepoStep;
@@ -12,6 +12,7 @@ import net.lenni0451.sourcegen.steps.impl.io.CleanupStep;
 import net.lenni0451.sourcegen.steps.impl.io.DownloadStep;
 import net.lenni0451.sourcegen.steps.impl.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.utils.asm.remapping.ProguardRemapper;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -45,7 +46,7 @@ public class MinecraftMojangMappings implements GeneratorTarget {
             versionSteps.add(new CleanRepoStep(REPO_DIR));
             versionSteps.add(new DownloadStep(mappingsUrl, MAPPINGS_FILE));
             versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
-            versionSteps.add(new ReconstructStep(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR));
+            versionSteps.add(new RemapStep(new ProguardRemapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
             versionSteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
             versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
             versionSteps.add(new CleanupStep(UNWANTED_SOURCE_FILES));
