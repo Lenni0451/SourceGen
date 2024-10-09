@@ -27,7 +27,7 @@ public abstract class BaseRemapper {
         Map<String, byte[]> entries = JarUtils.read(this.input);
         MapRemapper remapper;
         if (this.mappings.exists()) {
-            remapper = loadMappings(entries, this.mappings);
+            remapper = this.loadMappings(entries, this.mappings);
         } else {
             remapper = null;
         }
@@ -36,7 +36,7 @@ public abstract class BaseRemapper {
         if (remapper == null) {
             out = entries;
         } else {
-            out = remap(entries, remapper);
+            out = this.remap(entries, remapper);
         }
         this.postRemap(out);
         JarUtils.write(this.output, out);
