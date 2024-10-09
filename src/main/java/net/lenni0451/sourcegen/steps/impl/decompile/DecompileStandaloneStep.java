@@ -17,7 +17,7 @@ public class DecompileStandaloneStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Decompiling using VineFlower...");
+        System.out.println("Decompiling " + this.input.getName() + " using VineFlower...");
     }
 
     @Override

@@ -21,7 +21,7 @@ public class ModifyJarStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Modifying jar file " + this.input.getName() + "...");
+        System.out.println("Modifying jar file " + this.output.getName() + "...");
     }
 
     @Override
