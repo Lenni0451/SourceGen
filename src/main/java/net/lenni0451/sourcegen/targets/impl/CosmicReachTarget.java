@@ -2,6 +2,7 @@ package net.lenni0451.sourcegen.targets.impl;
 
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.DecompileWithLibStep;
+import net.lenni0451.sourcegen.steps.impl.git.ChangeGitUserStep;
 import net.lenni0451.sourcegen.steps.impl.git.CommitChangesStep;
 import net.lenni0451.sourcegen.steps.impl.git.PrepareRepoStep;
 import net.lenni0451.sourcegen.steps.impl.git.PushRepoStep;
@@ -30,6 +31,7 @@ public class CosmicReachTarget implements GeneratorTarget {
 
     @Override
     public void addSteps(List<GeneratorStep> steps) {
+        steps.add(new ChangeGitUserStep("finalforeach", "finalforeach@github.ui"));
         this.addSteps(steps, IterateCosmicReachVersions.VersionType.CLIENT, "client");
         this.addSteps(steps, IterateCosmicReachVersions.VersionType.SERVER, "server");
     }

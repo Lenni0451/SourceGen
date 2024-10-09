@@ -4,6 +4,7 @@ import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.DecompileStandaloneStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.FixLocalVariablesStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.RemapStep;
+import net.lenni0451.sourcegen.steps.impl.git.ChangeGitUserStep;
 import net.lenni0451.sourcegen.steps.impl.git.CommitChangesStep;
 import net.lenni0451.sourcegen.steps.impl.git.PrepareRepoStep;
 import net.lenni0451.sourcegen.steps.impl.git.PushRepoStep;
@@ -37,6 +38,7 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
 
     @Override
     public void addSteps(List<GeneratorStep> steps) {
+        steps.add(new ChangeGitUserStep("mojang", "noreply@mojang.com"));
         steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, REPO_BRANCH));
         steps.add(new IterateMinecraftVersions(REPO_DIR, REPO_BRANCH, (versionSteps, versionName, releaseTime, manifest) -> {
             JSONObject downloads = manifest.getJSONObject("downloads");
