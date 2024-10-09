@@ -1,18 +1,13 @@
 package net.lenni0451.sourcegen.utils.asm;
 
 import net.lenni0451.classtransform.utils.ASMUtils;
-import net.lenni0451.commons.io.IOUtils;
+import net.lenni0451.sourcegen.utils.JarUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.jar.JarOutputStream;
 
 public class LocalVariableFixer {
 
@@ -30,15 +25,11 @@ public class LocalVariableFixer {
             "var", "void", "volatile", "while"
     ));
 
-    public static void run(final File input, final File output) throws IOException {
-        Map<String, byte[]> files = new HashMap<>();
-        JarFile jf = new JarFile(input);
-        Enumeration<JarEntry> entries = jf.entries();
-        while (entries.hasMoreElements()) {
-            JarEntry entry = entries.nextElement();
-            byte[] bytes = IOUtils.readAll(jf.getInputStream(entry));
-            if (entry.getName().toLowerCase(Locale.ROOT).endsWith(".class")) {
-                ClassNode node = ASMUtils.fromBytes(bytes);
+    public static void run(final File input, final File output) throws Exception {
+        Map<String, byte[]> entries = JarUtils.read(input);
+        for (Map.Entry<String, byte[]> entry : entries.entrySet()) {
+            if (entry.getKey().toLowerCase(Locale.ROOT).endsWith(".class")) {
+                ClassNode node = ASMUtils.fromBytes(entry.getValue());
                 for (MethodNode method : node.methods) {
                     Set<String> names = new HashSet<>();
                     if (method.localVariables != null) {
@@ -69,19 +60,10 @@ public class LocalVariableFixer {
                     }
                 }
                 fixRecordComponents(node);
-                bytes = ASMUtils.toStacklessBytes(node);
+                entry.setValue(ASMUtils.toStacklessBytes(node));
             }
-            files.put(entry.getName(), bytes);
         }
-        jf.close();
-
-        JarOutputStream jos = new JarOutputStream(Files.newOutputStream(output.toPath()));
-        for (Map.Entry<String, byte[]> entry : files.entrySet()) {
-            jos.putNextEntry(new JarEntry(entry.getKey()));
-            jos.write(entry.getValue());
-            jos.closeEntry();
-        }
-        jos.close();
+        JarUtils.write(output, entries);
     }
 
     private static void fixRecordComponents(final ClassNode node) {
