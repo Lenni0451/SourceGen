@@ -37,8 +37,11 @@ public class Commands {
             Executor.execute(this.gitDir, "git", "fetch", "--all");
         }
 
+        public void resetHardHead() throws IOException {
+            Executor.execute(this.gitDir, "git", "reset", "--hard", "origin/master");
+        }
+
         public void checkout(final String branch) throws IOException {
-            Executor.execute(this.gitDir, Collections.emptyMap(), new int[]{0, 128}, "git", "checkout", "-b", branch);
             Executor.execute(this.gitDir, "git", "checkout", branch);
         }
 

@@ -26,13 +26,13 @@ public class PrepareRepoStep implements GeneratorStep {
     public void run() throws Exception {
         Commands.Git git = Commands.git(this.repoDir);
         if (!this.repoDir.exists()) {
-            //If the repository does not exist yet, clone it
-            git.clone(this.url);
+            git.clone(this.url); //If the repository does not exist yet, clone it
+            git.checkout(this.branch); //Checkout the specified branch
         } else {
-            //Fetch all changes
-            git.fetchAll();
+            git.fetchAll(); //Fetch all changes
+            git.checkout(this.branch); //Checkout the specified branch
+            git.resetHardHead(); //Reset the repository to the latest commit
         }
-        git.checkout(this.branch); //Checkout the specified branch
     }
 
 }
