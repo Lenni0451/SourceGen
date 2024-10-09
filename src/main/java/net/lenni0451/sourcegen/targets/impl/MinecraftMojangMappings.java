@@ -51,7 +51,7 @@ public class MinecraftMojangMappings implements GeneratorTarget {
             versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
             versionSteps.add(new CleanupStep(UNWANTED_SOURCE_FILES));
             versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-            versionSteps.add(new CleanupStep(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR, FIXED_LOCALS_JAR, new File("logs")));
+            versionSteps.add(new CleanupStep(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR, FIXED_LOCALS_JAR));
         }));
         steps.add(new PushRepoStep(REPO_DIR));
     }

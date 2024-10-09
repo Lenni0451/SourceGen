@@ -2,7 +2,6 @@ package net.lenni0451.sourcegen.steps;
 
 import net.lenni0451.commons.collections.Lists;
 
-import java.io.IOException;
 import java.util.List;
 
 public class StepExecutor implements GeneratorStep {
@@ -22,7 +21,7 @@ public class StepExecutor implements GeneratorStep {
     }
 
     @Override
-    public void run() throws IOException {
+    public void run() throws Exception {
         for (GeneratorStep step : this.steps) {
             step.printStep();
             step.run();

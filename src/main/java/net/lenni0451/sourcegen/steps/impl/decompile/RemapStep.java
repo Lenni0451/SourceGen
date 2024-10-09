@@ -1,10 +1,7 @@
 package net.lenni0451.sourcegen.steps.impl.decompile;
 
-import net.lenni0451.commons.Sneaky;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.asm.remapping.BaseRemapper;
-
-import java.io.IOException;
 
 public class RemapStep implements GeneratorStep {
 
@@ -16,16 +13,12 @@ public class RemapStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Applying mappings using Reconstruct...");
+        System.out.println("Applying mappings...");
     }
 
     @Override
-    public void run() throws IOException {
-        try {
-            this.remapper.remap();
-        } catch (Exception e) {
-            Sneaky.sneak(e);
-        }
+    public void run() throws Exception {
+        this.remapper.remap();
     }
 
 }

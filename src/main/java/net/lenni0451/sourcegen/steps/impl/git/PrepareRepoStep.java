@@ -4,7 +4,6 @@ import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
-import java.io.IOException;
 
 public class PrepareRepoStep implements GeneratorStep {
 
@@ -24,7 +23,7 @@ public class PrepareRepoStep implements GeneratorStep {
     }
 
     @Override
-    public void run() throws IOException {
+    public void run() throws Exception {
         Commands.Git git = Commands.git(this.repoDir);
         if (!this.repoDir.exists()) {
             //If the repository does not exist yet, clone it

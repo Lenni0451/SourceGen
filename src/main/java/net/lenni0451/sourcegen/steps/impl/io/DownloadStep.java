@@ -4,7 +4,6 @@ import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.NetUtils;
 
 import java.io.File;
-import java.io.IOException;
 
 public class DownloadStep implements GeneratorStep {
 
@@ -22,7 +21,7 @@ public class DownloadStep implements GeneratorStep {
     }
 
     @Override
-    public void run() throws IOException {
+    public void run() throws Exception {
         NetUtils.download(this.url, this.output);
     }
 

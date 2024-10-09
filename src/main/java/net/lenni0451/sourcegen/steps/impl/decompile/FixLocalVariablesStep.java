@@ -4,7 +4,6 @@ import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.asm.LocalVariableFixer;
 
 import java.io.File;
-import java.io.IOException;
 
 public class FixLocalVariablesStep implements GeneratorStep {
 
@@ -22,7 +21,7 @@ public class FixLocalVariablesStep implements GeneratorStep {
     }
 
     @Override
-    public void run() throws IOException {
+    public void run() throws Exception {
         LocalVariableFixer.run(this.input, this.output);
     }
 

@@ -4,7 +4,6 @@ import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 public class CommitChangesStep implements GeneratorStep {
@@ -25,7 +24,7 @@ public class CommitChangesStep implements GeneratorStep {
     }
 
     @Override
-    public void run() throws IOException {
+    public void run() throws Exception {
         Commands.Git git = Commands.git(this.gitDir);
         git.addAll();
         git.commit(this.message, this.commitDate);

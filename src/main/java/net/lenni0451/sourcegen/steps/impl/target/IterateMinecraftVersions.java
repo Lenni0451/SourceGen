@@ -44,7 +44,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
     }
 
     @Override
-    public void run() throws IOException {
+    public void run() throws Exception {
         Map<OffsetDateTime, JSONObject> versions = this.loadVersions();
         this.removeBuiltVersions(versions);
         this.resolveVersionManifest(versions);
@@ -52,6 +52,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
             JSONObject versionManifest = entry.getValue().getJSONObject("manifest");
             List<GeneratorStep> steps = new ArrayList<>();
             this.stepSupplier.provideSteps(steps, entry.getValue().getString("id"), entry.getKey(), versionManifest);
+            System.out.println("Running steps for version " + entry.getValue().getString("id") + "...");
             StepExecutor executor = new StepExecutor(steps);
             executor.run();
         }
@@ -105,7 +106,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
 
     @FunctionalInterface
     public interface VersionStepProvider {
-        void provideSteps(final List<GeneratorStep> versionSteps, final String versionName, final OffsetDateTime releaseTime, final JSONObject manifest) throws IOException;
+        void provideSteps(final List<GeneratorStep> versionSteps, final String versionName, final OffsetDateTime releaseTime, final JSONObject manifest) throws Exception;
     }
 
 }

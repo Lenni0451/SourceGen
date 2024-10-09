@@ -4,7 +4,6 @@ import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
-import java.io.IOException;
 
 public class DecompileStandaloneStep implements GeneratorStep {
 
@@ -22,7 +21,7 @@ public class DecompileStandaloneStep implements GeneratorStep {
     }
 
     @Override
-    public void run() throws IOException {
+    public void run() throws Exception {
         Commands.Vineflower.decompileStandalone(this.input, this.output);
     }
 
