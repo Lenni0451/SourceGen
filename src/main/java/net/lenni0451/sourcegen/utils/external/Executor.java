@@ -35,7 +35,7 @@ public class Executor {
         pb.environment().putAll(env);
         Process process = pb.start();
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
-        Thread readerThread = readStream(process.getInputStream(), stdout);
+        Thread readerThread = readStream(process.getInputStream(), process.getErrorStream(), stdout);
         while (process.isAlive()) {
             if (!ThreadUtils.sleep(200)) throw new IOException("Thread was interrupted");
         }
@@ -68,12 +68,15 @@ public class Executor {
         return out;
     }
 
-    private static Thread readStream(final InputStream is, final OutputStream os) {
+    private static Thread readStream(final InputStream stdin, final InputStream stderr, final OutputStream os) {
         Thread reader = new Thread(() -> {
             try {
                 byte[] buffer = new byte[1024];
                 int length;
-                while ((length = is.read(buffer)) != -1) {
+                while ((length = stdin.read(buffer)) != -1) {
+                    os.write(buffer, 0, length);
+                }
+                while ((length = stderr.read(buffer)) != -1) {
                     os.write(buffer, 0, length);
                 }
             } catch (Throwable t) {
