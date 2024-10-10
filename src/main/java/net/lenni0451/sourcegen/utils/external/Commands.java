@@ -31,8 +31,8 @@ public class Commands {
             Executor.execute(this.gitDir, "git", "fetch", "--all");
         }
 
-        public void resetHardHead() throws IOException {
-            Executor.execute(this.gitDir, "git", "reset", "--hard", "origin/HEAD");
+        public void resetHardHead(final String branch) throws IOException {
+            Executor.execute(this.gitDir, "git", "reset", "--hard", "origin/" + branch);
         }
 
         public void checkout(final String branch) throws IOException {

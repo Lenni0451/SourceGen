@@ -31,7 +31,7 @@ public class PrepareRepoStep implements GeneratorStep {
         } else {
             git.fetchAll(); //Fetch all changes
             git.checkout(this.branch); //Checkout the specified branch
-            git.resetHardHead(); //Reset the repository to the latest commit
+            git.resetHardHead(this.branch); //Reset the repository to the latest commit
         }
     }
 
