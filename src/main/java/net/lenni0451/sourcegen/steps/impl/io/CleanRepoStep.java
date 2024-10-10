@@ -22,6 +22,7 @@ public class CleanRepoStep implements GeneratorStep {
     public void run() throws Exception {
         for (File file : this.repoDir.listFiles()) {
             if (file.getName().equals(".git")) continue;
+            if (file.getName().equals("README.md")) continue;
             FileUtils.recursiveDelete(file);
         }
     }
