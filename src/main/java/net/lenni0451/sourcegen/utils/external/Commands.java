@@ -40,8 +40,8 @@ public class Commands {
         }
 
         public void setConfig(final String name, final String email) throws IOException {
-            Executor.execute(CURRENT_DIR, "git", "config", "user.name", name);
-            Executor.execute(CURRENT_DIR, "git", "config", "user.email", email);
+            Executor.execute(this.gitDir, "git", "config", "user.name", name);
+            Executor.execute(this.gitDir, "git", "config", "user.email", email);
         }
 
         public String latestCommitMessage(final String branch) throws IOException {
