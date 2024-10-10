@@ -31,13 +31,13 @@ public class CosmicReachTarget implements GeneratorTarget {
 
     @Override
     public void addSteps(List<GeneratorStep> steps) {
-        steps.add(new ChangeGitUserStep("finalforeach", "finalforeach@github.ui"));
         this.addSteps(steps, IterateCosmicReachVersions.VersionType.CLIENT, "client");
         this.addSteps(steps, IterateCosmicReachVersions.VersionType.SERVER, "server");
     }
 
     private void addSteps(final List<GeneratorStep> steps, final IterateCosmicReachVersions.VersionType type, final String branch) {
         steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, branch));
+        steps.add(new ChangeGitUserStep(REPO_DIR, "finalforeach", "finalforeach@github.ui"));
         steps.add(new IterateCosmicReachVersions(type, REPO_DIR, branch, (versionSteps, versionName, releaseTime, url) -> {
             versionSteps.add(new CleanRepoStep(REPO_DIR));
             versionSteps.add(new DownloadStep(url, RAW_JAR));

@@ -17,12 +17,6 @@ public class Commands {
 
     public static class Git {
 
-        public static void setConfig(final String name, final String email) throws IOException {
-            Executor.execute(CURRENT_DIR, "git", "config", "--global", "user.name", name);
-            Executor.execute(CURRENT_DIR, "git", "config", "--global", "user.email", email);
-        }
-
-
         private final File gitDir;
 
         private Git(final File gitDir) {
@@ -43,6 +37,11 @@ public class Commands {
 
         public void checkout(final String branch) throws IOException {
             Executor.execute(this.gitDir, "git", "checkout", branch);
+        }
+
+        public void setConfig(final String name, final String email) throws IOException {
+            Executor.execute(CURRENT_DIR, "git", "config", "user.name", name);
+            Executor.execute(CURRENT_DIR, "git", "config", "user.email", email);
         }
 
         public String latestCommitMessage(final String branch) throws IOException {
