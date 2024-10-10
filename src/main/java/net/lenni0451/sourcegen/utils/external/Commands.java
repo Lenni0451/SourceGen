@@ -45,7 +45,7 @@ public class Commands {
         }
 
         public String latestCommitMessage(final String branch) throws IOException {
-            String response = Executor.execute(this.gitDir, Collections.emptyMap(), new int[]{0, 128}, "git", "log", "--pretty=format:\"%s\"", "-b", branch);
+            String response = Executor.execute(this.gitDir, Collections.emptyMap(), new int[]{0, 128}, "git", "log", "--pretty=format:\"%s\"", "-b", branch).output();
             return response.split("\n")[0].replace("\"", "");
         }
 

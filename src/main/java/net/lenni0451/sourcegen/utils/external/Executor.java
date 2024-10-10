@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class Executor {
 
-    public static String execute(final File runDir, final String[]... cmdParts) throws IOException {
+    public static ProcessOutput execute(final File runDir, final String[]... cmdParts) throws IOException {
         int length = 0;
         for (String[] cmdPart : cmdParts) length += cmdPart.length;
         String[] cmd = new String[length];
@@ -21,15 +21,15 @@ public class Executor {
         return execute(runDir, cmd);
     }
 
-    public static String execute(final File runDir, final String... cmd) throws IOException {
+    public static ProcessOutput execute(final File runDir, final String... cmd) throws IOException {
         return execute(runDir, Collections.emptyMap(), cmd);
     }
 
-    public static String execute(final File runDir, final Map<String, String> env, final String... cmd) throws IOException {
+    public static ProcessOutput execute(final File runDir, final Map<String, String> env, final String... cmd) throws IOException {
         return execute(runDir, env, new int[]{0}, cmd);
     }
 
-    public static String execute(final File runDir, final Map<String, String> env, final int[] allowedExitCodes, final String... cmd) throws IOException {
+    public static ProcessOutput execute(final File runDir, final Map<String, String> env, final int[] allowedExitCodes, final String... cmd) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(cmd);
         pb.directory(runDir);
         pb.environment().putAll(env);
@@ -65,7 +65,7 @@ public class Executor {
             System.out.println(out);
             System.exit(exitCode);
         }
-        return out;
+        return new ProcessOutput(exitCode, out);
     }
 
     private static Thread readStream(final InputStream stdin, final InputStream stderr, final OutputStream os) {
@@ -87,6 +87,10 @@ public class Executor {
         reader.setDaemon(true);
         reader.start();
         return reader;
+    }
+
+
+    public record ProcessOutput(int exitCode, String output) {
     }
 
 }
