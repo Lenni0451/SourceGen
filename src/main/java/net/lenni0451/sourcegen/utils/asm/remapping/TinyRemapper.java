@@ -1,17 +1,10 @@
 package net.lenni0451.sourcegen.utils.asm.remapping;
 
-import net.lenni0451.classtransform.additionalclassprovider.DelegatingClassProvider;
-import net.lenni0451.classtransform.additionalclassprovider.MapClassProvider;
 import net.lenni0451.classtransform.mappings.AMapper;
 import net.lenni0451.classtransform.mappings.MapperConfig;
 import net.lenni0451.classtransform.mappings.impl.TinyV2Mapper;
 import net.lenni0451.classtransform.utils.ASMUtils;
 import net.lenni0451.classtransform.utils.MemberDeclaration;
-import net.lenni0451.classtransform.utils.mappings.MapRemapper;
-import net.lenni0451.classtransform.utils.mappings.SuperMappingFiller;
-import net.lenni0451.classtransform.utils.tree.BasicClassProvider;
-import net.lenni0451.classtransform.utils.tree.ClassTree;
-import net.lenni0451.classtransform.utils.tree.IClassProvider;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -40,20 +33,12 @@ public class TinyRemapper extends BaseRemapper {
     }
 
     @Override
-    protected MapRemapper loadMappings(final Map<String, byte[]> entries, final File mappings) {
-        AMapper mapper;
+    protected AMapper loadMapper(Map<String, byte[]> entries, File mappings) {
         try {
-            mapper = new TinyV2Mapper(MapperConfig.create(), mappings, "named", "official");
-            mapper.load();
+            return new TinyV2Mapper(MapperConfig.create(), mappings, "named", "official");
         } catch (Throwable t) {
-            mapper = new TinyV2Mapper(MapperConfig.create(), mappings, "named", "client");
-            mapper.load();
+            return new TinyV2Mapper(MapperConfig.create(), mappings, "named", "client");
         }
-        MapRemapper remapper = mapper.getRemapper();
-        ClassTree classTree = new ClassTree();
-        IClassProvider classProvider = new MapClassProvider(entries, MapClassProvider.NameFormat.SLASH_CLASS);
-        SuperMappingFiller.fillAllSuperMembers(remapper, classTree, new DelegatingClassProvider(classProvider, new BasicClassProvider()));
-        return remapper.reverse();
     }
 
     private void fillExceptions(final Map<String, byte[]> entries) throws IOException {

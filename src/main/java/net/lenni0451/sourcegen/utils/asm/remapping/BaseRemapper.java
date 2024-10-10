@@ -1,9 +1,17 @@
 package net.lenni0451.sourcegen.utils.asm.remapping;
 
+import net.lenni0451.classtransform.additionalclassprovider.DelegatingClassProvider;
+import net.lenni0451.classtransform.additionalclassprovider.MapClassProvider;
+import net.lenni0451.classtransform.mappings.AMapper;
 import net.lenni0451.classtransform.utils.ASMUtils;
 import net.lenni0451.classtransform.utils.mappings.MapRemapper;
 import net.lenni0451.classtransform.utils.mappings.Remapper;
+import net.lenni0451.classtransform.utils.mappings.SuperMappingFiller;
+import net.lenni0451.classtransform.utils.tree.BasicClassProvider;
+import net.lenni0451.classtransform.utils.tree.ClassTree;
+import net.lenni0451.classtransform.utils.tree.IClassProvider;
 import net.lenni0451.sourcegen.utils.JarUtils;
+import net.lenni0451.sourcegen.utils.asm.DummyClassProvider;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.io.File;
@@ -42,7 +50,17 @@ public abstract class BaseRemapper {
         JarUtils.write(this.output, out);
     }
 
-    protected abstract MapRemapper loadMappings(final Map<String, byte[]> entries, final File mappings) throws Exception;
+    protected abstract AMapper loadMapper(final Map<String, byte[]> entries, final File mappings) throws Exception;
+
+    protected MapRemapper loadMappings(final Map<String, byte[]> entries, final File mappings) throws Exception {
+        AMapper mapper = this.loadMapper(entries, mappings);
+        mapper.load();
+        MapRemapper remapper = mapper.getRemapper();
+        ClassTree classTree = new ClassTree();
+        IClassProvider classProvider = new DelegatingClassProvider(new MapClassProvider(entries, MapClassProvider.NameFormat.SLASH_CLASS), new DummyClassProvider());
+        SuperMappingFiller.fillAllSuperMembers(remapper, classTree, new DelegatingClassProvider(classProvider, new BasicClassProvider()));
+        return remapper.reverse();
+    }
 
     protected void postRemap(final Map<String, byte[]> out) throws Exception {
     }
