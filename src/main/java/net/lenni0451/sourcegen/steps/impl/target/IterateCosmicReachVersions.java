@@ -44,17 +44,18 @@ public class IterateCosmicReachVersions implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Searching for CosmicReach versions...");
+        System.out.println("Searching for CosmicReach versions (" + this.type.name().toLowerCase() + ")...");
     }
 
     @Override
     public void run() throws Exception {
         List<CosmicReachVersion> versions = this.loadVersions();
         this.removeBuiltVersions(versions);
+        int i = 0;
         for (CosmicReachVersion version : versions) {
             List<GeneratorStep> steps = new ArrayList<>();
             this.stepSupplier.provideSteps(steps, version.id, version.releaseTime, this.type.url(version));
-            System.out.println("Running steps for version " + version.id + "...");
+            System.out.println("Running steps for version " + version.id + " (" + (++i) + "/" + versions.size() + ")...");
             long start = System.nanoTime();
             StepExecutor executor = new StepExecutor(steps);
             executor.run();

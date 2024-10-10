@@ -48,12 +48,13 @@ public class IterateMinecraftVersions implements GeneratorStep {
         Map<OffsetDateTime, JSONObject> versions = this.loadVersions();
         this.removeBuiltVersions(versions);
         this.resolveVersionManifest(versions);
+        int i = 0;
         for (Map.Entry<OffsetDateTime, JSONObject> entry : versions.entrySet()) {
             JSONObject versionManifest = entry.getValue().getJSONObject("manifest");
             List<GeneratorStep> steps = new ArrayList<>();
             String versionName = entry.getValue().getString("id");
             this.stepSupplier.provideSteps(steps, versionName, entry.getKey(), versionManifest);
-            System.out.println("Running steps for version " + versionName + "...");
+            System.out.println("Running steps for version " + versionName + " (" + (++i) + "/" + versions.size() + ")...");
             long start = System.nanoTime();
             StepExecutor executor = new StepExecutor(steps);
             executor.run();
