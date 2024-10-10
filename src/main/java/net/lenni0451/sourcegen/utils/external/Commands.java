@@ -35,8 +35,12 @@ public class Commands {
             Executor.execute(this.gitDir, "git", "reset", "--hard", "origin/" + branch);
         }
 
-        public void checkout(final String branch) throws IOException {
-            Executor.execute(this.gitDir, "git", "checkout", branch);
+        public boolean checkout(final String branch) throws IOException {
+            return Executor.execute(this.gitDir, Collections.emptyMap(), new int[]{0, 1}, "git", "checkout", branch).exitCode() == 0;
+        }
+
+        public void checkoutCreate(final String branch) throws IOException {
+            Executor.execute(this.gitDir, "git", "checkout", "-b", branch);
         }
 
         public void setConfig(final String name, final String email) throws IOException {

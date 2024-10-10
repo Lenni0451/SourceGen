@@ -30,8 +30,13 @@ public class PrepareRepoStep implements GeneratorStep {
             git.checkout(this.branch); //Checkout the specified branch
         } else {
             git.fetchAll(); //Fetch all changes
-            git.checkout(this.branch); //Checkout the specified branch
-            git.resetHardHead(this.branch); //Reset the repository to the latest commit
+            if (git.checkout(this.branch)) { //Checkout the specified branch
+                //The branch was checked out successfully
+                git.resetHardHead(this.branch); //Reset the repository to the latest commit
+            } else {
+                //The branch does not exist yet, create it
+                git.checkoutCreate(this.branch);
+            }
         }
     }
 
