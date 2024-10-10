@@ -21,7 +21,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
 
     static {
         try {
-            EXCLUDED = Files.readAllLines(new File("excluded.txt").toPath());
+            EXCLUDED = Files.readAllLines(new File("minecraft_excluded.txt").toPath());
         } catch (IOException e) {
             Sneaky.sneak(e);
             throw new RuntimeException(e);
