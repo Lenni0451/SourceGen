@@ -29,7 +29,7 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
     private static final File CLIENT_JAR = new File("client.jar");
     private static final File REMAPPED_JAR = new File("remapped.jar");
     private static final File FIXED_LOCALS_JAR = new File("fixed_locals.jar");
-    private static final File[] UNWANTED_SOURCE_FILES = {new File(REPO_DIR, "assets"), new File(REPO_DIR, "data"), new File(REPO_DIR, "META-INF"), new File(REPO_DIR, "pack.png"), new File(REPO_DIR, "pack.mcmeta")};
+    private static final File[] UNWANTED_SOURCE_FILES = {new File(REPO_DIR, "assets"), new File(REPO_DIR, "data"), new File(REPO_DIR, "META-INF"), new File(REPO_DIR, "pack.png"), new File(REPO_DIR, "pack.mcmeta"), new File(REPO_DIR, "flightrecorder-config.jfc")};
 
     @Override
     public String getName() {
