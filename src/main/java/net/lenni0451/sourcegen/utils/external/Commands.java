@@ -59,7 +59,7 @@ public class Commands {
                     "GIT_COMMITTER_DATE", commitDateString,
                     "GIT_AUTHOR_DATE", commitDateString
             );
-            Executor.execute(this.gitDir, env, "git", "commit", "-m", message);
+            Executor.execute(this.gitDir, env, "git", "commit", "--allow-empty", "-m", message);
         }
 
         public void push() throws IOException {
