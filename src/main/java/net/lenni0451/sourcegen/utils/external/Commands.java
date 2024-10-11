@@ -39,8 +39,12 @@ public class Commands {
             return Executor.execute(this.repoDir, Collections.emptyMap(), new int[]{0, 1}, "git", "checkout", branch).exitCode() == 0;
         }
 
-        public void checkoutCreate(final String branch) throws IOException {
-            Executor.execute(this.repoDir, "git", "checkout", "-b", branch);
+        public void checkoutOrphan(final String branch) throws IOException {
+            Executor.execute(this.repoDir, "git", "checkout", "--orphan", branch);
+        }
+
+        public void rmAll() throws IOException {
+            Executor.execute(this.repoDir, "git", "rm", "-rf", ".");
         }
 
         public void setConfig(final String name, final String email) throws IOException {

@@ -30,7 +30,8 @@ public class PrepareRepoStep implements GeneratorStep {
             git.clone(this.url);
             if (!git.checkout(this.branch)) {
                 //If the branch doesn't exist, create it
-                git.checkoutCreate(this.branch);
+                git.checkoutOrphan(this.branch);
+                git.rmAll();
             }
         } else {
             //The repo dir exists, fetch all changes and checkout the branch
@@ -40,7 +41,8 @@ public class PrepareRepoStep implements GeneratorStep {
                 git.resetHardHead(this.branch);
             } else {
                 //If the branch doesn't exist, create it
-                git.checkoutCreate(this.branch);
+                git.checkoutOrphan(this.branch);
+                git.rmAll();
             }
         }
     }
