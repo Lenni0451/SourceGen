@@ -11,50 +11,50 @@ public class Commands {
     private static final File CURRENT_DIR = new File(".");
     private static final File VINEFLOWER_JAR = new File("vineflower-1.10.1.jar");
 
-    public static Git git(final File gitDir) {
-        return new Git(gitDir);
+    public static Git git(final File repoDir) {
+        return new Git(repoDir);
     }
 
     public static class Git {
 
-        private final File gitDir;
+        private final File repoDir;
 
-        private Git(final File gitDir) {
-            this.gitDir = gitDir;
+        private Git(final File repoDir) {
+            this.repoDir = repoDir;
         }
 
         public void clone(final String repoURL) throws IOException {
-            Executor.execute(new File("."), "git", "clone", repoURL, this.gitDir.getAbsolutePath());
+            Executor.execute(new File("."), "git", "clone", repoURL, this.repoDir.getAbsolutePath());
         }
 
         public void fetchAll() throws IOException {
-            Executor.execute(this.gitDir, "git", "fetch", "--all");
+            Executor.execute(this.repoDir, "git", "fetch", "--all");
         }
 
         public void resetHardHead(final String branch) throws IOException {
-            Executor.execute(this.gitDir, "git", "reset", "--hard", "origin/" + branch);
+            Executor.execute(this.repoDir, "git", "reset", "--hard", "origin/" + branch);
         }
 
         public boolean checkout(final String branch) throws IOException {
-            return Executor.execute(this.gitDir, Collections.emptyMap(), new int[]{0, 1}, "git", "checkout", branch).exitCode() == 0;
+            return Executor.execute(this.repoDir, Collections.emptyMap(), new int[]{0, 1}, "git", "checkout", branch).exitCode() == 0;
         }
 
         public void checkoutCreate(final String branch) throws IOException {
-            Executor.execute(this.gitDir, "git", "checkout", "-b", branch);
+            Executor.execute(this.repoDir, "git", "checkout", "-b", branch);
         }
 
         public void setConfig(final String name, final String email) throws IOException {
-            Executor.execute(this.gitDir, "git", "config", "user.name", name);
-            Executor.execute(this.gitDir, "git", "config", "user.email", email);
+            Executor.execute(this.repoDir, "git", "config", "user.name", name);
+            Executor.execute(this.repoDir, "git", "config", "user.email", email);
         }
 
         public String latestCommitMessage(final String branch) throws IOException {
-            String response = Executor.execute(this.gitDir, Collections.emptyMap(), new int[]{0, 128}, "git", "log", "--pretty=format:\"%s\"", "-b", branch).output();
+            String response = Executor.execute(this.repoDir, Collections.emptyMap(), new int[]{0, 128}, "git", "log", "--pretty=format:\"%s\"", "-b", branch).output();
             return response.split("\n")[0].replace("\"", "");
         }
 
         public void addAll() throws IOException {
-            Executor.execute(this.gitDir, "git", "add", "--all");
+            Executor.execute(this.repoDir, "git", "add", "--all");
         }
 
         public void commit(final String message, final Date commitDate) throws IOException {
@@ -63,11 +63,11 @@ public class Commands {
                     "GIT_COMMITTER_DATE", commitDateString,
                     "GIT_AUTHOR_DATE", commitDateString
             );
-            Executor.execute(this.gitDir, env, "git", "commit", "--allow-empty", "-m", message);
+            Executor.execute(this.repoDir, env, "git", "commit", "--allow-empty", "-m", message);
         }
 
         public void push() throws IOException {
-            Executor.execute(this.gitDir, "git", "push");
+            Executor.execute(this.repoDir, "git", "push");
         }
 
     }

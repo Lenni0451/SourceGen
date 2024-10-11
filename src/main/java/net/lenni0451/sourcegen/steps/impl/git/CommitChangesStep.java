@@ -8,12 +8,12 @@ import java.util.Date;
 
 public class CommitChangesStep implements GeneratorStep {
 
-    private final File gitDir;
+    private final File repoDir;
     private final String message;
     private final Date commitDate;
 
-    public CommitChangesStep(final File gitDir, final String message, final Date commitDate) {
-        this.gitDir = gitDir;
+    public CommitChangesStep(final File repoDir, final String message, final Date commitDate) {
+        this.repoDir = repoDir;
         this.message = message;
         this.commitDate = commitDate;
     }
@@ -25,7 +25,7 @@ public class CommitChangesStep implements GeneratorStep {
 
     @Override
     public void run() throws Exception {
-        Commands.Git git = Commands.git(this.gitDir);
+        Commands.Git git = Commands.git(this.repoDir);
         git.addAll();
         git.commit(this.message, this.commitDate);
     }

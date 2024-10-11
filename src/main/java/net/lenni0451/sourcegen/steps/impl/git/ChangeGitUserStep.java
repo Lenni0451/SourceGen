@@ -7,12 +7,12 @@ import java.io.File;
 
 public class ChangeGitUserStep implements GeneratorStep {
 
-    private final File gitDir;
+    private final File repoDir;
     private final String name;
     private final String email;
 
-    public ChangeGitUserStep(final File gitDir, final String name, final String email) {
-        this.gitDir = gitDir;
+    public ChangeGitUserStep(final File repoDir, final String name, final String email) {
+        this.repoDir = repoDir;
         this.name = name;
         this.email = email;
     }
@@ -24,7 +24,7 @@ public class ChangeGitUserStep implements GeneratorStep {
 
     @Override
     public void run() throws Exception {
-        Commands.git(this.gitDir).setConfig(this.name, this.email);
+        Commands.git(this.repoDir).setConfig(this.name, this.email);
     }
 
 }
