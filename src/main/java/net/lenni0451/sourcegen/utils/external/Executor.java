@@ -32,9 +32,7 @@ public class Executor {
     }
 
     public static ProcessOutput execute(final File runDir, final Map<String, String> env, final int[] allowedExitCodes, final String... cmd) throws IOException {
-        if (PRINT_COMMANDS) {
-            System.out.println("Executing command: " + String.join(" ", cmd));
-        }
+        if (PRINT_COMMANDS) System.out.println(" > " + String.join(" ", cmd));
         ProcessBuilder pb = new ProcessBuilder(cmd);
         pb.directory(runDir);
         pb.environment().putAll(env);
