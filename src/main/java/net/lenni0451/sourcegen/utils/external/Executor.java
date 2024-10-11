@@ -9,6 +9,8 @@ import java.util.Map;
 
 public class Executor {
 
+    private static final boolean PRINT_COMMANDS = System.getProperty("sourcegen.printCommands", "false").equalsIgnoreCase("true");
+
     public static ProcessOutput execute(final File runDir, final String[]... cmdParts) throws IOException {
         int length = 0;
         for (String[] cmdPart : cmdParts) length += cmdPart.length;
@@ -30,6 +32,9 @@ public class Executor {
     }
 
     public static ProcessOutput execute(final File runDir, final Map<String, String> env, final int[] allowedExitCodes, final String... cmd) throws IOException {
+        if (PRINT_COMMANDS) {
+            System.out.println("Executing command: " + String.join(" ", cmd));
+        }
         ProcessBuilder pb = new ProcessBuilder(cmd);
         pb.directory(runDir);
         pb.environment().putAll(env);
