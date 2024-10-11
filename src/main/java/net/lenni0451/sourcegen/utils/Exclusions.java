@@ -11,7 +11,10 @@ public class Exclusions {
 
     public Exclusions(final File file) {
         try {
-            this.exclusions.addAll(Files.readAllLines(file.toPath()));
+            for (String line : Files.readAllLines(file.toPath())) {
+                if (line.isBlank()) continue;
+                this.exclusions.add(line);
+            }
         } catch (Throwable t) {
             t.printStackTrace();
         }
