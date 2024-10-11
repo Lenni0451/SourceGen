@@ -54,7 +54,6 @@ public abstract class BaseRemapper {
 
     protected MapRemapper loadMappings(final Map<String, byte[]> entries, final File mappings) throws Exception {
         AMapper mapper = this.loadMapper(entries, mappings);
-        mapper.load();
         MapRemapper remapper = mapper.getRemapper();
         ClassTree classTree = new ClassTree();
         IClassProvider classProvider = new DelegatingClassProvider(new MapClassProvider(entries, MapClassProvider.NameFormat.SLASH_CLASS), new DummyClassProvider());

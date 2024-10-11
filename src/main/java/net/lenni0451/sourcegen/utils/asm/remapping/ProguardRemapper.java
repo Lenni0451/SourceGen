@@ -15,7 +15,9 @@ public class ProguardRemapper extends BaseRemapper {
 
     @Override
     protected AMapper loadMapper(Map<String, byte[]> entries, File mappings) {
-        return new ProguardMapper(MapperConfig.create(), mappings);
+        ProguardMapper mapper = new ProguardMapper(MapperConfig.create(), mappings);
+        mapper.load();
+        return mapper;
     }
 
 }

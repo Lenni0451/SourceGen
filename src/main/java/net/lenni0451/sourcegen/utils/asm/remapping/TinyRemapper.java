@@ -29,15 +29,19 @@ public class TinyRemapper extends BaseRemapper {
 
     @Override
     protected void postRemap(Map<String, byte[]> out) throws IOException {
-        this.fillExceptions(out);
+        if (this.exceptions.exists()) this.fillExceptions(out);
     }
 
     @Override
     protected AMapper loadMapper(Map<String, byte[]> entries, File mappings) {
         try {
-            return new TinyV2Mapper(MapperConfig.create(), mappings, "named", "official");
+            TinyV2Mapper mapper = new TinyV2Mapper(MapperConfig.create(), mappings, "named", "official");
+            mapper.load();
+            return mapper;
         } catch (Throwable t) {
-            return new TinyV2Mapper(MapperConfig.create(), mappings, "named", "client");
+            TinyV2Mapper mapper = new TinyV2Mapper(MapperConfig.create(), mappings, "named", "client");
+            mapper.load();
+            return mapper;
         }
     }
 
