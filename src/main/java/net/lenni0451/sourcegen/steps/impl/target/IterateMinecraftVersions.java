@@ -8,6 +8,7 @@ import net.lenni0451.sourcegen.utils.external.Commands;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,11 +31,13 @@ public class IterateMinecraftVersions implements GeneratorStep {
 
     private final File repoDir;
     private final String branch;
+    private final VersionRange versionRange;
     private final VersionStepProvider stepSupplier;
 
-    public IterateMinecraftVersions(final File repoDir, final String branch, final VersionStepProvider stepSupplier) {
+    public IterateMinecraftVersions(final File repoDir, final String branch, final VersionRange versionRange, final VersionStepProvider stepSupplier) {
         this.repoDir = repoDir;
         this.branch = branch;
+        this.versionRange = versionRange;
         this.stepSupplier = stepSupplier;
     }
 
@@ -47,6 +50,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
     public void run() throws Exception {
         Map<OffsetDateTime, JSONObject> versions = this.loadVersions();
         this.removeBuiltVersions(versions);
+        this.filterVersionRange(versions);
         this.resolveVersionManifest(versions);
         int i = 0;
         for (Map.Entry<OffsetDateTime, JSONObject> entry : versions.entrySet()) {
@@ -80,7 +84,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
     private void removeBuiltVersions(final Map<OffsetDateTime, JSONObject> versions) throws IOException {
         String lastBuiltVersion = Commands.git(this.repoDir).latestCommitMessage(this.branch);
         boolean hasVersion = versions.values().stream().map(v -> v.getString("id")).toList().contains(lastBuiltVersion);
-        if (!hasVersion) lastBuiltVersion = "1.13.2";
+        if (!hasVersion) return;
         Iterator<Map.Entry<OffsetDateTime, JSONObject>> it = versions.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<OffsetDateTime, JSONObject> entry = it.next();
@@ -88,6 +92,30 @@ public class IterateMinecraftVersions implements GeneratorStep {
             String versionName = version.getString("id");
             it.remove();
             if (versionName.equalsIgnoreCase(lastBuiltVersion)) break;
+        }
+    }
+
+    private void filterVersionRange(final Map<OffsetDateTime, JSONObject> versions) {
+        if (this.versionRange.minVersion != null) {
+            Iterator<Map.Entry<OffsetDateTime, JSONObject>> it = versions.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<OffsetDateTime, JSONObject> entry = it.next();
+                JSONObject version = entry.getValue();
+                String versionName = version.getString("id");
+                if (versionName.equals(this.versionRange.minVersion)) break;
+                it.remove();
+            }
+        }
+        if (this.versionRange.maxVersion != null) {
+            Iterator<Map.Entry<OffsetDateTime, JSONObject>> it = versions.entrySet().iterator();
+            boolean remove = false;
+            while (it.hasNext()) {
+                Map.Entry<OffsetDateTime, JSONObject> entry = it.next();
+                JSONObject version = entry.getValue();
+                String versionName = version.getString("id");
+                if (remove) it.remove();
+                else if (versionName.equals(this.versionRange.maxVersion)) remove = true;
+            }
         }
     }
 
@@ -112,6 +140,9 @@ public class IterateMinecraftVersions implements GeneratorStep {
     @FunctionalInterface
     public interface VersionStepProvider {
         void provideSteps(final List<GeneratorStep> versionSteps, final String versionName, final OffsetDateTime releaseTime, final JSONObject manifest) throws Exception;
+    }
+
+    public record VersionRange(@Nullable String minVersion, @Nullable String maxVersion) {
     }
 
 }

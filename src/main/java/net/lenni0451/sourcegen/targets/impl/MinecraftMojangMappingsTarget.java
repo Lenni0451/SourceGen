@@ -12,6 +12,7 @@ import net.lenni0451.sourcegen.steps.impl.io.CleanRepoStep;
 import net.lenni0451.sourcegen.steps.impl.io.CleanupStep;
 import net.lenni0451.sourcegen.steps.impl.io.DownloadStep;
 import net.lenni0451.sourcegen.steps.impl.target.IterateMinecraftVersions;
+import net.lenni0451.sourcegen.steps.impl.target.IterateMinecraftVersions.VersionRange;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.utils.asm.remapping.ProguardRemapper;
 import org.json.JSONObject;
@@ -40,7 +41,7 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
     public void addSteps(List<GeneratorStep> steps) {
         steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, REPO_BRANCH));
         steps.add(new ChangeGitUserStep(REPO_DIR, "mojang", "noreply@mojang.com"));
-        steps.add(new IterateMinecraftVersions(REPO_DIR, REPO_BRANCH, (versionSteps, versionName, releaseTime, manifest) -> {
+        steps.add(new IterateMinecraftVersions(REPO_DIR, REPO_BRANCH, new VersionRange("1.14", null), (versionSteps, versionName, releaseTime, manifest) -> {
             JSONObject downloads = manifest.getJSONObject("downloads");
             String clientUrl = downloads.getJSONObject("client").getString("url");
             String mappingsUrl = downloads.getJSONObject("client_mappings").getString("url");
