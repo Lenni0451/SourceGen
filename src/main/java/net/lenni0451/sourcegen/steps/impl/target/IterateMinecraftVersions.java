@@ -1,8 +1,8 @@
 package net.lenni0451.sourcegen.steps.impl.target;
 
-import net.lenni0451.commons.Sneaky;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
+import net.lenni0451.sourcegen.utils.Exclusions;
 import net.lenni0451.sourcegen.utils.NetUtils;
 import net.lenni0451.sourcegen.utils.external.Commands;
 import org.json.JSONArray;
@@ -11,23 +11,13 @@ import org.json.JSONObject;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.util.*;
 
 public class IterateMinecraftVersions implements GeneratorStep {
 
     private static final String MANIFEST = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
-    private static final List<String> EXCLUDED;
-
-    static {
-        try {
-            EXCLUDED = Files.readAllLines(new File("minecraft_excluded.txt").toPath());
-        } catch (IOException e) {
-            Sneaky.sneak(e);
-            throw new RuntimeException(e);
-        }
-    }
+    private static final Exclusions EXCLUSIONS = new Exclusions(new File("minecraft_excluded.txt"));
 
     private final File repoDir;
     private final String branch;
@@ -73,7 +63,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
         Map<OffsetDateTime, JSONObject> sortedVersions = new TreeMap<>();
         for (int i = 0; i < versions.length(); i++) {
             JSONObject version = versions.getJSONObject(i);
-            if (EXCLUDED.contains(version.getString("id"))) continue;
+            if (EXCLUSIONS.isExcluded(version.getString("id"))) continue;
 
             String time = version.getString("releaseTime");
             sortedVersions.put(OffsetDateTime.parse(time), version);
