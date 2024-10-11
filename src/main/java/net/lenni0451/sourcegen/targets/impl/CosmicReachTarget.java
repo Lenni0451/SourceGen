@@ -20,6 +20,7 @@ public class CosmicReachTarget implements GeneratorTarget {
 
     private static final String REPO_URL = "https://github.com/Lenni0451/CosmicReachSources";
     private static final File REPO_DIR = new File("cosmicreach");
+    private static final File DEFAULTS_DIR = new File("defaults", "cosmicreach");
     private static final File RAW_JAR = new File("raw.jar");
     private static final File NO_GAME_JAR = new File("no_game.jar");
     private static final File ONLY_GAME_JAR = new File("only_game.jar");
@@ -39,7 +40,7 @@ public class CosmicReachTarget implements GeneratorTarget {
         steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, branch));
         steps.add(new ChangeGitUserStep(REPO_DIR, "finalforeach", "finalforeach@github.io"));
         steps.add(new IterateCosmicReachVersions(type, REPO_DIR, branch, (versionSteps, versionName, releaseTime, url) -> {
-            versionSteps.add(new CleanRepoStep(REPO_DIR));
+            versionSteps.add(new CleanRepoStep(REPO_DIR, DEFAULTS_DIR));
             versionSteps.add(new DownloadStep(url, RAW_JAR));
             versionSteps.add(new ModifyJarStep(RAW_JAR, NO_GAME_JAR, entry -> entry.startsWith("finalforeach") || entry.startsWith("/finalforeach")));
             versionSteps.add(new ModifyJarStep(RAW_JAR, ONLY_GAME_JAR, entry -> !entry.startsWith("finalforeach") && !entry.startsWith("/finalforeach")));

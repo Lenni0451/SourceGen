@@ -26,6 +26,7 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
     private static final String REPO_URL = "https://github.com/Lenni0451/MinecraftSources";
     private static final String REPO_BRANCH = "mojang";
     private static final File REPO_DIR = new File("minecraft");
+    private static final File DEFAULTS_DIR = new File("defaults", "minecraft_mojang_mappings");
     private static final File MAPPINGS_FILE = new File("mappings");
     private static final File CLIENT_JAR = new File("client.jar");
     private static final File REMAPPED_JAR = new File("remapped.jar");
@@ -46,7 +47,7 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
             String clientUrl = downloads.getJSONObject("client").getString("url");
             String mappingsUrl = downloads.getJSONObject("client_mappings").getString("url");
 
-            versionSteps.add(new CleanRepoStep(REPO_DIR));
+            versionSteps.add(new CleanRepoStep(REPO_DIR, DEFAULTS_DIR));
             versionSteps.add(new DownloadStep(mappingsUrl, MAPPINGS_FILE));
             versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
             versionSteps.add(new RemapStep(new ProguardRemapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
