@@ -14,40 +14,37 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.*;
 
-public class IterateMinecraftVersions implements GeneratorStep {
+public class IterateRetroMCPVersions implements GeneratorStep {
 
-    private static final String INDEX_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
-    private static final Exclusions EXCLUSIONS = new Exclusions(new File("minecraft_excluded.txt"));
+    private static final String INDEX_URL = "https://mcphackers.org/versionsV2/versions.json";
+    private static final Exclusions EXCLUSIONS = new Exclusions(new File("retromcp_excluded.txt"));
 
     private final File repoDir;
     private final String branch;
-    private final VersionRange versionRange;
     private final VersionStepProvider stepProvider;
 
-    public IterateMinecraftVersions(final File repoDir, final String branch, final VersionRange versionRange, final VersionStepProvider stepProvider) {
+    public IterateRetroMCPVersions(final File repoDir, final String branch, final VersionStepProvider stepProvider) {
         this.repoDir = repoDir;
         this.branch = branch;
-        this.versionRange = versionRange;
         this.stepProvider = stepProvider;
     }
 
     @Override
     public void printStep() {
-        System.out.println("Searching for Minecraft versions...");
+        System.out.println("Searching for RetroMCP versions...");
     }
 
     @Override
     public void run() throws Exception {
         Map<OffsetDateTime, JSONObject> versions = this.loadVersions();
         this.removeBuiltVersions(versions);
-        this.filterVersionRange(versions);
         this.resolveVersionManifest(versions);
         int i = 0;
         for (Map.Entry<OffsetDateTime, JSONObject> entry : versions.entrySet()) {
             JSONObject versionManifest = entry.getValue().getJSONObject("manifest");
             List<GeneratorStep> steps = new ArrayList<>();
             String versionName = entry.getValue().getString("id");
-            this.stepProvider.provideSteps(steps, versionName, entry.getKey(), versionManifest);
+            this.stepProvider.provideSteps(steps, versionName, entry.getKey(), entry.getValue().optString("resources", null), versionManifest);
             System.out.println("Running steps for version " + versionName + " (" + (++i) + "/" + versions.size() + ")...");
             long start = System.nanoTime();
             StepExecutor executor = new StepExecutor(steps);
@@ -58,8 +55,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
     }
 
     private Map<OffsetDateTime, JSONObject> loadVersions() throws IOException {
-        JSONObject meta = NetUtils.getJsonObject(INDEX_URL);
-        JSONArray versions = meta.getJSONArray("versions");
+        JSONArray versions = NetUtils.getJsonArray(INDEX_URL);
         Map<OffsetDateTime, JSONObject> sortedVersions = new TreeMap<>();
         for (int i = 0; i < versions.length(); i++) {
             JSONObject version = versions.getJSONObject(i);
@@ -85,54 +81,19 @@ public class IterateMinecraftVersions implements GeneratorStep {
         }
     }
 
-    private void filterVersionRange(final Map<OffsetDateTime, JSONObject> versions) {
-        if (this.versionRange.minVersion != null) {
-            Iterator<Map.Entry<OffsetDateTime, JSONObject>> it = versions.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry<OffsetDateTime, JSONObject> entry = it.next();
-                JSONObject version = entry.getValue();
-                String versionName = version.getString("id");
-                if (versionName.equals(this.versionRange.minVersion)) break;
-                it.remove();
-            }
-        }
-        if (this.versionRange.maxVersion != null) {
-            Iterator<Map.Entry<OffsetDateTime, JSONObject>> it = versions.entrySet().iterator();
-            boolean remove = false;
-            while (it.hasNext()) {
-                Map.Entry<OffsetDateTime, JSONObject> entry = it.next();
-                JSONObject version = entry.getValue();
-                String versionName = version.getString("id");
-                if (remove) it.remove();
-                else if (versionName.equals(this.versionRange.maxVersion)) remove = true;
-            }
-        }
-    }
-
     private void resolveVersionManifest(final Map<OffsetDateTime, JSONObject> versions) throws IOException {
-        Iterator<Map.Entry<OffsetDateTime, JSONObject>> it = versions.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<OffsetDateTime, JSONObject> entry = it.next();
+        for (Map.Entry<OffsetDateTime, JSONObject> entry : versions.entrySet()) {
             JSONObject version = entry.getValue();
             String url = version.getString("url");
             JSONObject versionManifest = NetUtils.getJsonObject(url);
-            JSONObject downloads = versionManifest.getJSONObject("downloads");
-            if (!downloads.has("client_mappings")) {
-                //If a version does not have mappings, remove it
-                it.remove();
-            } else {
-                version.put("manifest", versionManifest);
-            }
+            version.put("manifest", versionManifest);
         }
     }
 
 
     @FunctionalInterface
     public interface VersionStepProvider {
-        void provideSteps(final List<GeneratorStep> versionSteps, final String versionName, final OffsetDateTime releaseTime, final JSONObject manifest) throws Exception;
-    }
-
-    public record VersionRange(@Nullable String minVersion, @Nullable String maxVersion) {
+        void provideSteps(final List<GeneratorStep> steps, final String versionName, final OffsetDateTime releaseTime, @Nullable final String resourcesUrl, final JSONObject manifest) throws Exception;
     }
 
 }

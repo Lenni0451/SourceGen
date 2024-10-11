@@ -23,13 +23,13 @@ public class IterateCosmicReachVersions implements GeneratorStep {
     private final VersionType type;
     private final File repoDir;
     private final String branch;
-    private final VersionStepProvider stepSupplier;
+    private final VersionStepProvider stepProvider;
 
-    public IterateCosmicReachVersions(final VersionType type, final File repoDir, final String branch, final VersionStepProvider stepSupplier) {
+    public IterateCosmicReachVersions(final VersionType type, final File repoDir, final String branch, final VersionStepProvider stepProvider) {
         this.type = type;
         this.repoDir = repoDir;
         this.branch = branch;
-        this.stepSupplier = stepSupplier;
+        this.stepProvider = stepProvider;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class IterateCosmicReachVersions implements GeneratorStep {
         int i = 0;
         for (CosmicReachVersion version : versions) {
             List<GeneratorStep> steps = new ArrayList<>();
-            this.stepSupplier.provideSteps(steps, version.id, version.releaseTime, this.type.url(version));
+            this.stepProvider.provideSteps(steps, version.id, version.releaseTime, this.type.url(version));
             System.out.println("Running steps for version " + version.id + " (" + (++i) + "/" + versions.size() + ")...");
             long start = System.nanoTime();
             StepExecutor executor = new StepExecutor(steps);
