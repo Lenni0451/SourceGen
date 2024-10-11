@@ -50,6 +50,7 @@ public class TinyRemapper extends BaseRemapper {
 
         Map<MemberDeclaration, String[]> exceptions = new HashMap<>();
         for (String line : lines) {
+            if (line.isBlank()) continue;
             Matcher matcher = EXCEPTION_PATTERN1.matcher(line);
             if (!matcher.matches()) {
                 matcher = EXCEPTION_PATTERN2.matcher(line);
