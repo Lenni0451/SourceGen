@@ -1,4 +1,4 @@
-package net.lenni0451.sourcegen.utils.asm.remapping;
+package net.lenni0451.sourcegen.utils.remapping;
 
 import net.lenni0451.classtransform.additionalclassprovider.DelegatingClassProvider;
 import net.lenni0451.classtransform.additionalclassprovider.MapClassProvider;

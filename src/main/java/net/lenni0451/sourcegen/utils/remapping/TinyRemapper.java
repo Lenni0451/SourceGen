@@ -1,4 +1,4 @@
-package net.lenni0451.sourcegen.utils.asm.remapping;
+package net.lenni0451.sourcegen.utils.remapping;
 
 import net.lenni0451.classtransform.mappings.AMapper;
 import net.lenni0451.classtransform.mappings.MapperConfig;

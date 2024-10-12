@@ -14,7 +14,7 @@ import net.lenni0451.sourcegen.steps.impl.io.DownloadStep;
 import net.lenni0451.sourcegen.steps.impl.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.impl.target.IterateMinecraftVersions.VersionRange;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
-import net.lenni0451.sourcegen.utils.asm.remapping.ProguardRemapper;
+import net.lenni0451.sourcegen.utils.remapping.ProguardRemapper;
 import org.json.JSONObject;
 
 import java.io.File;

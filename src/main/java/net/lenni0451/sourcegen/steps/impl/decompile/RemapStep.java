@@ -1,7 +1,7 @@
 package net.lenni0451.sourcegen.steps.impl.decompile;
 
 import net.lenni0451.sourcegen.steps.GeneratorStep;
-import net.lenni0451.sourcegen.utils.asm.remapping.BaseRemapper;
+import net.lenni0451.sourcegen.utils.remapping.BaseRemapper;
 
 public class RemapStep implements GeneratorStep {
 

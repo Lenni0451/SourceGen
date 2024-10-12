@@ -11,7 +11,7 @@ import net.lenni0451.sourcegen.steps.impl.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.impl.io.*;
 import net.lenni0451.sourcegen.steps.impl.target.IterateRetroMCPVersions;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
-import net.lenni0451.sourcegen.utils.asm.remapping.TinyRemapper;
+import net.lenni0451.sourcegen.utils.remapping.TinyRemapper;
 import org.json.JSONObject;
 
 import java.io.File;
