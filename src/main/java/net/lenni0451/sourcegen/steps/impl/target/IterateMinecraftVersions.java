@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class IterateMinecraftVersions implements GeneratorStep {
 
@@ -22,12 +23,24 @@ public class IterateMinecraftVersions implements GeneratorStep {
     private final File repoDir;
     private final String branch;
     private final VersionRange versionRange;
+    private final Predicate<String> removeVersionIf;
+    private final boolean keepVersionsWithoutMappings;
     private final VersionStepProvider stepProvider;
 
+    public IterateMinecraftVersions(final File repoDir, final String branch, final VersionStepProvider stepProvider) {
+        this(repoDir, branch, new VersionRange(null, null), stepProvider);
+    }
+
     public IterateMinecraftVersions(final File repoDir, final String branch, final VersionRange versionRange, final VersionStepProvider stepProvider) {
+        this(repoDir, branch, versionRange, version -> false, false, stepProvider);
+    }
+
+    public IterateMinecraftVersions(final File repoDir, final String branch, final VersionRange versionRange, final Predicate<String> removeVersionIf, final boolean keepVersionsWithoutMappings, final VersionStepProvider stepProvider) {
         this.repoDir = repoDir;
         this.branch = branch;
         this.versionRange = versionRange;
+        this.removeVersionIf = removeVersionIf;
+        this.keepVersionsWithoutMappings = keepVersionsWithoutMappings;
         this.stepProvider = stepProvider;
     }
 
@@ -41,6 +54,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
         Map<OffsetDateTime, JSONObject> versions = this.loadVersions();
         this.removeBuiltVersions(versions);
         this.filterVersionRange(versions);
+        this.filterPredicate(versions);
         this.resolveVersionManifest(versions);
         int i = 0;
         for (Map.Entry<OffsetDateTime, JSONObject> entry : versions.entrySet()) {
@@ -109,6 +123,16 @@ public class IterateMinecraftVersions implements GeneratorStep {
         }
     }
 
+    private void filterPredicate(final Map<OffsetDateTime, JSONObject> versions) {
+        Iterator<Map.Entry<OffsetDateTime, JSONObject>> it = versions.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<OffsetDateTime, JSONObject> entry = it.next();
+            JSONObject version = entry.getValue();
+            String versionName = version.getString("id");
+            if (this.removeVersionIf.test(versionName)) it.remove();
+        }
+    }
+
     private void resolveVersionManifest(final Map<OffsetDateTime, JSONObject> versions) throws IOException {
         Iterator<Map.Entry<OffsetDateTime, JSONObject>> it = versions.entrySet().iterator();
         while (it.hasNext()) {
@@ -117,8 +141,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
             String url = version.getString("url");
             JSONObject versionManifest = NetUtils.getJsonObject(url);
             JSONObject downloads = versionManifest.getJSONObject("downloads");
-            if (!downloads.has("client_mappings")) {
-                //If a version does not have mappings, remove it
+            if (!downloads.has("client_mappings") && !this.keepVersionsWithoutMappings) {
                 it.remove();
             } else {
                 version.put("manifest", versionManifest);

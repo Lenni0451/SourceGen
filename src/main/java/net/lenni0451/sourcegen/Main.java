@@ -2,6 +2,7 @@ package net.lenni0451.sourcegen;
 
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.impl.CosmicReachTarget;
+import net.lenni0451.sourcegen.targets.impl.MinecraftFeatherMappingsTarget;
 import net.lenni0451.sourcegen.targets.impl.MinecraftMojangMappingsTarget;
 import net.lenni0451.sourcegen.targets.impl.RetroMCPTarget;
 
@@ -12,7 +13,8 @@ public class Main {
     private static final List<GeneratorTarget> TARGETS = List.of(
             new MinecraftMojangMappingsTarget(),
             new CosmicReachTarget(),
-            new RetroMCPTarget()
+            new RetroMCPTarget(),
+            new MinecraftFeatherMappingsTarget()
     );
 
     public static void main(String[] args) throws Throwable {

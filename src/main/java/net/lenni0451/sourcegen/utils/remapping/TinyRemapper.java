@@ -29,7 +29,7 @@ public class TinyRemapper extends BaseRemapper {
 
     @Override
     protected void postRemap(Map<String, byte[]> out) throws IOException {
-        if (this.exceptions.exists()) this.fillExceptions(out);
+        if (this.exceptions != null && this.exceptions.exists()) this.fillExceptions(out);
     }
 
     @Override
