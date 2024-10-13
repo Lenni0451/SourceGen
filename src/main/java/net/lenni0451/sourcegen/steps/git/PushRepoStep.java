@@ -1,4 +1,4 @@
-package net.lenni0451.sourcegen.steps.impl.git;
+package net.lenni0451.sourcegen.steps.git;
 
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.external.Commands;

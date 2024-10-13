@@ -1,8 +1,7 @@
 package net.lenni0451.sourcegen;
 
 import net.lenni0451.commons.io.FileUtils;
-import net.lenni0451.sourcegen.targets.GeneratorTarget;
-import net.lenni0451.sourcegen.targets.impl.*;
+import net.lenni0451.sourcegen.targets.*;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;

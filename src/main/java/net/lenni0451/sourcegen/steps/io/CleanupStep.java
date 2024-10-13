@@ -1,4 +1,4 @@
-package net.lenni0451.sourcegen.steps.impl.io;
+package net.lenni0451.sourcegen.steps.io;
 
 import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.sourcegen.steps.GeneratorStep;

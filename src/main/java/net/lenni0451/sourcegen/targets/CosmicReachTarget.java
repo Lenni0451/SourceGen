@@ -1,19 +1,18 @@
-package net.lenni0451.sourcegen.targets.impl;
+package net.lenni0451.sourcegen.targets;
 
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
-import net.lenni0451.sourcegen.steps.impl.decompile.DecompileWithLibStep;
-import net.lenni0451.sourcegen.steps.impl.git.ChangeGitUserStep;
-import net.lenni0451.sourcegen.steps.impl.git.CommitChangesStep;
-import net.lenni0451.sourcegen.steps.impl.git.PrepareRepoStep;
-import net.lenni0451.sourcegen.steps.impl.git.PushRepoStep;
-import net.lenni0451.sourcegen.steps.impl.io.CleanRepoStep;
-import net.lenni0451.sourcegen.steps.impl.io.CleanupStep;
-import net.lenni0451.sourcegen.steps.impl.io.DownloadStep;
-import net.lenni0451.sourcegen.steps.impl.io.ModifyJarStep;
-import net.lenni0451.sourcegen.steps.impl.target.IterateCosmicReachVersions;
-import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.steps.decompile.DecompileWithLibStep;
+import net.lenni0451.sourcegen.steps.git.ChangeGitUserStep;
+import net.lenni0451.sourcegen.steps.git.CommitChangesStep;
+import net.lenni0451.sourcegen.steps.git.PrepareRepoStep;
+import net.lenni0451.sourcegen.steps.git.PushRepoStep;
+import net.lenni0451.sourcegen.steps.io.CleanRepoStep;
+import net.lenni0451.sourcegen.steps.io.CleanupStep;
+import net.lenni0451.sourcegen.steps.io.DownloadStep;
+import net.lenni0451.sourcegen.steps.io.ModifyJarStep;
+import net.lenni0451.sourcegen.steps.target.IterateCosmicReachVersions;
 
 import java.io.File;
 import java.util.List;

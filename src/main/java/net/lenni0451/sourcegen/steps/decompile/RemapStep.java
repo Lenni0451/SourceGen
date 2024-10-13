@@ -1,4 +1,4 @@
-package net.lenni0451.sourcegen.steps.impl.decompile;
+package net.lenni0451.sourcegen.steps.decompile;
 
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.remapping.BaseRemapper;

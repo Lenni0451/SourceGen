@@ -1,18 +1,17 @@
-package net.lenni0451.sourcegen.targets.impl;
+package net.lenni0451.sourcegen.targets;
 
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
-import net.lenni0451.sourcegen.steps.impl.decompile.DecompileStandaloneStep;
-import net.lenni0451.sourcegen.steps.impl.decompile.FixLocalVariablesStep;
-import net.lenni0451.sourcegen.steps.impl.decompile.RemapStep;
-import net.lenni0451.sourcegen.steps.impl.git.ChangeGitUserStep;
-import net.lenni0451.sourcegen.steps.impl.git.CommitChangesStep;
-import net.lenni0451.sourcegen.steps.impl.git.PrepareRepoStep;
-import net.lenni0451.sourcegen.steps.impl.git.PushRepoStep;
-import net.lenni0451.sourcegen.steps.impl.io.*;
-import net.lenni0451.sourcegen.steps.impl.target.IterateRetroMCPVersions;
-import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.steps.decompile.DecompileStandaloneStep;
+import net.lenni0451.sourcegen.steps.decompile.FixLocalVariablesStep;
+import net.lenni0451.sourcegen.steps.decompile.RemapStep;
+import net.lenni0451.sourcegen.steps.git.ChangeGitUserStep;
+import net.lenni0451.sourcegen.steps.git.CommitChangesStep;
+import net.lenni0451.sourcegen.steps.git.PrepareRepoStep;
+import net.lenni0451.sourcegen.steps.git.PushRepoStep;
+import net.lenni0451.sourcegen.steps.io.*;
+import net.lenni0451.sourcegen.steps.target.IterateRetroMCPVersions;
 import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 import org.json.JSONObject;
 
