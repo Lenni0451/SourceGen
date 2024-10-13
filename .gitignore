@@ -5,5 +5,7 @@
 build/
 out/
 *.iml
+
 /run/minecraft
 /run/cosmicreach
+/run/work
