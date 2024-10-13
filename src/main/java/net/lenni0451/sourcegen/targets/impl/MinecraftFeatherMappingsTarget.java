@@ -39,7 +39,6 @@ public class MinecraftFeatherMappingsTarget implements GeneratorTarget {
 
     @Override
     public void addSteps(List<GeneratorStep> steps) {
-        steps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR, FIXED_LOCALS_JAR));
         steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, REPO_BRANCH));
         steps.add(new ChangeGitUserStep(REPO_DIR, "mojang", "noreply@mojang.com"));
         steps.add(new LoadFeatherMappings((subSteps, versionToUrl) -> {
@@ -54,7 +53,7 @@ public class MinecraftFeatherMappingsTarget implements GeneratorTarget {
                 versionSteps.add(new RemapStep(new TinyV2Remapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR, null)));
                 versionSteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
                 versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
-                versionSteps.add(new RemoveAssetsStep(REPO_DIR));
+                versionSteps.add(new RemoveResourcesStep(REPO_DIR));
                 versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
                 versionSteps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR, FIXED_LOCALS_JAR));
             }));

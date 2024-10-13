@@ -5,19 +5,19 @@ import net.lenni0451.sourcegen.steps.GeneratorStep;
 import java.io.File;
 import java.util.List;
 
-public class RemoveAssetsStep implements GeneratorStep {
+public class RemoveResourcesStep implements GeneratorStep {
 
     private final File repoDir;
     private final List<File> keepFiles;
 
-    public RemoveAssetsStep(final File repoDir, final File... keepFiles) {
+    public RemoveResourcesStep(final File repoDir, final File... keepFiles) {
         this.repoDir = repoDir;
         this.keepFiles = List.of(keepFiles);
     }
 
     @Override
     public void printStep() {
-        System.out.println("Removing assets...");
+        System.out.println("Removing resources...");
     }
 
     @Override

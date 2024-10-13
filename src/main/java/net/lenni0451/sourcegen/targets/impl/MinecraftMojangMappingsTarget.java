@@ -12,6 +12,7 @@ import net.lenni0451.sourcegen.steps.impl.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.impl.io.CleanRepoStep;
 import net.lenni0451.sourcegen.steps.impl.io.CleanupStep;
 import net.lenni0451.sourcegen.steps.impl.io.DownloadStep;
+import net.lenni0451.sourcegen.steps.impl.io.RemoveResourcesStep;
 import net.lenni0451.sourcegen.steps.impl.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.impl.target.IterateMinecraftVersions.VersionRange;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
@@ -32,7 +33,6 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
     private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
     private static final File FIXED_LOCALS_JAR = new File(Main.WORK_DIR, "fixed_locals.jar");
-    private static final File[] UNWANTED_SOURCE_FILES = {new File(REPO_DIR, "assets"), new File(REPO_DIR, "data"), new File(REPO_DIR, "META-INF"), new File(REPO_DIR, "pack.png"), new File(REPO_DIR, "pack.mcmeta"), new File(REPO_DIR, "flightrecorder-config.jfc")};
 
     @Override
     public String getName() {
@@ -41,7 +41,6 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
 
     @Override
     public void addSteps(List<GeneratorStep> steps) {
-        steps.add(new CleanupStep(MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR, FIXED_LOCALS_JAR));
         steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, REPO_BRANCH));
         steps.add(new ChangeGitUserStep(REPO_DIR, "mojang", "noreply@mojang.com"));
         steps.add(new IterateMinecraftVersions(REPO_DIR, REPO_BRANCH, new VersionRange("1.14", null), (versionSteps, versionName, releaseTime, manifest) -> {
@@ -55,7 +54,7 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
             versionSteps.add(new RemapStep(new ProguardRemapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
             versionSteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
             versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
-            versionSteps.add(new CleanupStep(UNWANTED_SOURCE_FILES));
+            versionSteps.add(new RemoveResourcesStep(REPO_DIR, new File(REPO_DIR, "version.json")));
             versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
             versionSteps.add(new CleanupStep(MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR, FIXED_LOCALS_JAR));
         }));

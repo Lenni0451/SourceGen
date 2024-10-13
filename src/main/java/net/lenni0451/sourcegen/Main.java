@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen;
 
+import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.impl.*;
 
@@ -40,6 +41,7 @@ public class Main {
             return;
         }
 
+        FileUtils.recursiveDelete(WORK_DIR); //Remove old leftovers
         WORK_DIR.mkdirs();
         EXCLUSIONS_DIR.mkdirs();
         DEFAULTS_DIR.mkdirs();

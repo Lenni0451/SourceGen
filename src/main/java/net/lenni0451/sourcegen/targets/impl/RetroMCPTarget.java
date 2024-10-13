@@ -38,7 +38,6 @@ public class RetroMCPTarget implements GeneratorTarget {
 
     @Override
     public void addSteps(List<GeneratorStep> steps) {
-        steps.add(new CleanupStep(RESOURCES_FILE, RESOURCES_DIR, CLIENT_JAR, REMAPPED_JAR));
         steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, REPO_BRANCH));
         steps.add(new ChangeGitUserStep(REPO_DIR, "mojang", "noreply@mojang.com"));
         steps.add(new IterateRetroMCPVersions(REPO_DIR, REPO_BRANCH, (versionSteps, versionName, releaseTime, resourcesUrl, manifest) -> {
@@ -56,7 +55,7 @@ public class RetroMCPTarget implements GeneratorTarget {
             } else {
                 versionSteps.add(new DecompileStandaloneStep(CLIENT_JAR, REPO_DIR));
             }
-            versionSteps.add(new RemoveAssetsStep(REPO_DIR));
+            versionSteps.add(new RemoveResourcesStep(REPO_DIR));
             versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
             versionSteps.add(new CleanupStep(RESOURCES_FILE, RESOURCES_DIR, CLIENT_JAR, REMAPPED_JAR));
         }));

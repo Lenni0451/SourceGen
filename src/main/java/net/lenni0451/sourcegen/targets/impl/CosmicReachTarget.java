@@ -38,7 +38,6 @@ public class CosmicReachTarget implements GeneratorTarget {
     }
 
     private void addSteps(final List<GeneratorStep> steps, final IterateCosmicReachVersions.VersionType type, final String branch) {
-        steps.add(new CleanupStep(RAW_JAR, NO_GAME_JAR, ONLY_GAME_JAR));
         steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, branch));
         steps.add(new ChangeGitUserStep(REPO_DIR, "finalforeach", "finalforeach@github.io"));
         steps.add(new IterateCosmicReachVersions(type, REPO_DIR, branch, (versionSteps, versionName, releaseTime, url) -> {
