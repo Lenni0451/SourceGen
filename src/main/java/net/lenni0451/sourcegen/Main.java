@@ -40,6 +40,9 @@ public class Main {
             return;
         }
 
+        WORK_DIR.mkdirs();
+        EXCLUSIONS_DIR.mkdirs();
+        DEFAULTS_DIR.mkdirs();
         GeneratorTarget target = TARGETS.get(targetIndex - 1);
         System.out.println("Generating target: " + target.getName());
         target.execute();
