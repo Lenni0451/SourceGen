@@ -8,10 +8,7 @@ import net.lenni0451.sourcegen.steps.git.ChangeGitUserStep;
 import net.lenni0451.sourcegen.steps.git.CommitChangesStep;
 import net.lenni0451.sourcegen.steps.git.PrepareRepoStep;
 import net.lenni0451.sourcegen.steps.git.PushRepoStep;
-import net.lenni0451.sourcegen.steps.io.CleanRepoStep;
-import net.lenni0451.sourcegen.steps.io.CleanupStep;
-import net.lenni0451.sourcegen.steps.io.DownloadStep;
-import net.lenni0451.sourcegen.steps.io.ModifyJarStep;
+import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateCosmicReachVersions;
 
 import java.io.File;
@@ -40,11 +37,12 @@ public class CosmicReachTarget implements GeneratorTarget {
         steps.add(new PrepareRepoStep(REPO_DIR, Config.CosmicReach.gitRepo, branch));
         steps.add(new ChangeGitUserStep(REPO_DIR, Config.CosmicReach.authorName, Config.CosmicReach.authorEmail));
         steps.add(new IterateCosmicReachVersions(type, REPO_DIR, branch, (versionSteps, versionName, releaseTime, url) -> {
-            versionSteps.add(new CleanRepoStep(REPO_DIR, DEFAULTS_DIR));
+            versionSteps.add(new CleanRepoStep(REPO_DIR));
             versionSteps.add(new DownloadStep(url, RAW_JAR));
             versionSteps.add(new ModifyJarStep(RAW_JAR, NO_GAME_JAR, entry -> entry.startsWith("finalforeach") || entry.startsWith("/finalforeach")));
             versionSteps.add(new ModifyJarStep(RAW_JAR, ONLY_GAME_JAR, entry -> !entry.startsWith("finalforeach") && !entry.startsWith("/finalforeach")));
             versionSteps.add(new DecompileWithLibStep(ONLY_GAME_JAR, NO_GAME_JAR, REPO_DIR));
+            versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
             versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, releaseTime));
             versionSteps.add(new CleanupStep(RAW_JAR, NO_GAME_JAR, ONLY_GAME_JAR));
         }));

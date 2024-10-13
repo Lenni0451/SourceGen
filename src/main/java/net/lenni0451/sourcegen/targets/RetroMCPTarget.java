@@ -42,7 +42,7 @@ public class RetroMCPTarget implements GeneratorTarget {
             JSONObject downloads = manifest.getJSONObject("downloads");
             String clientUrl = downloads.getJSONObject("client").getString("url");
 
-            versionSteps.add(new CleanRepoStep(REPO_DIR, DEFAULTS_DIR));
+            versionSteps.add(new CleanRepoStep(REPO_DIR));
             versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
             if (resourcesUrl != null) {
                 versionSteps.add(new DownloadStep(resourcesUrl, RESOURCES_FILE));
@@ -54,6 +54,7 @@ public class RetroMCPTarget implements GeneratorTarget {
                 versionSteps.add(new DecompileStandaloneStep(CLIENT_JAR, REPO_DIR));
             }
             versionSteps.add(new RemoveResourcesStep(REPO_DIR));
+            versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
             versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
             versionSteps.add(new CleanupStep(RESOURCES_FILE, RESOURCES_DIR, CLIENT_JAR, REMAPPED_JAR));
         }));

@@ -44,7 +44,7 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
                 JSONObject downloads = manifest.getJSONObject("downloads");
                 String clientUrl = downloads.getJSONObject("client").getString("url");
 
-                versionSteps.add(new CleanRepoStep(REPO_DIR, DEFAULTS_DIR));
+                versionSteps.add(new CleanRepoStep(REPO_DIR));
                 versionSteps.add(new DownloadStep(versionToUrl.apply(versionName), MAPPINGS_JAR));
                 versionSteps.add(new UnzipSingleFileStep(MAPPINGS_JAR, "mappings/mappings.tiny", MAPPINGS_FILE));
                 versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
@@ -52,6 +52,7 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
                 versionSteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
                 versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
                 versionSteps.add(new RemoveResourcesStep(REPO_DIR));
+                versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
                 versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
                 versionSteps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR, FIXED_LOCALS_JAR));
             }));
