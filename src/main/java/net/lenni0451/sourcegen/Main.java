@@ -3,10 +3,14 @@ package net.lenni0451.sourcegen;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.impl.*;
 
+import java.io.File;
 import java.util.List;
 
 public class Main {
 
+    public static final File WORK_DIR = new File("work");
+    public static final File EXCLUSIONS_DIR = new File("exclusions");
+    public static final File DEFAULTS_DIR = new File("defaults");
     private static final List<GeneratorTarget> TARGETS = List.of(
             new MinecraftMojangMappingsTarget(),
             new CosmicReachTarget(),

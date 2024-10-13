@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.targets.impl;
 
+import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.DecompileStandaloneStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.FixLocalVariablesStep;
@@ -26,11 +27,11 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
     private static final String REPO_URL = "https://github.com/Lenni0451/MinecraftSources";
     private static final String REPO_BRANCH = "mojang";
     private static final File REPO_DIR = new File("minecraft");
-    private static final File DEFAULTS_DIR = new File("defaults", "minecraft_mojang_mappings");
-    private static final File MAPPINGS_FILE = new File("mappings");
-    private static final File CLIENT_JAR = new File("client.jar");
-    private static final File REMAPPED_JAR = new File("remapped.jar");
-    private static final File FIXED_LOCALS_JAR = new File("fixed_locals.jar");
+    private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_mojang_mappings");
+    private static final File MAPPINGS_FILE = new File(Main.WORK_DIR, "mappings");
+    private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
+    private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
+    private static final File FIXED_LOCALS_JAR = new File(Main.WORK_DIR, "fixed_locals.jar");
     private static final File[] UNWANTED_SOURCE_FILES = {new File(REPO_DIR, "assets"), new File(REPO_DIR, "data"), new File(REPO_DIR, "META-INF"), new File(REPO_DIR, "pack.png"), new File(REPO_DIR, "pack.mcmeta"), new File(REPO_DIR, "flightrecorder-config.jfc")};
 
     @Override

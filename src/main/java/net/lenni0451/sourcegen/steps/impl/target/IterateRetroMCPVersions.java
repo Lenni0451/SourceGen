@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.impl.target;
 
+import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.Exclusions;
@@ -17,7 +18,7 @@ import java.util.*;
 public class IterateRetroMCPVersions implements GeneratorStep {
 
     private static final String INDEX_URL = "https://mcphackers.org/versionsV2/versions.json";
-    private static final Exclusions EXCLUSIONS = new Exclusions(new File("exclusions", "retromcp.txt"));
+    private static final Exclusions EXCLUSIONS = new Exclusions(new File(Main.EXCLUSIONS_DIR, "retromcp.txt"));
 
     private final File repoDir;
     private final String branch;

@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.impl.target;
 
+import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.Exclusions;
@@ -18,7 +19,7 @@ import java.util.function.Predicate;
 public class IterateCosmicReachVersions implements GeneratorStep {
 
     private static final String INDEX_URL = "https://raw.githubusercontent.com/CRModders/CosmicArchive/refs/heads/main/versions.json";
-    private static final Exclusions EXCLUSIONS = new Exclusions(new File("exclusions", "cosmicreach.txt"));
+    private static final Exclusions EXCLUSIONS = new Exclusions(new File(Main.EXCLUSIONS_DIR, "cosmicreach.txt"));
 
     private final VersionType type;
     private final File repoDir;

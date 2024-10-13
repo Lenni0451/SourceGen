@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.impl.target;
 
+import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.Exclusions;
@@ -18,7 +19,7 @@ import java.util.function.Predicate;
 public class IterateMinecraftVersions implements GeneratorStep {
 
     private static final String INDEX_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
-    private static final Exclusions EXCLUSIONS = new Exclusions(new File("exclusions", "minecraft.txt"));
+    private static final Exclusions EXCLUSIONS = new Exclusions(new File(Main.EXCLUSIONS_DIR, "minecraft.txt"));
 
     private final File repoDir;
     private final String branch;

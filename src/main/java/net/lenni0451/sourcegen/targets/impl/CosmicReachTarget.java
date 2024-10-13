@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.targets.impl;
 
+import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.DecompileWithLibStep;
 import net.lenni0451.sourcegen.steps.impl.git.ChangeGitUserStep;
@@ -20,10 +21,10 @@ public class CosmicReachTarget implements GeneratorTarget {
 
     private static final String REPO_URL = "https://github.com/Lenni0451/CosmicReachSources";
     private static final File REPO_DIR = new File("cosmicreach");
-    private static final File DEFAULTS_DIR = new File("defaults", "cosmicreach");
-    private static final File RAW_JAR = new File("raw.jar");
-    private static final File NO_GAME_JAR = new File("no_game.jar");
-    private static final File ONLY_GAME_JAR = new File("only_game.jar");
+    private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "cosmicreach");
+    private static final File RAW_JAR = new File(Main.WORK_DIR, "raw.jar");
+    private static final File NO_GAME_JAR = new File(Main.WORK_DIR, "no_game.jar");
+    private static final File ONLY_GAME_JAR = new File(Main.WORK_DIR, "only_game.jar");
 
     @Override
     public String getName() {
