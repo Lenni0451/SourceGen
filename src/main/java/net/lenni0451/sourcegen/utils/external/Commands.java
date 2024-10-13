@@ -9,7 +9,7 @@ import java.util.Map;
 public class Commands {
 
     private static final File CURRENT_DIR = new File(".");
-    private static final File VINEFLOWER_JAR = new File("vineflower-1.10.1.jar");
+    private static final File VINEFLOWER_JAR = new File("vineflower.jar");
 
     public static Git git(final File repoDir) {
         return new Git(repoDir);
