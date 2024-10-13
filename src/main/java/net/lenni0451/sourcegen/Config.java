@@ -56,7 +56,7 @@ public class Config {
 
         @Option("FeatherMappings")
         @Description("The URL to the maven repository where the feather mappings are stored")
-        public static String featherMappings = "https://maven.ornithemc.net/cache/net/ornithemc/feather/";
+        public static String featherMappings = "https://maven.ornithemc.net/releases/net/ornithemc/feather/";
 
         @Option("YarnMappings")
         @Description("The URL to the maven repository where the yarn mappings are stored")
