@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.impl.target;
 
+import com.google.common.net.UrlEscapers;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.NetUtils;
@@ -8,7 +9,7 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.net.URLEncoder;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
@@ -48,7 +49,7 @@ public class LoadYarnMappings implements GeneratorStep {
         List<String> versions = new ArrayList<>();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(new java.io.ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+        Document document = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
         NodeList versionNodes = document.getElementsByTagName("version");
         for (int i = 0; i < versionNodes.getLength(); i++) {
             versions.add(versionNodes.item(i).getTextContent());
@@ -68,7 +69,7 @@ public class LoadYarnMappings implements GeneratorStep {
             String minecraftVersion = matcher.group(1);
             int build = Integer.parseInt(matcher.group(2));
             if (!parsedVersions.containsKey(minecraftVersion) || parsedVersions.get(minecraftVersion).build < build) {
-                String encodedVersion = URLEncoder.encode(version, StandardCharsets.UTF_8);
+                String encodedVersion = UrlEscapers.urlFragmentEscaper().escape(version);
                 String url = "https://maven.fabricmc.net/net/fabricmc/yarn/" + encodedVersion + "/yarn-" + encodedVersion + ".jar";
                 parsedVersions.put(minecraftVersion, new MavenVersion(build, url));
             }
