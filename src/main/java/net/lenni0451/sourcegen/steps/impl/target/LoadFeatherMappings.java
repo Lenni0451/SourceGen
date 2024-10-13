@@ -6,9 +6,9 @@ import net.lenni0451.sourcegen.utils.NetUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,10 +38,19 @@ public class LoadFeatherMappings implements GeneratorStep {
     @Override
     public void run() throws Exception {
         List<String> rawVersions = this.getVersions();
-        Map<String, Integer> splitVersions = this.splitVersions(rawVersions);
+        Map<String, MavenVersion> parsedVersions = this.parseVersions(rawVersions);
 
         List<GeneratorStep> steps = new ArrayList<>();
-        this.stepProvider.provideSteps(steps, version -> this.versionToUrl(splitVersions, version));
+        this.stepProvider.provideSteps(steps, version -> {
+            MavenVersion ver = parsedVersions.get(version);
+            if (ver == null) {
+                Matcher matcher = Pattern.compile(PRE_RELEASE_PATTERN).matcher(version);
+                if (!matcher.find()) return null;
+                ver = parsedVersions.get(matcher.group(1));
+            }
+            if (ver == null) return null;
+            return ver.url();
+        });
         StepExecutor executor = new StepExecutor(steps);
         executor.run();
     }
@@ -52,51 +61,37 @@ public class LoadFeatherMappings implements GeneratorStep {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.parse(new java.io.ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-
         NodeList versionNodes = document.getElementsByTagName("version");
         for (int i = 0; i < versionNodes.getLength(); i++) {
             versions.add(versionNodes.item(i).getTextContent());
         }
-
         return versions;
     }
 
-    private Map<String, Integer> splitVersions(final List<String> versions) {
-        Map<String, Integer> splitVersions = new HashMap<>();
+    private Map<String, MavenVersion> parseVersions(final List<String> versions) {
+        Map<String, MavenVersion> parsedVersions = new HashMap<>();
         for (String version : versions) {
             Matcher matcher = BUILD_PATTERN.matcher(version);
-            if (!matcher.find()) {
-                throw new IllegalStateException("Invalid version: " + version);
-            }
-            Integer build = splitVersions.get(matcher.group(1));
-            if (build == null || build < Integer.parseInt(matcher.group(2))) {
-                splitVersions.put(matcher.group(1), Integer.parseInt(matcher.group(2)));
+            if (!matcher.find()) throw new IllegalStateException("Invalid version: " + version);
+
+            String minecraftVersion = matcher.group(1);
+            int build = Integer.parseInt(matcher.group(2));
+            if (!parsedVersions.containsKey(minecraftVersion) || parsedVersions.get(minecraftVersion).build < build) {
+                String encodedVersion = URLEncoder.encode(version, StandardCharsets.UTF_8);
+                String url = "https://maven.lenni0451.net/cache/net/ornithemc/feather/" + encodedVersion + "/feather-" + encodedVersion + "-mergedv2.jar";
+                parsedVersions.put(minecraftVersion, new MavenVersion(build, url));
             }
         }
-        return splitVersions;
-    }
-
-    @Nullable
-    private String versionToUrl(final Map<String, Integer> splitVersions, String version) {
-        if (version.matches(PRE_RELEASE_PATTERN)) version = version.replaceAll(PRE_RELEASE_PATTERN, "$1-pre$2");
-        Integer build = splitVersions.get(version);
-        if (build == null) {
-            version = version + "-client";
-            build = splitVersions.get(version);
-        }
-        if (build == null) return null;
-        return this.toUrl(version, build);
-    }
-
-    private String toUrl(final String version, final int build) {
-        String buildName = version + "+build." + build;
-        return "https://maven.lenni0451.net/cache/net/ornithemc/feather/" + buildName + "/feather-" + buildName + "-mergedv2.jar";
+        return parsedVersions;
     }
 
 
     @FunctionalInterface
     public interface VersionStepProvider {
         void provideSteps(final List<GeneratorStep> subSteps, final Function<String, String> versionToUrl);
+    }
+
+    private record MavenVersion(int build, String url) {
     }
 
 }
