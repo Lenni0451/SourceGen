@@ -1,29 +1,23 @@
-# GradleTemplate
-A template project for my gradle based repos.\
-This readme is only a template. You need to replace all mentions of `GradleTemplate` with the name of your project.\
-Check the [wiki](https://github.com/Lenni0451/GradleTemplate/wiki) for more information on how to setup everything required for this template.
+# SourceGen
+Generator for source diff repos.\
+Supports:
+- Minecraft Mojang mappings
+- Minecraft Yarn mappings
+- Minecraft Feather mappings
+- Minecraft RetroMCP mappings
+- CosmicReach
 
 ## Usage
-To use `GradleTemplate` using [Gradle](#gradle)/[Maven](#maven) you can add it as a dependency to your project.\
-The latest version can be found in the [releases](https://github.com/Lenni0451/GradleTemplate/releases).\
-My libraries are hosted on [Maven Central](https://mvnrepository.com/artifact/net.lenni0451/GradleTempalte) or my own [maven server](https://maven.lenni0451.net/).
-
-### Gradle
-```groovy
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation "net.lenni0451:GradleTemplate:x.x.x"
-}
+Before running the generator, you need to extract the `runtime_files.zip` file to the run directory.\
+After that, configure all the necessary files.\
+If everything is set up correctly, you can run the generator with the following command:
+```shell
+java -jar SourceGen.jar <generator id>
 ```
+To list all available generators, run the command without any arguments.
 
-### Maven
-```xml
-<dependency>
-  <groupId>net.lenni0451</groupId>
-  <artifactId>GradleTemplate</artifactId>
-  <version>x.x.x</version>
-</dependency>
+## Building
+```shell
+./gradlew build
 ```
+The compiled jar and the runtime files will be located in the `build/libs` directory.
