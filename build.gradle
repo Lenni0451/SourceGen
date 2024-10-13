@@ -63,14 +63,6 @@ jar {
     }
 }
 
-tasks.register("zipRunDir", Zip) {
-    from "run"
-    include "**/*"
-    archiveFileName = "runtime_files.zip"
-    destinationDirectory = file("${layout.buildDirectory.get()}/libs")
-}
-build.dependsOn zipRunDir
-
 checkstyle {
     toolVersion = "10.16.0" //Latest version for Java 8: 9.3
     configFile = rootProject.file("config/checkstyle/checkstyle.xml")
