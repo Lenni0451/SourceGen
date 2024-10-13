@@ -11,7 +11,7 @@ import net.lenni0451.sourcegen.steps.impl.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.impl.io.*;
 import net.lenni0451.sourcegen.steps.impl.target.IterateRetroMCPVersions;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
-import net.lenni0451.sourcegen.utils.remapping.TinyRemapper;
+import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -49,7 +49,7 @@ public class RetroMCPTarget implements GeneratorTarget {
             if (resourcesUrl != null) {
                 versionSteps.add(new DownloadStep(resourcesUrl, RESOURCES_FILE));
                 versionSteps.add(new UnzipStep(RESOURCES_FILE, RESOURCES_DIR));
-                versionSteps.add(new RemapStep(new TinyRemapper(CLIENT_JAR, new File(RESOURCES_DIR, "mappings.tiny"), REMAPPED_JAR, new File(RESOURCES_DIR, "exceptions.exc"))));
+                versionSteps.add(new RemapStep(new TinyV2Remapper(CLIENT_JAR, new File(RESOURCES_DIR, "mappings.tiny"), REMAPPED_JAR, new File(RESOURCES_DIR, "exceptions.exc"))));
                 versionSteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
                 versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
             } else {

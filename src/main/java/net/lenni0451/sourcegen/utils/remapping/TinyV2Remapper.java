@@ -15,14 +15,14 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TinyRemapper extends BaseRemapper {
+public class TinyV2Remapper extends BaseRemapper {
 
     private static final Pattern EXCEPTION_PATTERN1 = Pattern.compile("^([^.]+)\\.([^(]+)([^=]+)=(.*)$");
     private static final Pattern EXCEPTION_PATTERN2 = Pattern.compile("^(\\S+)/(\\S+)\\s(\\S+)\\s(.*)");
 
     private final File exceptions;
 
-    public TinyRemapper(final File input, final File mappings, final File output, final File exceptions) {
+    public TinyV2Remapper(final File input, final File mappings, final File output, final File exceptions) {
         super(input, mappings, output);
         this.exceptions = exceptions;
     }

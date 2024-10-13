@@ -12,7 +12,7 @@ import net.lenni0451.sourcegen.steps.impl.io.*;
 import net.lenni0451.sourcegen.steps.impl.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.impl.target.LoadFeatherMappings;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
-import net.lenni0451.sourcegen.utils.remapping.TinyRemapper;
+import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -50,7 +50,7 @@ public class MinecraftFeatherMappingsTarget implements GeneratorTarget {
                 versionSteps.add(new DownloadStep(versionToUrl.apply(versionName), MAPPINGS_JAR));
                 versionSteps.add(new UnzipSingleFileStep(MAPPINGS_JAR, "mappings/mappings.tiny", MAPPINGS_FILE));
                 versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
-                versionSteps.add(new RemapStep(new TinyRemapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR, null)));
+                versionSteps.add(new RemapStep(new TinyV2Remapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR, null)));
                 versionSteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
                 versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
                 versionSteps.add(new RemoveAssetsStep(REPO_DIR));
