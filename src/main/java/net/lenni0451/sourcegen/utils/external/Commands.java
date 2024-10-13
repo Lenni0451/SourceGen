@@ -81,6 +81,10 @@ public class Commands {
         private static final String[] BASE_COMMAND = {"java", "-jar", VINEFLOWER_JAR.getAbsolutePath()};
         private static final String[] DEFAULT_OPTIONS = {"-dgs=1", "-asc=1", "-ump=0", "-rsy=1", "-aoa=1"};
 
+        public static boolean exists() {
+            return VINEFLOWER_JAR.exists();
+        }
+
         public static void decompileStandalone(final File input, final File output) throws IOException {
             String[] args = {input.getAbsolutePath(), output.getAbsolutePath()};
             Executor.execute(CURRENT_DIR, BASE_COMMAND, DEFAULT_OPTIONS, args);

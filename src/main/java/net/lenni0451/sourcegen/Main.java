@@ -3,6 +3,7 @@ package net.lenni0451.sourcegen;
 import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.impl.*;
+import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
 import java.util.List;
@@ -21,6 +22,7 @@ public class Main {
     );
 
     public static void main(String[] args) throws Throwable {
+        checkRequirements();
         if (args.length != 1) {
             System.out.println("Please specify a target to generate!");
             printTargets();
@@ -56,6 +58,14 @@ public class Main {
         for (int i = 0; i < TARGETS.size(); i++) {
             GeneratorTarget target = TARGETS.get(i);
             System.out.println((i + 1) + ". " + target.getName());
+        }
+    }
+
+    private static void checkRequirements() {
+        if (!Commands.Vineflower.exists()) {
+            System.out.println("VineFlower is not present in the working directory.");
+            System.out.println("Please download VineFlower and put 'vineflower.jar' into the working directory.");
+            System.exit(-1);
         }
     }
 
