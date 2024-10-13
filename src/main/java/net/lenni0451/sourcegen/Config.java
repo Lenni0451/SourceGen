@@ -24,7 +24,10 @@ public class Config {
         configLoader.loadStatic(ConfigProvider.file(new File("config.yml")));
     }
 
-    @Section(name = "Exclusions", description = "The versions on the exclusion list will not be decompiled")
+    @Section(name = "Exclusions", description = {
+            "The versions on the exclusion list will not be decompiled",
+            "This is recommended for april fools version because they contain many temporary changes which makes diffing the actual source code harder"
+    })
     public static class Exclusions {
         @Option("CosmicReach")
         public static List<String> cosmicReach = List.of("0.1.17b red", "0.1.17b blue");
