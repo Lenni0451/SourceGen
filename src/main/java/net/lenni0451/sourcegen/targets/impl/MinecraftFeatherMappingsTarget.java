@@ -55,7 +55,7 @@ public class MinecraftFeatherMappingsTarget implements GeneratorTarget {
                 versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
                 versionSteps.add(new RemoveAssetsStep(REPO_DIR));
                 versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-                steps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR, FIXED_LOCALS_JAR));
+                versionSteps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR, FIXED_LOCALS_JAR));
             }));
         }));
         steps.add(new PushRepoStep(REPO_DIR));
