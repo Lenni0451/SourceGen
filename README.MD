@@ -8,13 +8,13 @@ Supports:
 - CosmicReach
 
 ## Usage
-Before running the generator, you need to extract the `runtime_files.zip` file to the run directory.\
-After that, configure all the necessary files.\
-If everything is set up correctly, you can run the generator with the following command:
+Before being able to use the generator, you need to prepare some things.\
+First, download the generator and `runtime_files.zip` and put the into a directory. The runtime files need to be extracted.\
+Then, create a git repository where the generated files will be stored. <b>Make sure the repo is private! Publishing the generated files without permission will make you liable to legal action by the copyright holder!</b>\
+After that, start the generator once to create the config file:
 ```shell
-java -jar SourceGen.jar <generator id>
+java -jar SourceGen.jar
 ```
-To list all available generators, run the command without any arguments.
 
 ## Building
 ```shell

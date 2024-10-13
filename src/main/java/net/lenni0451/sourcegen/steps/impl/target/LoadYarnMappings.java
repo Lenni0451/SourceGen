@@ -1,6 +1,7 @@
 package net.lenni0451.sourcegen.steps.impl.target;
 
 import com.google.common.net.UrlEscapers;
+import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.NetUtils;
@@ -18,7 +19,6 @@ import java.util.regex.Pattern;
 
 public class LoadYarnMappings implements GeneratorStep {
 
-    private static final String META_URL = "https://maven.fabricmc.net/net/fabricmc/yarn/maven-metadata.xml";
     private static final Pattern BUILD_PATTERN = Pattern.compile("(.*)\\+build\\.(\\d+)$");
     private static final Pattern SMALL_BUILD_PATTERN = Pattern.compile("(.*)\\.(\\d+)$");
 
@@ -45,7 +45,7 @@ public class LoadYarnMappings implements GeneratorStep {
     }
 
     private List<String> getVersions() throws Exception {
-        String xml = new String(NetUtils.get(META_URL), StandardCharsets.UTF_8);
+        String xml = new String(NetUtils.get(Config.OnlineResources.getYarnMappings("maven-metadata.xml")), StandardCharsets.UTF_8);
         List<String> versions = new ArrayList<>();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -70,7 +70,7 @@ public class LoadYarnMappings implements GeneratorStep {
             int build = Integer.parseInt(matcher.group(2));
             if (!parsedVersions.containsKey(minecraftVersion) || parsedVersions.get(minecraftVersion).build < build) {
                 String encodedVersion = UrlEscapers.urlFragmentEscaper().escape(version);
-                String url = "https://maven.fabricmc.net/net/fabricmc/yarn/" + encodedVersion + "/yarn-" + encodedVersion + ".jar";
+                String url = Config.OnlineResources.getYarnMappings(encodedVersion + "/yarn-" + encodedVersion + ".jar");
                 parsedVersions.put(minecraftVersion, new MavenVersion(build, url));
             }
         }

@@ -1,9 +1,8 @@
 package net.lenni0451.sourcegen.steps.impl.target;
 
-import net.lenni0451.sourcegen.Main;
+import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
-import net.lenni0451.sourcegen.utils.Exclusions;
 import net.lenni0451.sourcegen.utils.NetUtils;
 import net.lenni0451.sourcegen.utils.external.Commands;
 import org.json.JSONArray;
@@ -16,9 +15,6 @@ import java.time.OffsetDateTime;
 import java.util.*;
 
 public class IterateRetroMCPVersions implements GeneratorStep {
-
-    private static final String INDEX_URL = "https://mcphackers.org/versionsV2/versions.json";
-    private static final Exclusions EXCLUSIONS = new Exclusions(new File(Main.EXCLUSIONS_DIR, "retromcp.txt"));
 
     private final File repoDir;
     private final String branch;
@@ -56,11 +52,11 @@ public class IterateRetroMCPVersions implements GeneratorStep {
     }
 
     private Map<OffsetDateTime, JSONObject> loadVersions() throws IOException {
-        JSONArray versions = NetUtils.getJsonArray(INDEX_URL);
+        JSONArray versions = NetUtils.getJsonArray(Config.OnlineResources.retroMCPVersions);
         Map<OffsetDateTime, JSONObject> sortedVersions = new TreeMap<>();
         for (int i = 0; i < versions.length(); i++) {
             JSONObject version = versions.getJSONObject(i);
-            if (EXCLUSIONS.isExcluded(version.getString("id"))) continue;
+            if (Config.Exclusions.retroMCP.contains(version.getString("id"))) continue;
 
             String time = version.getString("releaseTime");
             sortedVersions.put(OffsetDateTime.parse(time), version);

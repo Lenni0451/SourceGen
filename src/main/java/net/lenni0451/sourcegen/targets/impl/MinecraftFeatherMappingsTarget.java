@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.targets.impl;
 
+import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.DecompileStandaloneStep;
@@ -22,8 +23,6 @@ import java.util.List;
 
 public class MinecraftFeatherMappingsTarget implements GeneratorTarget {
 
-    private static final String REPO_URL = "https://github.com/Lenni0451/MinecraftSources";
-    private static final String REPO_BRANCH = "feather";
     private static final File REPO_DIR = new File("minecraft");
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_feather_mappings");
     private static final File MAPPINGS_JAR = new File(Main.WORK_DIR, "mappings.jar");
@@ -39,10 +38,10 @@ public class MinecraftFeatherMappingsTarget implements GeneratorTarget {
 
     @Override
     public void addSteps(List<GeneratorStep> steps) {
-        steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, REPO_BRANCH));
-        steps.add(new ChangeGitUserStep(REPO_DIR, "mojang", "noreply@mojang.com"));
+        steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftFeatherMappings.gitRepo, Config.MinecraftFeatherMappings.branch));
+        steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftFeatherMappings.authorName, Config.MinecraftFeatherMappings.authorEmail));
         steps.add(new LoadFeatherMappings((subSteps, versionToUrl) -> {
-            subSteps.add(new IterateMinecraftVersions(REPO_DIR, REPO_BRANCH, new IterateMinecraftVersions.VersionRange(null, null), version -> versionToUrl.apply(version) == null, true, (versionSteps, versionName, releaseTime, manifest) -> {
+            subSteps.add(new IterateMinecraftVersions(REPO_DIR, Config.MinecraftFeatherMappings.branch, new IterateMinecraftVersions.VersionRange(null, null), version -> versionToUrl.apply(version) == null, true, (versionSteps, versionName, releaseTime, manifest) -> {
                 JSONObject downloads = manifest.getJSONObject("downloads");
                 String clientUrl = downloads.getJSONObject("client").getString("url");
 

@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.targets.impl;
 
+import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.DecompileWithLibStep;
@@ -19,7 +20,6 @@ import java.util.List;
 
 public class CosmicReachTarget implements GeneratorTarget {
 
-    private static final String REPO_URL = "https://github.com/Lenni0451/CosmicReachSources";
     private static final File REPO_DIR = new File("cosmicreach");
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "cosmicreach");
     private static final File RAW_JAR = new File(Main.WORK_DIR, "raw.jar");
@@ -33,13 +33,13 @@ public class CosmicReachTarget implements GeneratorTarget {
 
     @Override
     public void addSteps(List<GeneratorStep> steps) {
-        this.addSteps(steps, IterateCosmicReachVersions.VersionType.CLIENT, "client");
-        this.addSteps(steps, IterateCosmicReachVersions.VersionType.SERVER, "server");
+        this.addSteps(steps, IterateCosmicReachVersions.VersionType.CLIENT, Config.CosmicReach.clientBranch);
+        this.addSteps(steps, IterateCosmicReachVersions.VersionType.SERVER, Config.CosmicReach.serverBranch);
     }
 
     private void addSteps(final List<GeneratorStep> steps, final IterateCosmicReachVersions.VersionType type, final String branch) {
-        steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, branch));
-        steps.add(new ChangeGitUserStep(REPO_DIR, "finalforeach", "finalforeach@github.io"));
+        steps.add(new PrepareRepoStep(REPO_DIR, Config.CosmicReach.gitRepo, branch));
+        steps.add(new ChangeGitUserStep(REPO_DIR, Config.CosmicReach.authorName, Config.CosmicReach.authorEmail));
         steps.add(new IterateCosmicReachVersions(type, REPO_DIR, branch, (versionSteps, versionName, releaseTime, url) -> {
             versionSteps.add(new CleanRepoStep(REPO_DIR, DEFAULTS_DIR));
             versionSteps.add(new DownloadStep(url, RAW_JAR));

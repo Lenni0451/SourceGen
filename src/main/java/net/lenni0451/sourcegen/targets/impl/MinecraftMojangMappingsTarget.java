@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.targets.impl;
 
+import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.DecompileStandaloneStep;
@@ -25,8 +26,6 @@ import java.util.List;
 
 public class MinecraftMojangMappingsTarget implements GeneratorTarget {
 
-    private static final String REPO_URL = "https://github.com/Lenni0451/MinecraftSources";
-    private static final String REPO_BRANCH = "mojang";
     private static final File REPO_DIR = new File("minecraft");
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_mojang_mappings");
     private static final File MAPPINGS_FILE = new File(Main.WORK_DIR, "mappings");
@@ -41,9 +40,9 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
 
     @Override
     public void addSteps(List<GeneratorStep> steps) {
-        steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, REPO_BRANCH));
-        steps.add(new ChangeGitUserStep(REPO_DIR, "mojang", "noreply@mojang.com"));
-        steps.add(new IterateMinecraftVersions(REPO_DIR, REPO_BRANCH, new VersionRange("1.14", null), (versionSteps, versionName, releaseTime, manifest) -> {
+        steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftMojangMappings.gitRepo, Config.MinecraftMojangMappings.branch));
+        steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftMojangMappings.authorName, Config.MinecraftMojangMappings.authorEmail));
+        steps.add(new IterateMinecraftVersions(REPO_DIR, Config.MinecraftMojangMappings.branch, new VersionRange("1.14", null), (versionSteps, versionName, releaseTime, manifest) -> {
             JSONObject downloads = manifest.getJSONObject("downloads");
             String clientUrl = downloads.getJSONObject("client").getString("url");
             String mappingsUrl = downloads.getJSONObject("client_mappings").getString("url");

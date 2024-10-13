@@ -1,9 +1,8 @@
 package net.lenni0451.sourcegen.steps.impl.target;
 
-import net.lenni0451.sourcegen.Main;
+import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
-import net.lenni0451.sourcegen.utils.Exclusions;
 import net.lenni0451.sourcegen.utils.NetUtils;
 import net.lenni0451.sourcegen.utils.external.Commands;
 import org.json.JSONArray;
@@ -17,9 +16,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class IterateCosmicReachVersions implements GeneratorStep {
-
-    private static final String INDEX_URL = "https://raw.githubusercontent.com/CRModders/CosmicArchive/refs/heads/main/versions.json";
-    private static final Exclusions EXCLUSIONS = new Exclusions(new File(Main.EXCLUSIONS_DIR, "cosmicreach.txt"));
 
     private final VersionType type;
     private final File repoDir;
@@ -56,12 +52,12 @@ public class IterateCosmicReachVersions implements GeneratorStep {
     }
 
     private List<CosmicReachVersion> loadVersions() throws IOException {
-        JSONObject meta = NetUtils.getJsonObject(INDEX_URL);
+        JSONObject meta = NetUtils.getJsonObject(Config.OnlineResources.cosmicReachArchive);
         JSONArray versions = meta.getJSONArray("versions");
         List<CosmicReachVersion> cosmicReachVersions = new ArrayList<>();
         for (int i = 0; i < versions.length(); i++) {
             JSONObject version = versions.getJSONObject(i);
-            if (EXCLUSIONS.isExcluded(version.getString("id"))) continue;
+            if (Config.Exclusions.cosmicReach.contains(version.getString("id"))) continue;
             JSONObject client = version.optJSONObject("client");
             JSONObject server = version.optJSONObject("server");
             if (client == null && server == null) continue;

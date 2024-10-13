@@ -11,7 +11,6 @@ import java.util.List;
 public class Main {
 
     public static final File WORK_DIR = new File("work");
-    public static final File EXCLUSIONS_DIR = new File("exclusions");
     public static final File DEFAULTS_DIR = new File("defaults");
     private static final List<GeneratorTarget> TARGETS = List.of(
             new MinecraftMojangMappingsTarget(),
@@ -22,6 +21,7 @@ public class Main {
     );
 
     public static void main(String[] args) throws Throwable {
+        Config.load();
         checkRequirements();
         if (args.length != 1) {
             System.out.println("Please specify a target to generate!");
@@ -45,7 +45,6 @@ public class Main {
 
         FileUtils.recursiveDelete(WORK_DIR); //Remove old leftovers
         WORK_DIR.mkdirs();
-        EXCLUSIONS_DIR.mkdirs();
         DEFAULTS_DIR.mkdirs();
         GeneratorTarget target = TARGETS.get(targetIndex - 1);
         System.out.println("Generating target: " + target.getName());

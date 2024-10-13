@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.targets.impl;
 
+import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.impl.decompile.DecompileStandaloneStep;
@@ -21,8 +22,6 @@ import java.util.List;
 
 public class RetroMCPTarget implements GeneratorTarget {
 
-    private static final String REPO_URL = "https://github.com/Lenni0451/MinecraftSources";
-    private static final String REPO_BRANCH = "retromcp";
     private static final File REPO_DIR = new File("minecraft");
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "retromcp");
     private static final File RESOURCES_FILE = new File(Main.WORK_DIR, "resources.zip");
@@ -38,9 +37,9 @@ public class RetroMCPTarget implements GeneratorTarget {
 
     @Override
     public void addSteps(List<GeneratorStep> steps) {
-        steps.add(new PrepareRepoStep(REPO_DIR, REPO_URL, REPO_BRANCH));
-        steps.add(new ChangeGitUserStep(REPO_DIR, "mojang", "noreply@mojang.com"));
-        steps.add(new IterateRetroMCPVersions(REPO_DIR, REPO_BRANCH, (versionSteps, versionName, releaseTime, resourcesUrl, manifest) -> {
+        steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftRetroMCPMappings.gitRepo, Config.MinecraftRetroMCPMappings.branch));
+        steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftRetroMCPMappings.authorName, Config.MinecraftRetroMCPMappings.authorEmail));
+        steps.add(new IterateRetroMCPVersions(REPO_DIR, Config.MinecraftRetroMCPMappings.branch, (versionSteps, versionName, releaseTime, resourcesUrl, manifest) -> {
             JSONObject downloads = manifest.getJSONObject("downloads");
             String clientUrl = downloads.getJSONObject("client").getString("url");
 
