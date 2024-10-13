@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 public class IterateMinecraftVersions implements GeneratorStep {
 
     private static final String INDEX_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
-    private static final Exclusions EXCLUSIONS = new Exclusions(new File("minecraft_excluded.txt"));
+    private static final Exclusions EXCLUSIONS = new Exclusions(new File("exclusions", "minecraft.txt"));
 
     private final File repoDir;
     private final String branch;

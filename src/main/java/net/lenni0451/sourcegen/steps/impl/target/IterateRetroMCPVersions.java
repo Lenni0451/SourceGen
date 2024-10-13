@@ -17,7 +17,7 @@ import java.util.*;
 public class IterateRetroMCPVersions implements GeneratorStep {
 
     private static final String INDEX_URL = "https://mcphackers.org/versionsV2/versions.json";
-    private static final Exclusions EXCLUSIONS = new Exclusions(new File("retromcp_excluded.txt"));
+    private static final Exclusions EXCLUSIONS = new Exclusions(new File("exclusions", "retromcp.txt"));
 
     private final File repoDir;
     private final String branch;

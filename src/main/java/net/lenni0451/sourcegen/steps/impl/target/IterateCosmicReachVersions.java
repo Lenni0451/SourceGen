@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 public class IterateCosmicReachVersions implements GeneratorStep {
 
     private static final String INDEX_URL = "https://raw.githubusercontent.com/CRModders/CosmicArchive/refs/heads/main/versions.json";
-    private static final Exclusions EXCLUSIONS = new Exclusions(new File("cosmicreach_excluded.txt"));
+    private static final Exclusions EXCLUSIONS = new Exclusions(new File("exclusions", "cosmicreach.txt"));
 
     private final VersionType type;
     private final File repoDir;
