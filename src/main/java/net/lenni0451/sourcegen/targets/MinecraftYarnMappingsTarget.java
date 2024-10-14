@@ -13,7 +13,7 @@ import net.lenni0451.sourcegen.steps.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.target.LoadYarnMappings;
-import net.lenni0451.sourcegen.utils.remapping.TinyV1Remapper;
+import net.lenni0451.sourcegen.utils.remapping.DetectingTinyRemapper;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -45,10 +45,10 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
                 String clientUrl = downloads.getJSONObject("client").getString("url");
 
                 versionSteps.add(new CleanRepoStep(REPO_DIR));
-                versionSteps.add(new DownloadStep(versionToUrl.apply(versionName), MAPPINGS_JAR));
+                versionSteps.add(new DownloadAlternativesStep(versionToUrl.apply(versionName), MAPPINGS_JAR));
                 versionSteps.add(new UnzipSingleFileStep(MAPPINGS_JAR, "mappings/mappings.tiny", MAPPINGS_FILE));
                 versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
-                versionSteps.add(new RemapStep(new TinyV1Remapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
+                versionSteps.add(new RemapStep(new DetectingTinyRemapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
                 versionSteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
                 versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
                 versionSteps.add(new RemoveResourcesStep(REPO_DIR));

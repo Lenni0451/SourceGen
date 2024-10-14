@@ -39,7 +39,7 @@ public class LoadYarnMappings implements GeneratorStep {
         Map<String, MavenVersion> parsedVersions = this.parseVersions(rawVersions);
 
         List<GeneratorStep> steps = new ArrayList<>();
-        this.stepProvider.provideSteps(steps, version -> Optional.ofNullable(parsedVersions.get(version)).map(MavenVersion::url).orElse(null));
+        this.stepProvider.provideSteps(steps, version -> Optional.ofNullable(parsedVersions.get(version)).map(MavenVersion::mergeUrls).orElse(null));
         StepExecutor executor = new StepExecutor(steps);
         executor.run();
     }
@@ -70,8 +70,9 @@ public class LoadYarnMappings implements GeneratorStep {
             int build = Integer.parseInt(matcher.group(2));
             if (!parsedVersions.containsKey(minecraftVersion) || parsedVersions.get(minecraftVersion).build < build) {
                 String encodedVersion = UrlEscapers.urlFragmentEscaper().escape(version);
-                String url = Config.OnlineResources.getYarnMappings(encodedVersion + "/yarn-" + encodedVersion + ".jar");
-                parsedVersions.put(minecraftVersion, new MavenVersion(build, url));
+                String mergedUrl = Config.OnlineResources.getYarnMappings(encodedVersion + "/yarn-" + encodedVersion + ".jar");
+                String v1Url = Config.OnlineResources.getYarnMappings(encodedVersion + "/yarn-" + encodedVersion + "-mergedv2.jar");
+                parsedVersions.put(minecraftVersion, new MavenVersion(build, mergedUrl, v1Url));
             }
         }
         return parsedVersions;
@@ -80,10 +81,13 @@ public class LoadYarnMappings implements GeneratorStep {
 
     @FunctionalInterface
     public interface VersionStepProvider {
-        void provideSteps(final List<GeneratorStep> subSteps, final Function<String, String> versionToUrl);
+        void provideSteps(final List<GeneratorStep> subSteps, final Function<String, String[]> versionToUrl);
     }
 
-    private record MavenVersion(int build, String url) {
+    private record MavenVersion(int build, String mergedUrl, String v1Url) {
+        public String[] mergeUrls() {
+            return new String[]{this.mergedUrl, this.v1Url};
+        }
     }
 
 }

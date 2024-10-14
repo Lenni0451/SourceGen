@@ -1,6 +1,7 @@
 package net.lenni0451.sourcegen.utils;
 
 import net.lenni0451.commons.httpclient.HttpClient;
+import net.lenni0451.commons.httpclient.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,7 +21,11 @@ public class NetUtils {
     }
 
     public static void download(final String url, final File out) throws IOException {
-        try (InputStream download = HTTP_CLIENT.get(url).setStreamedResponse(true).execute().getInputStream()) {
+        HttpResponse response = HTTP_CLIENT.get(url).setStreamedResponse(true).execute();
+        try (InputStream download = response.getInputStream()) {
+            if (response.getStatusCode() / 100 != 2) {
+                throw new IOException("Failed to download file from " + url + " (Status: " + response.getStatusCode() + ")");
+            }
             try (FileOutputStream fos = new FileOutputStream(out)) {
                 download.transferTo(fos);
             }
