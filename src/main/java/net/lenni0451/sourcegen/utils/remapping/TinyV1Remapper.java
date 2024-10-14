@@ -16,13 +16,9 @@ public class TinyV1Remapper extends BaseRemapper {
     @Override
     protected AMapper loadMapper(Map<String, byte[]> entries, File mappings) {
         try {
-            TinyV1Mapper mapper = new TinyV1Mapper(MapperConfig.create(), mappings, "named", "official");
-            mapper.load();
-            return mapper;
+            return this.load(new TinyV1Mapper(MapperConfig.create(), mappings, "named", "official"));
         } catch (Throwable t) {
-            TinyV1Mapper mapper = new TinyV1Mapper(MapperConfig.create(), mappings, "named", "client");
-            mapper.load();
-            return mapper;
+            return this.load(new TinyV1Mapper(MapperConfig.create(), mappings, "named", "client"));
         }
     }
 

@@ -31,7 +31,7 @@ public abstract class BaseRemapper {
         this.output = output;
     }
 
-    public void remap() throws Exception {
+    public final void remap() throws Exception {
         Map<String, byte[]> entries = JarUtils.read(this.input);
         MapRemapper remapper;
         if (this.mappings.exists()) {
@@ -52,7 +52,7 @@ public abstract class BaseRemapper {
 
     protected abstract AMapper loadMapper(final Map<String, byte[]> entries, final File mappings) throws Exception;
 
-    protected MapRemapper loadMappings(final Map<String, byte[]> entries, final File mappings) throws Exception {
+    private MapRemapper loadMappings(final Map<String, byte[]> entries, final File mappings) throws Exception {
         AMapper mapper = this.loadMapper(entries, mappings);
         MapRemapper remapper = mapper.getRemapper();
         ClassTree classTree = new ClassTree();
@@ -64,7 +64,7 @@ public abstract class BaseRemapper {
     protected void postRemap(final Map<String, byte[]> out) throws Exception {
     }
 
-    protected Map<String, byte[]> remap(final Map<String, byte[]> entries, final MapRemapper remapper) {
+    private Map<String, byte[]> remap(final Map<String, byte[]> entries, final MapRemapper remapper) {
         Map<String, byte[]> output = new HashMap<>();
         for (Map.Entry<String, byte[]> entry : entries.entrySet()) {
             if (entry.getKey().toLowerCase(Locale.ROOT).endsWith(".class")) {
@@ -76,6 +76,11 @@ public abstract class BaseRemapper {
             }
         }
         return output;
+    }
+
+    protected final <T extends AMapper> T load(final T mapper) {
+        mapper.load();
+        return mapper;
     }
 
 }
