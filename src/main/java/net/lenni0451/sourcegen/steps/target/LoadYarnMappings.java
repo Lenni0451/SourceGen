@@ -70,9 +70,9 @@ public class LoadYarnMappings implements GeneratorStep {
             int build = Integer.parseInt(matcher.group(2));
             if (!parsedVersions.containsKey(minecraftVersion) || parsedVersions.get(minecraftVersion).build < build) {
                 String encodedVersion = UrlEscapers.urlFragmentEscaper().escape(version);
-                String mergedUrl = Config.OnlineResources.getYarnMappings(encodedVersion + "/yarn-" + encodedVersion + ".jar");
-                String v1Url = Config.OnlineResources.getYarnMappings(encodedVersion + "/yarn-" + encodedVersion + "-mergedv2.jar");
-                parsedVersions.put(minecraftVersion, new MavenVersion(build, mergedUrl, v1Url));
+                String v1Url = Config.OnlineResources.getYarnMappings(encodedVersion + "/yarn-" + encodedVersion + ".jar");
+                String mergedUrl = Config.OnlineResources.getYarnMappings(encodedVersion + "/yarn-" + encodedVersion + "-mergedv2.jar");
+                parsedVersions.put(minecraftVersion, new MavenVersion(build, v1Url, mergedUrl));
             }
         }
         return parsedVersions;
@@ -84,8 +84,9 @@ public class LoadYarnMappings implements GeneratorStep {
         void provideSteps(final List<GeneratorStep> subSteps, final Function<String, String[]> versionToUrl);
     }
 
-    private record MavenVersion(int build, String mergedUrl, String v1Url) {
+    private record MavenVersion(int build, String v1Url, String mergedUrl) {
         public String[] mergeUrls() {
+            //Prioritize the merged URL
             return new String[]{this.mergedUrl, this.v1Url};
         }
     }
