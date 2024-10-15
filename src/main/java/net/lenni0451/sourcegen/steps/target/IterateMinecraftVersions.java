@@ -49,8 +49,8 @@ public class IterateMinecraftVersions implements GeneratorStep {
     @Override
     public void run() throws Exception {
         Map<OffsetDateTime, JSONObject> versions = this.loadVersions();
-        this.removeBuiltVersions(versions);
         this.filterVersionRange(versions);
+        this.removeBuiltVersions(versions);
         this.filterPredicate(versions);
         this.resolveVersionManifest(versions);
         int i = 0;
