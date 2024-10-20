@@ -4,6 +4,7 @@ import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.decompile.DecompileStandaloneStep;
+import net.lenni0451.sourcegen.steps.decompile.FillExceptionsStep;
 import net.lenni0451.sourcegen.steps.decompile.FixLocalVariablesStep;
 import net.lenni0451.sourcegen.steps.decompile.RemapStep;
 import net.lenni0451.sourcegen.steps.git.ChangeGitUserStep;
@@ -27,6 +28,7 @@ public class RetroMCPTarget implements GeneratorTarget {
     private static final File RESOURCES_DIR = new File(Main.WORK_DIR, "resources");
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
     private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
+    private static final File EXCEPTIONS_JAR = new File(Main.WORK_DIR, "exceptions.jar");
     private static final File FIXED_LOCALS_JAR = new File(Main.WORK_DIR, "fixed_locals.jar");
 
     @Override
@@ -47,8 +49,9 @@ public class RetroMCPTarget implements GeneratorTarget {
             if (resourcesUrl != null) {
                 versionSteps.add(new DownloadStep(resourcesUrl, RESOURCES_FILE));
                 versionSteps.add(new UnzipStep(RESOURCES_FILE, RESOURCES_DIR));
-                versionSteps.add(new RemapStep(new TinyV2Remapper(CLIENT_JAR, new File(RESOURCES_DIR, "mappings.tiny"), REMAPPED_JAR, new File(RESOURCES_DIR, "exceptions.exc"))));
-                versionSteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
+                versionSteps.add(new RemapStep(new TinyV2Remapper(CLIENT_JAR, new File(RESOURCES_DIR, "mappings.tiny"), REMAPPED_JAR)));
+                versionSteps.add(new FillExceptionsStep(REMAPPED_JAR, new File(RESOURCES_DIR, "exceptions.exc"), EXCEPTIONS_JAR));
+                versionSteps.add(new FixLocalVariablesStep(EXCEPTIONS_JAR, FIXED_LOCALS_JAR));
                 versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
             } else {
                 versionSteps.add(new DecompileStandaloneStep(CLIENT_JAR, REPO_DIR));
@@ -56,7 +59,7 @@ public class RetroMCPTarget implements GeneratorTarget {
             versionSteps.add(new RemoveResourcesStep(REPO_DIR));
             versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
             versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-            versionSteps.add(new CleanupStep(RESOURCES_FILE, RESOURCES_DIR, CLIENT_JAR, REMAPPED_JAR));
+            versionSteps.add(new CleanupStep(RESOURCES_FILE, RESOURCES_DIR, CLIENT_JAR, REMAPPED_JAR, EXCEPTIONS_JAR, FIXED_LOCALS_JAR));
         }));
         steps.add(new PushRepoStep(REPO_DIR));
     }

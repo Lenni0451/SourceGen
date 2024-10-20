@@ -24,7 +24,7 @@ public class DetectingTinyRemapper extends BaseRemapper {
         if (content.startsWith("v1")) {
             delegate = new TinyV1Remapper(this.input, mappings, this.output);
         } else if (content.startsWith("tiny\t2")) {
-            delegate = new TinyV2Remapper(this.input, mappings, this.output, null);
+            delegate = new TinyV2Remapper(this.input, mappings, this.output);
         } else {
             throw new IllegalArgumentException("Unknown mappings format");
         }
