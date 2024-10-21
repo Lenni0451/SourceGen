@@ -179,6 +179,17 @@ public class TinyV2MetadataMapper {
 
     private void applyParameterNames(final MetaTinyV2Mapper.MethodMetadata metadata, final MethodNode methodNode) {
         for (MetaTinyV2Mapper.ParameterMetadata parameter : metadata.getParameters()) {
+            if (methodNode.parameters != null) {
+                int[] parameterIndices = ASMUtils.getParameterIndices(methodNode);
+                if (methodNode.parameters.size() == parameterIndices.length) {
+                    for (int i = 0; i < parameterIndices.length; i++) {
+                        if (parameter.getIndex() == parameterIndices[i]) {
+                            methodNode.parameters.get(i).name = parameter.getName();
+                            break;
+                        }
+                    }
+                }
+            }
             if (methodNode.localVariables != null) {
                 for (LocalVariableNode localVariable : methodNode.localVariables) {
                     if (localVariable.index == parameter.getIndex()) {
