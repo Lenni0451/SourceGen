@@ -5,10 +5,7 @@ import net.lenni0451.classtransform.mappings.impl.special.MetaTinyV2Mapper;
 import net.lenni0451.classtransform.utils.ASMUtils;
 import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.sourcegen.utils.JarUtils;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +66,7 @@ public class TinyV2MetadataMapper {
                 MethodNode methodNode = ASMUtils.getMethod(classNode, methodMetadata.getName(), methodMetadata.getDescriptor());
                 if (methodNode != null) {
                     this.applyMethodComment(methodMetadata, methodNode);
+                    this.applyParameterNames(methodMetadata, methodNode);
                 }
             }
 
@@ -186,6 +184,19 @@ public class TinyV2MetadataMapper {
             commentAnnotation.values.add("value");
             commentAnnotation.values.add(this.comments.size() - 1);
             visibleAnnotations.add(0, commentAnnotation);
+        }
+    }
+
+    private void applyParameterNames(final MetaTinyV2Mapper.MethodMetadata metadata, final MethodNode methodNode) {
+        for (MetaTinyV2Mapper.ParameterMetadata parameter : metadata.getParameters()) {
+            if (methodNode.localVariables != null) {
+                for (LocalVariableNode localVariable : methodNode.localVariables) {
+                    if (localVariable.index == parameter.getIndex()) {
+                        localVariable.name = parameter.getName();
+                        break;
+                    }
+                }
+            }
         }
     }
 
