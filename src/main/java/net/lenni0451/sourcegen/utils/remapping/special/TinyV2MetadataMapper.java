@@ -28,16 +28,6 @@ public class TinyV2MetadataMapper {
     private final File output;
     private final List<String> comments;
 
-    public static void main(String[] args) throws Throwable {
-        File baseDir = new File("C:\\Users\\User\\Desktop\\mappings");
-        TinyV2MetadataMapper mapper = new TinyV2MetadataMapper(new File(baseDir, "client_mapped.jar"), new File(baseDir, "mappings.tiny"), new File(baseDir, "client_mapped_metadata.jar"), new ArrayList<>());
-        mapper.generate();
-        System.exit(0);
-//        new DecompileStandaloneStep(new File(baseDir, "client_mapped_metadata.jar"), new File(baseDir, "dec")).run();
-        mapper = new TinyV2MetadataMapper(new File(baseDir, "dec"), null, null, mapper.comments);
-        mapper.apply();
-    }
-
     public TinyV2MetadataMapper(final File input, final File mappings, final File output, final List<String> comments) {
         this.input = input;
         this.mappings = mappings;
