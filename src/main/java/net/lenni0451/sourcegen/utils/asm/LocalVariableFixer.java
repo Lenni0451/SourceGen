@@ -7,6 +7,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.io.File;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class LocalVariableFixer {
@@ -35,27 +36,29 @@ public class LocalVariableFixer {
                     if (method.localVariables != null) {
                         for (int i = 0; i < method.localVariables.size(); i++) {
                             LocalVariableNode localVariable = method.localVariables.get(i);
-                            if (localVariable.name.equals("this")) continue;
-
-                            Type type = Type.getType(localVariable.desc);
-                            String newName = type.getClassName();
-                            if (type.getSort() == Type.ARRAY) {
-                                newName = type.getElementType().getClassName();
-                                for (int j = 0; j < type.getDimensions(); j++) newName += "Array";
-                            }
-                            if (localVariable.desc.length() == 1) {
-                                newName = localVariable.desc.toLowerCase(Locale.ROOT);
+                            if (!Modifier.isStatic(method.access) && i == 0) {
+                                localVariable.name = "this";
                             } else {
-                                newName = newName.substring(newName.lastIndexOf('.') + 1);
-                                newName = newName.substring(newName.lastIndexOf('$') + 1);
-                                newName = newName.substring(0, 1).toLowerCase(Locale.ROOT) + newName.substring(1);
-                            }
-                            if (KEYWORDS.contains(newName)) newName = "_" + newName;
+                                Type type = Type.getType(localVariable.desc);
+                                String newName = type.getClassName();
+                                if (type.getSort() == Type.ARRAY) {
+                                    newName = type.getElementType().getClassName();
+                                    for (int j = 0; j < type.getDimensions(); j++) newName += "Array";
+                                }
+                                if (localVariable.desc.length() == 1) {
+                                    newName = localVariable.desc.toLowerCase(Locale.ROOT);
+                                } else {
+                                    newName = newName.substring(newName.lastIndexOf('.') + 1);
+                                    newName = newName.substring(newName.lastIndexOf('$') + 1);
+                                    newName = newName.substring(0, 1).toLowerCase(Locale.ROOT) + newName.substring(1);
+                                }
+                                if (KEYWORDS.contains(newName)) newName = "_" + newName;
 
-                            int index = 2;
-                            String name = newName;
-                            while (!names.add(name)) name = newName + index++;
-                            localVariable.name = name;
+                                int index = 2;
+                                String name = newName;
+                                while (!names.add(name)) name = newName + index++;
+                                localVariable.name = name;
+                            }
                         }
                     }
                 }
