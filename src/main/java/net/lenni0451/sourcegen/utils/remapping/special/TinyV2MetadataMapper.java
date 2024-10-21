@@ -46,8 +46,8 @@ public class TinyV2MetadataMapper {
     }
 
     public void generate() throws Exception {
-        MetaTinyV2Mapper mapper = this.loadMapper(mappings);
-        Map<String, byte[]> entries = JarUtils.read(input);
+        MetaTinyV2Mapper mapper = this.loadMapper(this.mappings);
+        Map<String, byte[]> entries = JarUtils.read(this.input);
         for (MetaTinyV2Mapper.ClassMetadata classMetadata : mapper.getMetadata()) {
             byte[] classBytes = entries.get(classMetadata.getName() + ".class");
             if (classBytes == null) {
@@ -72,7 +72,7 @@ public class TinyV2MetadataMapper {
 
             entries.put(classMetadata.getName() + ".class", ASMUtils.toStacklessBytes(classNode));
         }
-        JarUtils.write(output, entries);
+        JarUtils.write(this.output, entries);
     }
 
     public void apply() throws IOException {

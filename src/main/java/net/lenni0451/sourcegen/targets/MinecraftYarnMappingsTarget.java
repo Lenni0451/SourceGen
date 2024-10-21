@@ -14,7 +14,8 @@ import net.lenni0451.sourcegen.steps.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.target.LoadYarnMappings;
-import net.lenni0451.sourcegen.utils.remapping.DetectingTinyRemapper;
+import net.lenni0451.sourcegen.utils.remapping.TinyV1Remapper;
+import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -52,11 +53,23 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
                 versionSteps.add(new DownloadAlternativesStep(versionToUrl.apply(versionName), MAPPINGS_JAR));
                 versionSteps.add(new UnzipSingleFileStep(MAPPINGS_JAR, "mappings/mappings.tiny", MAPPINGS_FILE));
                 versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
-                versionSteps.add(new RemapStep(new DetectingTinyRemapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
-                versionSteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
-                versionSteps.add(new TinyV2MetadataStep(FIXED_LOCALS_JAR, MAPPINGS_FILE, APPLIED_METADATA_JAR, comments)); //TODO: only apply if tiny v2 mappings are used
-                versionSteps.add(new DecompileStandaloneStep(APPLIED_METADATA_JAR, REPO_DIR));
-                versionSteps.add(new TinyV2MetadataStep(REPO_DIR, comments)); //TODO: only apply if tiny v2 mappings are used
+                versionSteps.add(new DetectTinyVersionStep(MAPPINGS_FILE, (version, tinySteps) -> {
+                    switch (version) {
+                        case V1 -> tinySteps.add(new RemapStep(new TinyV1Remapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
+                        case V2 -> tinySteps.add(new RemapStep(new TinyV2Remapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
+                        default -> throw new IllegalStateException("Unknown tiny mappings version: " + version);
+                    }
+                    tinySteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
+                    switch (version) {
+                        case V1 -> tinySteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
+                        case V2 -> {
+                            tinySteps.add(new TinyV2MetadataStep(FIXED_LOCALS_JAR, MAPPINGS_FILE, APPLIED_METADATA_JAR, comments));
+                            tinySteps.add(new DecompileStandaloneStep(APPLIED_METADATA_JAR, REPO_DIR));
+                            tinySteps.add(new TinyV2MetadataStep(REPO_DIR, comments));
+                        }
+                        default -> throw new IllegalStateException("Unknown tiny mappings version: " + version);
+                    }
+                }));
                 versionSteps.add(new RemoveResourcesStep(REPO_DIR));
                 versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
                 versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
