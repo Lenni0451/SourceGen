@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "checkstyle"
+    id "idea"
 }
 
 base {
@@ -68,3 +69,11 @@ checkstyle {
     configFile = rootProject.file("config/checkstyle/checkstyle.xml")
 }
 build.dependsOn(check)
+
+idea {
+    module {
+        ["run"].each {
+            excludeDirs << file("$it")
+        }
+    }
+}
