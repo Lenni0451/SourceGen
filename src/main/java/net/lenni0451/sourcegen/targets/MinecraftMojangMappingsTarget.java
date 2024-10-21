@@ -18,7 +18,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MinecraftMojangMappingsTarget implements GeneratorTarget {
 
@@ -27,7 +29,6 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
     private static final File MAPPINGS_FILE = new File(Main.WORK_DIR, "mappings");
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
     private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
-    private static final File FIXED_LOCALS_JAR = new File(Main.WORK_DIR, "fixed_locals.jar");
 
     @Override
     public String getName() {
@@ -42,17 +43,20 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
             JSONObject downloads = manifest.getJSONObject("downloads");
             String clientUrl = downloads.getJSONObject("client").getString("url");
             String mappingsUrl = downloads.getJSONObject("client_mappings").getString("url");
+            Map<String, byte[]> jarEntries = new HashMap<>();
 
             versionSteps.add(new CleanRepoStep(REPO_DIR));
             versionSteps.add(new DownloadStep(mappingsUrl, MAPPINGS_FILE));
             versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
-            versionSteps.add(new RemapStep(new ProguardRemapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
-            versionSteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
-            versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
+            versionSteps.add(new ReadJarEntriesStep(CLIENT_JAR, jarEntries));
+            versionSteps.add(new RemapStep(new ProguardRemapper(jarEntries, MAPPINGS_FILE)));
+            versionSteps.add(new FixLocalVariablesStep(jarEntries));
+            versionSteps.add(new WriteJarEntriesStep(jarEntries, REMAPPED_JAR));
+            versionSteps.add(new DecompileStandaloneStep(REMAPPED_JAR, REPO_DIR));
             versionSteps.add(new RemoveResourcesStep(REPO_DIR, new File(REPO_DIR, "version.json")));
             versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
             versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-            versionSteps.add(new CleanupStep(MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR, FIXED_LOCALS_JAR));
+            versionSteps.add(new CleanupStep(MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR));
         }));
         steps.add(new PushRepoStep(REPO_DIR));
     }

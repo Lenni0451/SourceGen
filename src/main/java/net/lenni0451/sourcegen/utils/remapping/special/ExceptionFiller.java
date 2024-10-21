@@ -2,7 +2,6 @@ package net.lenni0451.sourcegen.utils.remapping.special;
 
 import net.lenni0451.classtransform.utils.ASMUtils;
 import net.lenni0451.classtransform.utils.MemberDeclaration;
-import net.lenni0451.sourcegen.utils.JarUtils;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -18,13 +17,7 @@ public class ExceptionFiller {
     private static final Pattern EXCEPTION_PATTERN1 = Pattern.compile("^([^.]+)\\.([^(]+)([^=]+)=(.*)$");
     private static final Pattern EXCEPTION_PATTERN2 = Pattern.compile("^(\\S+)/(\\S+)\\s(\\S+)\\s(.*)");
 
-    public ExceptionFiller(final File input, final File exceptions, final File output) throws Exception {
-        Map<String, byte[]> entries = JarUtils.read(input);
-        this.fillExceptions(entries, exceptions);
-        JarUtils.write(output, entries);
-    }
-
-    private void fillExceptions(final Map<String, byte[]> entries, final File exceptionsFile) throws IOException {
+    public static void run(final Map<String, byte[]> entries, final File exceptionsFile) throws IOException {
         List<String> lines = Files.readAllLines(exceptionsFile.toPath());
 
         Map<MemberDeclaration, String[]> exceptions = new HashMap<>();

@@ -19,9 +19,7 @@ import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class MinecraftYarnMappingsTarget implements GeneratorTarget {
 
@@ -31,8 +29,6 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
     private static final File MAPPINGS_FILE = new File(Main.WORK_DIR, "mappings.tiny");
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
     private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
-    private static final File FIXED_LOCALS_JAR = new File(Main.WORK_DIR, "fixed_locals.jar");
-    private static final File APPLIED_METADATA_JAR = new File(Main.WORK_DIR, "applied_metadata.jar");
 
     @Override
     public String getName() {
@@ -47,24 +43,30 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
             subSteps.add(new IterateMinecraftVersions(REPO_DIR, Config.MinecraftYarnMappings.branch, new IterateMinecraftVersions.VersionRange(null, null), version -> versionToUrl.apply(version) == null, true, (versionSteps, versionName, releaseTime, manifest) -> {
                 JSONObject downloads = manifest.getJSONObject("downloads");
                 String clientUrl = downloads.getJSONObject("client").getString("url");
+                Map<String, byte[]> jarEntries = new HashMap<>();
                 List<String> comments = new ArrayList<>();
 
                 versionSteps.add(new CleanRepoStep(REPO_DIR));
                 versionSteps.add(new DownloadAlternativesStep(versionToUrl.apply(versionName), MAPPINGS_JAR));
                 versionSteps.add(new UnzipSingleFileStep(MAPPINGS_JAR, "mappings/mappings.tiny", MAPPINGS_FILE));
                 versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
+                versionSteps.add(new ReadJarEntriesStep(CLIENT_JAR, jarEntries));
                 versionSteps.add(new DetectTinyVersionStep(MAPPINGS_FILE, (version, tinySteps) -> {
                     switch (version) {
-                        case V1 -> tinySteps.add(new RemapStep(new TinyV1Remapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
-                        case V2 -> tinySteps.add(new RemapStep(new TinyV2Remapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
+                        case V1 -> tinySteps.add(new RemapStep(new TinyV1Remapper(jarEntries, MAPPINGS_FILE)));
+                        case V2 -> tinySteps.add(new RemapStep(new TinyV2Remapper(jarEntries, MAPPINGS_FILE)));
                         default -> throw new IllegalStateException("Unknown tiny mappings version: " + version);
                     }
-                    tinySteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
+                    tinySteps.add(new FixLocalVariablesStep(jarEntries));
                     switch (version) {
-                        case V1 -> tinySteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
+                        case V1 -> {
+                            tinySteps.add(new WriteJarEntriesStep(jarEntries, REMAPPED_JAR));
+                            tinySteps.add(new DecompileStandaloneStep(REMAPPED_JAR, REPO_DIR));
+                        }
                         case V2 -> {
-                            tinySteps.add(new TinyV2MetadataStep(FIXED_LOCALS_JAR, MAPPINGS_FILE, APPLIED_METADATA_JAR, comments));
-                            tinySteps.add(new DecompileStandaloneStep(APPLIED_METADATA_JAR, REPO_DIR));
+                            tinySteps.add(new TinyV2MetadataStep(jarEntries, MAPPINGS_FILE, comments));
+                            tinySteps.add(new WriteJarEntriesStep(jarEntries, REMAPPED_JAR));
+                            tinySteps.add(new DecompileStandaloneStep(REMAPPED_JAR, REPO_DIR));
                             tinySteps.add(new TinyV2MetadataStep(REPO_DIR, comments));
                         }
                         default -> throw new IllegalStateException("Unknown tiny mappings version: " + version);
@@ -73,7 +75,7 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
                 versionSteps.add(new RemoveResourcesStep(REPO_DIR));
                 versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
                 versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-                versionSteps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR, FIXED_LOCALS_JAR, APPLIED_METADATA_JAR));
+                versionSteps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR));
             }));
         }));
         steps.add(new PushRepoStep(REPO_DIR));

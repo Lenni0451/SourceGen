@@ -9,12 +9,12 @@ import java.util.Map;
 
 public class TinyV2Remapper extends BaseRemapper {
 
-    public TinyV2Remapper(final File input, final File mappings, final File output) {
-        super(input, mappings, output);
+    public TinyV2Remapper(final Map<String, byte[]> entries, final File mappings) {
+        super(entries, mappings);
     }
 
     @Override
-    protected AMapper loadMapper(Map<String, byte[]> entries, File mappings) {
+    protected AMapper loadMapper(File mappings) {
         try {
             return this.load(new TinyV2Mapper(MapperConfig.create(), mappings, "named", "official"));
         } catch (Throwable t) {

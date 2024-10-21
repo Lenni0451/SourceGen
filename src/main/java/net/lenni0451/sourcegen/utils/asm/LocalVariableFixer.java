@@ -2,12 +2,10 @@ package net.lenni0451.sourcegen.utils.asm;
 
 import net.lenni0451.classtransform.utils.ASMUtils;
 import net.lenni0451.classtransform.utils.Types;
-import net.lenni0451.sourcegen.utils.JarUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
-import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
@@ -27,8 +25,7 @@ public class LocalVariableFixer {
             "var", "void", "volatile", "while"
     ));
 
-    public static void run(final File input, final File output) throws Exception {
-        Map<String, byte[]> entries = JarUtils.read(input);
+    public static void run(final Map<String, byte[]> entries) throws Exception {
         for (Map.Entry<String, byte[]> entry : entries.entrySet()) {
             if (entry.getKey().toLowerCase(Locale.ROOT).endsWith(".class")) {
                 ClassNode node = ASMUtils.fromBytes(entry.getValue());
@@ -63,7 +60,6 @@ public class LocalVariableFixer {
                 entry.setValue(ASMUtils.toStacklessBytes(node));
             }
         }
-        JarUtils.write(output, entries);
     }
 
     private static void fixParameters(final MethodNode methodNode) {

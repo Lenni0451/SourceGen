@@ -5,28 +5,26 @@ import net.lenni0451.sourcegen.utils.remapping.special.TinyV2MetadataMapper;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public class TinyV2MetadataStep implements GeneratorStep {
 
     private final Action action;
-    private final File input;
-    private final File mappings;
-    private final File output;
+    private final Map<String, byte[]> entries;
+    private final File mappingsOrSource;
     private final List<String> comments;
 
-    public TinyV2MetadataStep(final File input, final File mappings, final File output, final List<String> comments) {
+    public TinyV2MetadataStep(final Map<String, byte[]> entries, final File mappingsOrSource, final List<String> comments) {
         this.action = Action.GENERATE;
-        this.input = input;
-        this.mappings = mappings;
-        this.output = output;
+        this.entries = entries;
+        this.mappingsOrSource = mappingsOrSource;
         this.comments = comments;
     }
 
     public TinyV2MetadataStep(final File baseDir, final List<String> comments) {
         this.action = Action.APPLY;
-        this.input = baseDir;
-        this.mappings = null;
-        this.output = null;
+        this.entries = null;
+        this.mappingsOrSource = baseDir;
         this.comments = comments;
     }
 
@@ -41,7 +39,7 @@ public class TinyV2MetadataStep implements GeneratorStep {
 
     @Override
     public void run() throws Exception {
-        TinyV2MetadataMapper mapper = new TinyV2MetadataMapper(this.input, this.mappings, this.output, this.comments);
+        TinyV2MetadataMapper mapper = new TinyV2MetadataMapper(this.entries, this.mappingsOrSource, this.comments);
         switch (this.action) {
             case GENERATE -> mapper.generate();
             case APPLY -> mapper.apply();

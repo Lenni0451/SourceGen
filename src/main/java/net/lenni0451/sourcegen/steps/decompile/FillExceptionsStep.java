@@ -4,17 +4,16 @@ import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.remapping.special.ExceptionFiller;
 
 import java.io.File;
+import java.util.Map;
 
 public class FillExceptionsStep implements GeneratorStep {
 
-    private final File input;
+    private final Map<String, byte[]> entries;
     private final File exceptions;
-    private final File output;
 
-    public FillExceptionsStep(final File input, final File exceptions, final File output) {
-        this.input = input;
+    public FillExceptionsStep(final Map<String, byte[]> entries, final File exceptions) {
+        this.entries = entries;
         this.exceptions = exceptions;
-        this.output = output;
     }
 
     @Override
@@ -24,7 +23,9 @@ public class FillExceptionsStep implements GeneratorStep {
 
     @Override
     public void run() throws Exception {
-        new ExceptionFiller(this.input, this.exceptions, this.output);
+        if (this.exceptions.exists()) {
+            ExceptionFiller.run(this.entries, this.exceptions);
+        }
     }
 
 }

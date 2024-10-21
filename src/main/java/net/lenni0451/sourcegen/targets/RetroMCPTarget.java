@@ -18,7 +18,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RetroMCPTarget implements GeneratorTarget {
 
@@ -27,9 +29,7 @@ public class RetroMCPTarget implements GeneratorTarget {
     private static final File RESOURCES_FILE = new File(Main.WORK_DIR, "resources.zip");
     private static final File RESOURCES_DIR = new File(Main.WORK_DIR, "resources");
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
-    private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
-    private static final File EXCEPTIONS_JAR = new File(Main.WORK_DIR, "exceptions.jar");
-    private static final File FIXED_LOCALS_JAR = new File(Main.WORK_DIR, "fixed_locals.jar");
+    private static final File REMAPPED_JARr = new File(Main.WORK_DIR, "remapped.jar");
 
     @Override
     public String getName() {
@@ -47,19 +47,23 @@ public class RetroMCPTarget implements GeneratorTarget {
             versionSteps.add(new CleanRepoStep(REPO_DIR));
             versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
             if (resourcesUrl != null) {
+                Map<String, byte[]> jarEntries = new HashMap<>();
+
+                versionSteps.add(new ReadJarEntriesStep(CLIENT_JAR, jarEntries));
                 versionSteps.add(new DownloadStep(resourcesUrl, RESOURCES_FILE));
                 versionSteps.add(new UnzipStep(RESOURCES_FILE, RESOURCES_DIR));
-                versionSteps.add(new RemapStep(new TinyV2Remapper(CLIENT_JAR, new File(RESOURCES_DIR, "mappings.tiny"), REMAPPED_JAR)));
-                versionSteps.add(new FillExceptionsStep(REMAPPED_JAR, new File(RESOURCES_DIR, "exceptions.exc"), EXCEPTIONS_JAR));
-                versionSteps.add(new FixLocalVariablesStep(EXCEPTIONS_JAR, FIXED_LOCALS_JAR));
-                versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
+                versionSteps.add(new RemapStep(new TinyV2Remapper(jarEntries, new File(RESOURCES_DIR, "mappings.tiny"))));
+                versionSteps.add(new FillExceptionsStep(jarEntries, new File(RESOURCES_DIR, "exceptions.exc")));
+                versionSteps.add(new FixLocalVariablesStep(jarEntries));
+                versionSteps.add(new WriteJarEntriesStep(jarEntries, REMAPPED_JARr));
+                versionSteps.add(new DecompileStandaloneStep(REMAPPED_JARr, REPO_DIR));
             } else {
                 versionSteps.add(new DecompileStandaloneStep(CLIENT_JAR, REPO_DIR));
             }
             versionSteps.add(new RemoveResourcesStep(REPO_DIR));
             versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
             versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-            versionSteps.add(new CleanupStep(RESOURCES_FILE, RESOURCES_DIR, CLIENT_JAR, REMAPPED_JAR, EXCEPTIONS_JAR, FIXED_LOCALS_JAR));
+            versionSteps.add(new CleanupStep(RESOURCES_FILE, RESOURCES_DIR, CLIENT_JAR, REMAPPED_JARr));
         }));
         steps.add(new PushRepoStep(REPO_DIR));
     }

@@ -9,12 +9,12 @@ import java.util.Map;
 
 public class ProguardRemapper extends BaseRemapper {
 
-    public ProguardRemapper(final File input, final File mappings, final File output) {
-        super(input, mappings, output);
+    public ProguardRemapper(final Map<String, byte[]> entries, final File mappings) {
+        super(entries, mappings);
     }
 
     @Override
-    protected AMapper loadMapper(Map<String, byte[]> entries, File mappings) {
+    protected AMapper loadMapper(File mappings) {
         return this.load(new ProguardMapper(MapperConfig.create(), mappings));
     }
 

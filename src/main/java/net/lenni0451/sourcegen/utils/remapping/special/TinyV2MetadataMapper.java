@@ -4,7 +4,6 @@ import net.lenni0451.classtransform.mappings.MapperConfig;
 import net.lenni0451.classtransform.mappings.impl.special.MetaTinyV2Mapper;
 import net.lenni0451.classtransform.utils.ASMUtils;
 import net.lenni0451.commons.io.FileUtils;
-import net.lenni0451.sourcegen.utils.JarUtils;
 import org.objectweb.asm.tree.*;
 
 import java.io.File;
@@ -23,23 +22,20 @@ public class TinyV2MetadataMapper {
     private static final String COMMENT_ANNOTATION_DESC = "L" + COMMENT_ANNOTATION_CLASS + ";";
     private static final Pattern COMMENT_PATTERN = Pattern.compile("( *)@Comment\\((\\d+)\\)");
 
-    private final File input;
-    private final File mappings;
-    private final File output;
+    private final Map<String, byte[]> entries;
+    private final File mappingsOrSource;
     private final List<String> comments;
 
-    public TinyV2MetadataMapper(final File input, final File mappings, final File output, final List<String> comments) {
-        this.input = input;
-        this.mappings = mappings;
-        this.output = output;
+    public TinyV2MetadataMapper(final Map<String, byte[]> entries, final File mappingsOrSource, final List<String> comments) {
+        this.entries = entries;
+        this.mappingsOrSource = mappingsOrSource;
         this.comments = comments;
     }
 
-    public void generate() throws Exception {
-        MetaTinyV2Mapper mapper = this.loadMapper(this.mappings);
-        Map<String, byte[]> entries = JarUtils.read(this.input);
+    public void generate() {
+        MetaTinyV2Mapper mapper = this.loadMapper(this.mappingsOrSource);
         for (MetaTinyV2Mapper.ClassMetadata classMetadata : mapper.getMetadata()) {
-            byte[] classBytes = entries.get(classMetadata.getName() + ".class");
+            byte[] classBytes = this.entries.get(classMetadata.getName() + ".class");
             if (classBytes == null) {
                 throw new IllegalStateException("Class " + classMetadata.getName() + " not found in input jar");
             }
@@ -60,13 +56,12 @@ public class TinyV2MetadataMapper {
                 }
             }
 
-            entries.put(classMetadata.getName() + ".class", ASMUtils.toStacklessBytes(classNode));
+            this.entries.put(classMetadata.getName() + ".class", ASMUtils.toStacklessBytes(classNode));
         }
-        JarUtils.write(this.output, entries);
     }
 
     public void apply() throws IOException {
-        for (File file : FileUtils.listFiles(this.input)) {
+        for (File file : FileUtils.listFiles(this.mappingsOrSource)) {
             if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".java")) continue;
             List<String> lines = Files.readAllLines(file.toPath());
             int startSize = lines.size();

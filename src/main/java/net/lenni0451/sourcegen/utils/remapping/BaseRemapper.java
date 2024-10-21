@@ -10,7 +10,6 @@ import net.lenni0451.classtransform.utils.mappings.SuperMappingFiller;
 import net.lenni0451.classtransform.utils.tree.BasicClassProvider;
 import net.lenni0451.classtransform.utils.tree.ClassTree;
 import net.lenni0451.classtransform.utils.tree.IClassProvider;
-import net.lenni0451.sourcegen.utils.JarUtils;
 import net.lenni0451.sourcegen.utils.asm.DummyClassProvider;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -21,39 +20,23 @@ import java.util.Map;
 
 public abstract class BaseRemapper {
 
-    private final File input;
+    private final Map<String, byte[]> entries;
     private final File mappings;
-    private final File output;
 
-    public BaseRemapper(final File input, final File mappings, final File output) {
-        this.input = input;
+    public BaseRemapper(final Map<String, byte[]> entries, final File mappings) {
+        this.entries = entries;
         this.mappings = mappings;
-        this.output = output;
     }
 
     public final void remap() throws Exception {
-        Map<String, byte[]> entries = JarUtils.read(this.input);
-        MapRemapper remapper;
-        if (this.mappings.exists()) {
-            remapper = this.loadMappings(entries, this.mappings);
-        } else {
-            remapper = null;
-        }
-
-        Map<String, byte[]> out;
-        if (remapper == null) {
-            out = entries;
-        } else {
-            out = this.remap(entries, remapper);
-        }
-        this.postRemap(out);
-        JarUtils.write(this.output, out);
+        MapRemapper remapper = this.loadMappings(this.entries, this.mappings);
+        this.remap(remapper);
     }
 
-    protected abstract AMapper loadMapper(final Map<String, byte[]> entries, final File mappings) throws Exception;
+    protected abstract AMapper loadMapper(final File mappings) throws Exception;
 
     private MapRemapper loadMappings(final Map<String, byte[]> entries, final File mappings) throws Exception {
-        AMapper mapper = this.loadMapper(entries, mappings);
+        AMapper mapper = this.loadMapper(mappings);
         MapRemapper remapper = mapper.getRemapper();
         ClassTree classTree = new ClassTree();
         IClassProvider classProvider = new DelegatingClassProvider(new MapClassProvider(entries, MapClassProvider.NameFormat.SLASH_CLASS), new DummyClassProvider());
@@ -61,12 +44,9 @@ public abstract class BaseRemapper {
         return remapper.reverse();
     }
 
-    protected void postRemap(final Map<String, byte[]> out) throws Exception {
-    }
-
-    private Map<String, byte[]> remap(final Map<String, byte[]> entries, final MapRemapper remapper) {
+    private void remap(final MapRemapper remapper) {
         Map<String, byte[]> output = new HashMap<>();
-        for (Map.Entry<String, byte[]> entry : entries.entrySet()) {
+        for (Map.Entry<String, byte[]> entry : this.entries.entrySet()) {
             if (entry.getKey().toLowerCase(Locale.ROOT).endsWith(".class")) {
                 ClassNode node = ASMUtils.fromBytes(entry.getValue());
                 node = Remapper.remap(node, remapper);
@@ -75,7 +55,8 @@ public abstract class BaseRemapper {
                 output.put(entry.getKey(), entry.getValue());
             }
         }
-        return output;
+        this.entries.clear();
+        this.entries.putAll(output);
     }
 
     protected final <T extends AMapper> T load(final T mapper) {
