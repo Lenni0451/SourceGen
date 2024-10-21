@@ -35,7 +35,7 @@ dependencies {
     include "org.json:json:20240303"
     include "org.ow2.asm:asm:9.7.1"
     include "org.ow2.asm:asm-tree:9.7.1"
-    include "net.lenni0451.commons:main:1.6.1-SNAPSHOT"
+    include "net.lenni0451.commons:main:1.6.1"
     include "net.lenni0451.commons:httpclient:1.6.1-SNAPSHOT"
     include "net.lenni0451.classtransform:core:1.14.1-SNAPSHOT"
     include "net.lenni0451.classtransform:additionalclassprovider:1.14.1-SNAPSHOT"
