@@ -37,7 +37,7 @@ public class Config {
         public static List<String> minecraft = List.of("22w13oneblockatatime", "20w14infinite", "3D Shareware v1.34", "15w14a", "1.RV-Pre1", "20w14infinite", "23w13a_or_b", "24w14potato");
 
         @Option("RetroMCP")
-        public static List<String> retroMCP = List.of("rd-20090515");
+        public static List<String> retroMCP = List.of("rd-20090515", "b1.4_01", "b1.5_01");
     }
 
     @Section(name = "MappingsSources")
