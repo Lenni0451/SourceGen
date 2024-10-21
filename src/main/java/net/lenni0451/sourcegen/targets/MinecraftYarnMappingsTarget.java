@@ -6,6 +6,7 @@ import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.decompile.DecompileStandaloneStep;
 import net.lenni0451.sourcegen.steps.decompile.FixLocalVariablesStep;
 import net.lenni0451.sourcegen.steps.decompile.RemapStep;
+import net.lenni0451.sourcegen.steps.decompile.TinyV2MetadataStep;
 import net.lenni0451.sourcegen.steps.git.ChangeGitUserStep;
 import net.lenni0451.sourcegen.steps.git.CommitChangesStep;
 import net.lenni0451.sourcegen.steps.git.PrepareRepoStep;
@@ -17,6 +18,7 @@ import net.lenni0451.sourcegen.utils.remapping.DetectingTinyRemapper;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
     private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
     private static final File FIXED_LOCALS_JAR = new File(Main.WORK_DIR, "fixed_locals.jar");
+    private static final File APPLIED_METADATA_JAR = new File(Main.WORK_DIR, "applied_metadata.jar");
 
     @Override
     public String getName() {
@@ -43,6 +46,7 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
             subSteps.add(new IterateMinecraftVersions(REPO_DIR, Config.MinecraftYarnMappings.branch, new IterateMinecraftVersions.VersionRange(null, null), version -> versionToUrl.apply(version) == null, true, (versionSteps, versionName, releaseTime, manifest) -> {
                 JSONObject downloads = manifest.getJSONObject("downloads");
                 String clientUrl = downloads.getJSONObject("client").getString("url");
+                List<String> comments = new ArrayList<>();
 
                 versionSteps.add(new CleanRepoStep(REPO_DIR));
                 versionSteps.add(new DownloadAlternativesStep(versionToUrl.apply(versionName), MAPPINGS_JAR));
@@ -50,11 +54,13 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
                 versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
                 versionSteps.add(new RemapStep(new DetectingTinyRemapper(CLIENT_JAR, MAPPINGS_FILE, REMAPPED_JAR)));
                 versionSteps.add(new FixLocalVariablesStep(REMAPPED_JAR, FIXED_LOCALS_JAR));
-                versionSteps.add(new DecompileStandaloneStep(FIXED_LOCALS_JAR, REPO_DIR));
+                versionSteps.add(new TinyV2MetadataStep(FIXED_LOCALS_JAR, MAPPINGS_FILE, APPLIED_METADATA_JAR, comments)); //TODO: only apply if tiny v2 mappings are used
+                versionSteps.add(new DecompileStandaloneStep(APPLIED_METADATA_JAR, REPO_DIR));
+                versionSteps.add(new TinyV2MetadataStep(REPO_DIR, comments)); //TODO: only apply if tiny v2 mappings are used
                 versionSteps.add(new RemoveResourcesStep(REPO_DIR));
                 versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
                 versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-                versionSteps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR, FIXED_LOCALS_JAR));
+                versionSteps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR, FIXED_LOCALS_JAR, APPLIED_METADATA_JAR));
             }));
         }));
         steps.add(new PushRepoStep(REPO_DIR));
