@@ -16,7 +16,7 @@ import java.util.List;
 
 public class CosmicReachTarget implements GeneratorTarget {
 
-    private static final File REPO_DIR = new File("cosmicreach");
+    private static final File REPO_DIR = new File(Config.CosmicReach.repoName);
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "cosmicreach");
     private static final File RAW_JAR = new File(Main.WORK_DIR, "raw.jar");
     private static final File NO_GAME_JAR = new File(Main.WORK_DIR, "no_game.jar");

@@ -83,6 +83,10 @@ public class Config {
         @Description("The URL to the git repo where the decompiled files should be stored")
         public static String gitRepo = "https://github.com/ExampleDude/CosmicReachSources";
 
+        @Option("RepoName")
+        @Description("The name of the local repository directory")
+        public static String repoName = "cosmicreach";
+
         @Option("AuthorName")
         @Description("The name of the author that should be used for the git commits")
         public static String authorName = "finalforeach";
@@ -106,6 +110,10 @@ public class Config {
         @Description("The URL to the git repo where the decompiled files should be stored")
         public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
 
+        @Option("RepoName")
+        @Description("The name of the local repository directory")
+        public static String repoName = "minecraft";
+
         @Option("AuthorName")
         @Description("The name of the author that should be used for the git commits")
         public static String authorName = "mojang";
@@ -124,6 +132,10 @@ public class Config {
         @Option("GitRepo")
         @Description("The URL to the git repo where the decompiled files should be stored")
         public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
+
+        @Option("RepoName")
+        @Description("The name of the local repository directory")
+        public static String repoName = "minecraft";
 
         @Option("AuthorName")
         @Description("The name of the author that should be used for the git commits")
@@ -144,6 +156,10 @@ public class Config {
         @Description("The URL to the git repo where the decompiled files should be stored")
         public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
 
+        @Option("RepoName")
+        @Description("The name of the local repository directory")
+        public static String repoName = "minecraft";
+
         @Option("AuthorName")
         @Description("The name of the author that should be used for the git commits")
         public static String authorName = "mojang";
@@ -162,6 +178,10 @@ public class Config {
         @Option("GitRepo")
         @Description("The URL to the git repo where the decompiled files should be stored")
         public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
+
+        @Option("RepoName")
+        @Description("The name of the local repository directory")
+        public static String repoName = "minecraft";
 
         @Option("AuthorName")
         @Description("The name of the author that should be used for the git commits")

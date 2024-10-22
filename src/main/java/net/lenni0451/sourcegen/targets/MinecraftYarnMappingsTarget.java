@@ -23,7 +23,7 @@ import java.util.*;
 
 public class MinecraftYarnMappingsTarget implements GeneratorTarget {
 
-    private static final File REPO_DIR = new File("minecraft");
+    private static final File REPO_DIR = new File(Config.MinecraftYarnMappings.repoName);
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_yarn_mappings");
     private static final File MAPPINGS_JAR = new File(Main.WORK_DIR, "mappings.jar");
     private static final File MAPPINGS_FILE = new File(Main.WORK_DIR, "mappings.tiny");

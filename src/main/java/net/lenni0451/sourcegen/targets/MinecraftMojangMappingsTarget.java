@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class MinecraftMojangMappingsTarget implements GeneratorTarget {
 
-    private static final File REPO_DIR = new File("minecraft");
+    private static final File REPO_DIR = new File(Config.MinecraftMojangMappings.repoName);
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_mojang_mappings");
     private static final File MAPPINGS_FILE = new File(Main.WORK_DIR, "mappings");
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");

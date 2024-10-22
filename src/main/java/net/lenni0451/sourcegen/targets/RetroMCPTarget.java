@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class RetroMCPTarget implements GeneratorTarget {
 
-    private static final File REPO_DIR = new File("minecraft");
+    private static final File REPO_DIR = new File(Config.MinecraftRetroMCPMappings.repoName);
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "retromcp");
     private static final File RESOURCES_FILE = new File(Main.WORK_DIR, "resources.zip");
     private static final File RESOURCES_DIR = new File(Main.WORK_DIR, "resources");
