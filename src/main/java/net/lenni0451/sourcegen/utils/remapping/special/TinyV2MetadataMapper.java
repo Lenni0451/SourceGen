@@ -22,46 +22,36 @@ public class TinyV2MetadataMapper {
     private static final String COMMENT_ANNOTATION_DESC = "L" + COMMENT_ANNOTATION_CLASS + ";";
     private static final Pattern COMMENT_PATTERN = Pattern.compile("( *)@Comment\\((\\d+)\\)");
 
-    private final Map<String, byte[]> entries;
-    private final File mappingsOrSource;
-    private final List<String> comments;
-
-    public TinyV2MetadataMapper(final Map<String, byte[]> entries, final File mappingsOrSource, final List<String> comments) {
-        this.entries = entries;
-        this.mappingsOrSource = mappingsOrSource;
-        this.comments = comments;
-    }
-
-    public void generate() {
-        MetaTinyV2Mapper mapper = this.loadMapper(this.mappingsOrSource);
+    public static void generate(final Map<String, byte[]> entries, final File mappings, final List<String> comments) {
+        MetaTinyV2Mapper mapper = loadMapper(mappings);
         for (MetaTinyV2Mapper.ClassMetadata classMetadata : mapper.getMetadata()) {
-            byte[] classBytes = this.entries.get(classMetadata.getName() + ".class");
+            byte[] classBytes = entries.get(classMetadata.getName() + ".class");
             if (classBytes == null) {
                 throw new IllegalStateException("Class " + classMetadata.getName() + " not found in input jar");
             }
             ClassNode classNode = ASMUtils.fromBytes(classBytes);
 
-            this.applyClassComment(classMetadata, classNode);
+            applyClassComment(classMetadata, classNode, comments);
             for (MetaTinyV2Mapper.FieldMetadata fieldMetadata : classMetadata.getFields()) {
                 FieldNode fieldNode = ASMUtils.getField(classNode, fieldMetadata.getName(), fieldMetadata.getDescriptor());
                 if (fieldNode != null) {
-                    this.applyFieldComment(fieldMetadata, fieldNode);
+                    applyFieldComment(fieldMetadata, fieldNode, comments);
                 }
             }
             for (MetaTinyV2Mapper.MethodMetadata methodMetadata : classMetadata.getMethods()) {
                 MethodNode methodNode = ASMUtils.getMethod(classNode, methodMetadata.getName(), methodMetadata.getDescriptor());
                 if (methodNode != null) {
-                    this.applyMethodComment(methodMetadata, methodNode);
-                    this.applyParameterNames(methodMetadata, methodNode);
+                    applyMethodComment(methodMetadata, methodNode, comments);
+                    applyParameterNames(methodMetadata, methodNode, comments);
                 }
             }
 
-            this.entries.put(classMetadata.getName() + ".class", ASMUtils.toStacklessBytes(classNode));
+            entries.put(classMetadata.getName() + ".class", ASMUtils.toStacklessBytes(classNode));
         }
     }
 
-    public void apply() throws IOException {
-        for (File file : FileUtils.listFiles(this.mappingsOrSource)) {
+    public static void apply(final File source, final List<String> comments) throws IOException {
+        for (File file : FileUtils.listFiles(source)) {
             if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".java")) continue;
             List<String> lines = Files.readAllLines(file.toPath());
             int startSize = lines.size();
@@ -78,14 +68,14 @@ public class TinyV2MetadataMapper {
 
                 String spaces = matcher.group(1);
                 int index = Integer.parseInt(matcher.group(2));
-                if (index < 0 || index >= this.comments.size()) {
+                if (index < 0 || index >= comments.size()) {
                     throw new IllegalStateException("Comment index out of bounds in " + file.getName() + " at line " + (i + 1));
                 }
 
                 lines.remove(i);
                 List<String> commentLines = new ArrayList<>();
                 commentLines.add(spaces + "/**");
-                this.comments.get(index).lines().forEach(part -> commentLines.add(spaces + " * " + part));
+                comments.get(index).lines().forEach(part -> commentLines.add(spaces + " * " + part));
                 commentLines.add(spaces + " */");
                 for (int j = commentLines.size() - 1; j >= 0; j--) {
                     lines.add(i, commentLines.get(j));
@@ -99,7 +89,7 @@ public class TinyV2MetadataMapper {
         }
     }
 
-    private MetaTinyV2Mapper loadMapper(final File mappings) {
+    private static MetaTinyV2Mapper loadMapper(final File mappings) {
         try {
             MetaTinyV2Mapper mapper = new MetaTinyV2Mapper(MapperConfig.create(), mappings, "official", "named");
             mapper.load();
@@ -111,9 +101,9 @@ public class TinyV2MetadataMapper {
         }
     }
 
-    private void applyClassComment(final MetaTinyV2Mapper.ClassMetadata metadata, final ClassNode classNode) {
+    private static void applyClassComment(final MetaTinyV2Mapper.ClassMetadata metadata, final ClassNode classNode, final List<String> comments) {
         if (metadata.getComment() != null) {
-            this.comments.add(metadata.getComment().replace("\\n", "\n"));
+            comments.add(metadata.getComment().replace("\\n", "\n"));
             List<AnnotationNode> visibleAnnotations = classNode.visibleAnnotations;
             if (visibleAnnotations == null) {
                 visibleAnnotations = new ArrayList<>();
@@ -122,14 +112,14 @@ public class TinyV2MetadataMapper {
             AnnotationNode commentAnnotation = new AnnotationNode(COMMENT_ANNOTATION_DESC);
             commentAnnotation.values = new ArrayList<>();
             commentAnnotation.values.add("value");
-            commentAnnotation.values.add(this.comments.size() - 1);
+            commentAnnotation.values.add(comments.size() - 1);
             visibleAnnotations.add(0, commentAnnotation);
         }
     }
 
-    private void applyFieldComment(final MetaTinyV2Mapper.FieldMetadata metadata, final FieldNode fieldNode) {
+    private static void applyFieldComment(final MetaTinyV2Mapper.FieldMetadata metadata, final FieldNode fieldNode, final List<String> comments) {
         if (metadata.getComment() != null) {
-            this.comments.add(metadata.getComment().replace("\\n", "\n"));
+            comments.add(metadata.getComment().replace("\\n", "\n"));
             List<AnnotationNode> visibleAnnotations = fieldNode.visibleAnnotations;
             if (visibleAnnotations == null) {
                 visibleAnnotations = new ArrayList<>();
@@ -138,12 +128,12 @@ public class TinyV2MetadataMapper {
             AnnotationNode commentAnnotation = new AnnotationNode(COMMENT_ANNOTATION_DESC);
             commentAnnotation.values = new ArrayList<>();
             commentAnnotation.values.add("value");
-            commentAnnotation.values.add(this.comments.size() - 1);
+            commentAnnotation.values.add(comments.size() - 1);
             visibleAnnotations.add(0, commentAnnotation);
         }
     }
 
-    private void applyMethodComment(final MetaTinyV2Mapper.MethodMetadata metadata, final MethodNode methodNode) {
+    private static void applyMethodComment(final MetaTinyV2Mapper.MethodMetadata metadata, final MethodNode methodNode, final List<String> comments) {
         String comment = "";
         if (metadata.getComment() != null) comment = metadata.getComment();
         boolean hasSpace = comment.isBlank();
@@ -158,7 +148,7 @@ public class TinyV2MetadataMapper {
         }
 
         if (!comment.isBlank()) {
-            this.comments.add(comment.replace("\\n", "\n"));
+            comments.add(comment.replace("\\n", "\n"));
             List<AnnotationNode> visibleAnnotations = methodNode.visibleAnnotations;
             if (visibleAnnotations == null) {
                 visibleAnnotations = new ArrayList<>();
@@ -167,12 +157,12 @@ public class TinyV2MetadataMapper {
             AnnotationNode commentAnnotation = new AnnotationNode(COMMENT_ANNOTATION_DESC);
             commentAnnotation.values = new ArrayList<>();
             commentAnnotation.values.add("value");
-            commentAnnotation.values.add(this.comments.size() - 1);
+            commentAnnotation.values.add(comments.size() - 1);
             visibleAnnotations.add(0, commentAnnotation);
         }
     }
 
-    private void applyParameterNames(final MetaTinyV2Mapper.MethodMetadata metadata, final MethodNode methodNode) {
+    private static void applyParameterNames(final MetaTinyV2Mapper.MethodMetadata metadata, final MethodNode methodNode, final List<String> comments) {
         for (MetaTinyV2Mapper.ParameterMetadata parameter : metadata.getParameters()) {
             if (methodNode.parameters != null) {
                 int[] parameterIndices = ASMUtils.getParameterIndices(methodNode);

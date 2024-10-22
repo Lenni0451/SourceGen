@@ -9,46 +9,33 @@ import java.util.Map;
 
 public class TinyV2MetadataStep implements GeneratorStep {
 
-    private final Action action;
-    private final Map<String, byte[]> entries;
-    private final File mappingsOrSource;
-    private final List<String> comments;
+    private final String message;
+    private final Runner runner;
 
     public TinyV2MetadataStep(final Map<String, byte[]> entries, final File mappingsOrSource, final List<String> comments) {
-        this.action = Action.GENERATE;
-        this.entries = entries;
-        this.mappingsOrSource = mappingsOrSource;
-        this.comments = comments;
+        this.message = "Generating tiny v2 metadata...";
+        this.runner = () -> TinyV2MetadataMapper.generate(entries, mappingsOrSource, comments);
     }
 
     public TinyV2MetadataStep(final File baseDir, final List<String> comments) {
-        this.action = Action.APPLY;
-        this.entries = null;
-        this.mappingsOrSource = baseDir;
-        this.comments = comments;
+        this.message = "Applying tiny v2 metadata...";
+        this.runner = () -> TinyV2MetadataMapper.apply(baseDir, comments);
     }
 
     @Override
     public void printStep() {
-        switch (this.action) {
-            case GENERATE -> System.out.println("Generating tiny v2 metadata...");
-            case APPLY -> System.out.println("Applying tiny v2 metadata...");
-            default -> throw new IllegalStateException("Unexpected value: " + this.action);
-        }
+        System.out.println(this.message);
     }
 
     @Override
     public void run() throws Exception {
-        TinyV2MetadataMapper mapper = new TinyV2MetadataMapper(this.entries, this.mappingsOrSource, this.comments);
-        switch (this.action) {
-            case GENERATE -> mapper.generate();
-            case APPLY -> mapper.apply();
-        }
+        this.runner.run();
     }
 
 
-    public enum Action {
-        GENERATE, APPLY
+    @FunctionalInterface
+    private interface Runner {
+        void run() throws Exception;
     }
 
 }
