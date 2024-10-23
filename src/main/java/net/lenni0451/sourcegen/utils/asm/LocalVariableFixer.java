@@ -6,24 +6,11 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
+import javax.lang.model.SourceVersion;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class LocalVariableFixer {
-
-    private static final Set<String> KEYWORDS = new HashSet<>(Arrays.asList(
-            "abstract", "assert", "boolean", "break", "byte",
-            "case", "catch", "char", "class", "continue",
-            "const", "default", "do", "double", "else",
-            "enum", "exports", "extends", "final", "finally",
-            "float", "for", "goto", "if", "implements",
-            "import", "instanceof", "int", "interface", "long",
-            "module", "native", "new", "package", "private",
-            "protected", "public", "requires", "return", "short",
-            "static", "strictfp", "super", "switch", "synchronized",
-            "this", "throw", "throws", "transient", "try",
-            "var", "void", "volatile", "while"
-    ));
 
     public static void run(final Map<String, byte[]> entries) throws Exception {
         for (Map.Entry<String, byte[]> entry : entries.entrySet()) {
@@ -137,7 +124,7 @@ public class LocalVariableFixer {
                 newName = newName.substring(0, 1).toLowerCase(Locale.ROOT) + newName.substring(1);
             }
         }
-        if (KEYWORDS.contains(newName)) newName = "_" + newName;
+        if (SourceVersion.isKeyword(newName)) newName = "_" + newName;
 
         int index = 2;
         String name = newName;
