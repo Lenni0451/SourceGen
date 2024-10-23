@@ -131,7 +131,11 @@ public class LocalVariableFixer {
         } else {
             newName = newName.substring(newName.lastIndexOf('.') + 1);
             newName = newName.substring(newName.lastIndexOf('$') + 1);
-            newName = newName.substring(0, 1).toLowerCase(Locale.ROOT) + newName.substring(1);
+            if (newName.toUpperCase(Locale.ROOT).equals(newName)) {
+                newName = newName.toLowerCase(Locale.ROOT);
+            } else {
+                newName = newName.substring(0, 1).toLowerCase(Locale.ROOT) + newName.substring(1);
+            }
         }
         if (KEYWORDS.contains(newName)) newName = "_" + newName;
 
