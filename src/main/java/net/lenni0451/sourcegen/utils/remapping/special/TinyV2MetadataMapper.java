@@ -31,7 +31,8 @@ public class TinyV2MetadataMapper {
         for (MetaTinyV2Mapper.ClassMetadata classMetadata : metadata) {
             byte[] classBytes = entries.get(classMetadata.getName() + ".class");
             if (classBytes == null) {
-                throw new IllegalStateException("Class " + classMetadata.getName() + " not found in input jar");
+                System.err.println("Class " + classMetadata.getName() + " not found in input jar");
+                continue;
             }
             ClassNode classNode = ASMUtils.fromBytes(classBytes);
 
