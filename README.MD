@@ -2,6 +2,7 @@
 Generator for source diff repos.\
 Supports:
 - Minecraft Mojang mappings
+- Minecraft Mojang + Parchment mappings
 - Minecraft Yarn mappings
 - Minecraft Feather mappings
 - Minecraft RetroMCP mappings
@@ -33,5 +34,6 @@ Default folders:
 - `defaults/cosmicreach`
 - `defaults/minecraft_feather_mappings`
 - `defaults/minecraft_mojang_mappings`
+- `defaults/minecraft_parchment_mappings`
 - `defaults/minecraft_retromcp_mappings`
 - `defaults/minecraft_yarn_mappings`
