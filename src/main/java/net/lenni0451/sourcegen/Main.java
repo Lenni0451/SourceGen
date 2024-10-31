@@ -16,7 +16,8 @@ public class Main {
             new CosmicReachTarget(),
             new RetroMCPTarget(),
             new MinecraftFeatherMappingsTarget(),
-            new MinecraftYarnMappingsTarget()
+            new MinecraftYarnMappingsTarget(),
+            new MinecraftParchmentMappingsTarget()
     );
 
     public static void main(String[] args) throws Throwable {

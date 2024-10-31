@@ -24,7 +24,11 @@ public class TinyV2MetadataMapper {
 
     public static void generate(final Map<String, byte[]> entries, final File mappings, final List<String> comments) {
         MetaTinyV2Mapper mapper = loadMapper(mappings);
-        for (MetaTinyV2Mapper.ClassMetadata classMetadata : mapper.getMetadata()) {
+        generate(entries, mapper.getMetadata(), comments);
+    }
+
+    public static void generate(final Map<String, byte[]> entries, final List<MetaTinyV2Mapper.ClassMetadata> metadata, final List<String> comments) {
+        for (MetaTinyV2Mapper.ClassMetadata classMetadata : metadata) {
             byte[] classBytes = entries.get(classMetadata.getName() + ".class");
             if (classBytes == null) {
                 throw new IllegalStateException("Class " + classMetadata.getName() + " not found in input jar");

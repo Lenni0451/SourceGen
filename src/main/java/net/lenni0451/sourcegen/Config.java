@@ -33,7 +33,7 @@ public class Config {
         public static List<String> cosmicReach = List.of("0.1.17b red", "0.1.17b blue");
 
         @Option("Minecraft")
-        @Description("This list is for Mojang mappings, Feather mappings and Yarn mappings")
+        @Description("This list is for Mojang mappings, Feather mappings, Yarn mappings and Parchment mappings")
         public static List<String> minecraft = List.of("22w13oneblockatatime", "20w14infinite", "3D Shareware v1.34", "15w14a", "1.RV-Pre1", "20w14infinite", "23w13a_or_b", "24w14potato");
 
         @Option("RetroMCP")
@@ -62,6 +62,14 @@ public class Config {
         @Description("The URL to the maven repository where the yarn mappings are stored")
         public static String yarnMappings = "https://maven.fabricmc.net/net/fabricmc/yarn/";
 
+        @Option("ParchmentMappings")
+        @Description("The URL to the maven repository where the parchment mappings are stored")
+        public static String parchmentMappings = "https://ldtteam.jfrog.io/artifactory/parchmentmc-public/org/parchmentmc/data/";
+
+        @Option("ParchmentMetadata")
+        @Description("The URL to the parchment metadata json file")
+        public static String parchmentMetadata = "https://ldtteam.jfrog.io/ui/api/v1/ui/v2/nativeBrowser/parchmentmc-public/org/parchmentmc/data/?recordNum=0";
+
         public static String getFeatherMappings(String suffix) {
             String url = featherMappings;
             if (!url.endsWith("/")) url += "/";
@@ -71,6 +79,13 @@ public class Config {
 
         public static String getYarnMappings(String suffix) {
             String url = yarnMappings;
+            if (!url.endsWith("/")) url += "/";
+            while (suffix.startsWith("/")) suffix = suffix.substring(1);
+            return url + suffix;
+        }
+
+        public static String getParchmentMappings(String suffix) {
+            String url = parchmentMappings;
             if (!url.endsWith("/")) url += "/";
             while (suffix.startsWith("/")) suffix = suffix.substring(1);
             return url + suffix;
@@ -194,6 +209,29 @@ public class Config {
         @Option("Branch")
         @Description("The branch where the files should be stored")
         public static String branch = "retromcp";
+    }
+
+    @Section(name = "MinecraftParchmentMappings")
+    public static class MinecraftParchmentMappings {
+        @Option("GitRepo")
+        @Description("The URL to the git repo where the decompiled files should be stored")
+        public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
+
+        @Option("RepoName")
+        @Description("The name of the local repository directory")
+        public static String repoName = "minecraft";
+
+        @Option("AuthorName")
+        @Description("The name of the author that should be used for the git commits")
+        public static String authorName = "mojang";
+
+        @Option("AuthorEmail")
+        @Description("The email of the author that should be used for the git commits")
+        public static String authorEmail = "noreply@mojang.com";
+
+        @Option("Branch")
+        @Description("The branch where the files should be stored")
+        public static String branch = "parchment";
     }
 
 }
