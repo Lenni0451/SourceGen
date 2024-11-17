@@ -1,8 +1,7 @@
 package net.lenni0451.sourcegen.utils.remapping;
 
-import net.lenni0451.classtransform.mappings.AMapper;
-import net.lenni0451.classtransform.mappings.MapperConfig;
-import net.lenni0451.classtransform.mappings.impl.ProguardMapper;
+import net.lenni0451.commons.asm.mappings.loader.MappingsLoader;
+import net.lenni0451.commons.asm.mappings.loader.ProguardMappingsLoader;
 
 import java.io.File;
 import java.util.Map;
@@ -14,8 +13,13 @@ public class ProguardRemapper extends BaseRemapper {
     }
 
     @Override
-    protected AMapper loadMapper(File mappings) {
-        return this.load(new ProguardMapper(MapperConfig.create(), mappings));
+    protected MappingsLoader initLoader(File mappings) {
+        return this.load(new ProguardMappingsLoader(mappings));
+    }
+
+    @Override
+    protected boolean isReverse() {
+        return true;
     }
 
 }

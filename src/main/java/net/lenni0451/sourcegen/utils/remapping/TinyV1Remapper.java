@@ -1,8 +1,7 @@
 package net.lenni0451.sourcegen.utils.remapping;
 
-import net.lenni0451.classtransform.mappings.AMapper;
-import net.lenni0451.classtransform.mappings.MapperConfig;
-import net.lenni0451.classtransform.mappings.impl.TinyV1Mapper;
+import net.lenni0451.commons.asm.mappings.loader.MappingsLoader;
+import net.lenni0451.commons.asm.mappings.loader.TinyV1MappingsLoader;
 
 import java.io.File;
 import java.util.Map;
@@ -14,12 +13,17 @@ public class TinyV1Remapper extends BaseRemapper {
     }
 
     @Override
-    protected AMapper loadMapper(File mappings) {
+    protected MappingsLoader initLoader(File mappings) {
         try {
-            return this.load(new TinyV1Mapper(MapperConfig.create(), mappings, "named", "official"));
+            return this.load(new TinyV1MappingsLoader(mappings, "official", "named"));
         } catch (Throwable t) {
-            return this.load(new TinyV1Mapper(MapperConfig.create(), mappings, "named", "client"));
+            return this.load(new TinyV1MappingsLoader(mappings, "client", "named"));
         }
+    }
+
+    @Override
+    protected boolean isReverse() {
+        return false;
     }
 
 }

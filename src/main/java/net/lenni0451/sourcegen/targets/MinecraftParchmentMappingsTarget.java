@@ -46,7 +46,7 @@ public class MinecraftParchmentMappingsTarget implements GeneratorTarget {
                 String mappingsUrl = downloads.getJSONObject("client_mappings").getString("url");
                 String metadataUrl = versionToUrl.apply(versionName);
                 Map<String, byte[]> jarEntries = new HashMap<>();
-                List<String> comments = new ArrayList<>();
+                List<String[]> comments = new ArrayList<>();
 
                 versionSteps.add(new CleanRepoStep(REPO_DIR));
                 versionSteps.add(new DownloadStep(mappingsUrl, MAPPINGS_FILE));

@@ -1,7 +1,8 @@
 package net.lenni0451.sourcegen.utils.asm;
 
-import net.lenni0451.classtransform.utils.ASMUtils;
-import net.lenni0451.classtransform.utils.Types;
+import net.lenni0451.commons.asm.ASMUtils;
+import net.lenni0451.commons.asm.Types;
+import net.lenni0451.commons.asm.io.ClassIO;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
@@ -15,13 +16,13 @@ public class LocalVariableFixer {
     public static void run(final Map<String, byte[]> entries) throws Exception {
         for (Map.Entry<String, byte[]> entry : entries.entrySet()) {
             if (entry.getKey().toLowerCase(Locale.ROOT).endsWith(".class")) {
-                ClassNode node = ASMUtils.fromBytes(entry.getValue());
+                ClassNode node = ClassIO.fromBytes(entry.getValue());
                 for (MethodNode method : node.methods) {
                     fixParameters(method);
                     fixLocalVariableTable(method);
                     Set<String> names = new HashSet<>();
                     if (method.localVariables != null) {
-                        int[] parameterIndices = ASMUtils.getParameterIndices(method);
+                        int[] parameterIndices = ASMUtils.parameterIndices(method);
                         for (int i = 0; i < method.localVariables.size(); i++) {
                             LocalVariableNode localVariable = method.localVariables.get(i);
                             if (!Modifier.isStatic(method.access) && i == 0) {
@@ -44,7 +45,7 @@ public class LocalVariableFixer {
                     }
                 }
                 fixRecordComponents(node);
-                entry.setValue(ASMUtils.toStacklessBytes(node));
+                entry.setValue(ClassIO.toStacklessBytes(node));
             }
         }
     }
@@ -74,7 +75,7 @@ public class LocalVariableFixer {
 
         if (methodNode.localVariables == null) methodNode.localVariables = new ArrayList<>();
         Type[] parameterTypes = Types.argumentTypes(methodNode);
-        int[] parameterIndices = ASMUtils.getParameterIndices(methodNode);
+        int[] parameterIndices = ASMUtils.parameterIndices(methodNode);
         List<Integer> missingVariables = new ArrayList<>();
         if (!Modifier.isStatic(methodNode.access)) {
             boolean found = false;

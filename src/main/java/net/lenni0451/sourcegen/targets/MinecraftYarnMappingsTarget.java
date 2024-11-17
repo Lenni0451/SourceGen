@@ -44,7 +44,7 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
                 JSONObject downloads = manifest.getJSONObject("downloads");
                 String clientUrl = downloads.getJSONObject("client").getString("url");
                 Map<String, byte[]> jarEntries = new HashMap<>();
-                List<String> comments = new ArrayList<>();
+                List<String[]> comments = new ArrayList<>();
 
                 versionSteps.add(new CleanRepoStep(REPO_DIR));
                 versionSteps.add(new DownloadAlternativesStep(versionToUrl.apply(versionName), MAPPINGS_JAR));

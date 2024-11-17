@@ -1,6 +1,6 @@
 package net.lenni0451.sourcegen.steps.decompile;
 
-import net.lenni0451.classtransform.mappings.impl.special.MetaTinyV2Mapper;
+import net.lenni0451.commons.asm.mappings.meta.ClassMetaMapping;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.remapping.special.TinyV2MetadataMapper;
 
@@ -13,17 +13,17 @@ public class TinyV2MetadataStep implements GeneratorStep {
     private final String message;
     private final Runner runner;
 
-    public TinyV2MetadataStep(final Map<String, byte[]> entries, final File mappings, final List<String> comments) {
+    public TinyV2MetadataStep(final Map<String, byte[]> entries, final File mappings, final List<String[]> comments) {
         this.message = "Generating tiny v2 metadata...";
         this.runner = () -> TinyV2MetadataMapper.generate(entries, mappings, comments);
     }
 
-    public TinyV2MetadataStep(final Map<String, byte[]> entries, final List<MetaTinyV2Mapper.ClassMetadata> mappings, final List<String> comments) {
+    public TinyV2MetadataStep(final Map<String, byte[]> entries, final List<ClassMetaMapping> mappings, final List<String[]> comments) {
         this.message = "Generating tiny v2 metadata...";
         this.runner = () -> TinyV2MetadataMapper.generate(entries, mappings, comments);
     }
 
-    public TinyV2MetadataStep(final File baseDir, final List<String> comments) {
+    public TinyV2MetadataStep(final File baseDir, final List<String[]> comments) {
         this.message = "Applying tiny v2 metadata...";
         this.runner = () -> TinyV2MetadataMapper.apply(baseDir, comments);
     }

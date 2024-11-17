@@ -1,6 +1,9 @@
 package net.lenni0451.sourcegen.utils.remapping.special;
 
-import net.lenni0451.classtransform.mappings.impl.special.MetaTinyV2Mapper;
+import net.lenni0451.commons.asm.mappings.meta.ClassMetaMapping;
+import net.lenni0451.commons.asm.mappings.meta.FieldMetaMapping;
+import net.lenni0451.commons.asm.mappings.meta.MethodMetaMapping;
+import net.lenni0451.commons.asm.mappings.meta.ParameterMetaMapping;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -10,14 +13,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ParchmentMetadataConverter {
 
     private static final JSONArray EMPTY_JSON_ARRAY = new JSONArray();
 
-    public static List<MetaTinyV2Mapper.ClassMetadata> toTinyV2Metadata(final File mappings) throws IOException {
-        List<MetaTinyV2Mapper.ClassMetadata> metadata = new ArrayList<>();
+    public static List<ClassMetaMapping> toTinyV2Metadata(final File mappings) throws IOException {
+        List<ClassMetaMapping> metadata = new ArrayList<>();
         JSONObject obj = new JSONObject(new JSONTokener(Files.readString(mappings.toPath())));
         JSONArray classes = obj.getJSONArray("classes");
         for (Object classMeta : classes) {
@@ -26,8 +30,8 @@ public class ParchmentMetadataConverter {
         return metadata;
     }
 
-    private static MetaTinyV2Mapper.ClassMetadata toClassMetadata(final JSONObject obj) {
-        MetaTinyV2Mapper.ClassMetadata classMetadata = new MetaTinyV2Mapper.ClassMetadata(obj.getString("name"), toComment(obj), new ArrayList<>(), new ArrayList<>());
+    private static ClassMetaMapping toClassMetadata(final JSONObject obj) {
+        ClassMetaMapping classMetadata = new ClassMetaMapping(obj.getString("name"), toComment(obj), new ArrayList<>(), new ArrayList<>());
         for (Object fieldMeta : obj.optJSONArray("fields", EMPTY_JSON_ARRAY)) {
             classMetadata.getFields().add(toFieldMetadata((JSONObject) fieldMeta));
         }
@@ -37,35 +41,35 @@ public class ParchmentMetadataConverter {
         return classMetadata;
     }
 
-    private static MetaTinyV2Mapper.FieldMetadata toFieldMetadata(final JSONObject obj) {
-        return new MetaTinyV2Mapper.FieldMetadata(obj.getString("name"), obj.getString("descriptor"), toComment(obj));
+    private static FieldMetaMapping toFieldMetadata(final JSONObject obj) {
+        return new FieldMetaMapping(obj.getString("name"), obj.getString("descriptor"), toComment(obj));
     }
 
-    private static MetaTinyV2Mapper.MethodMetadata toMethodMetadata(final JSONObject obj) {
-        MetaTinyV2Mapper.MethodMetadata methodMetadata = new MetaTinyV2Mapper.MethodMetadata(obj.getString("name"), obj.getString("descriptor"), toComment(obj), new ArrayList<>());
+    private static MethodMetaMapping toMethodMetadata(final JSONObject obj) {
+        MethodMetaMapping methodMetadata = new MethodMetaMapping(obj.getString("name"), obj.getString("descriptor"), toComment(obj), new ArrayList<>());
         for (Object parameterMeta : obj.optJSONArray("parameters", EMPTY_JSON_ARRAY)) {
             methodMetadata.getParameters().add(toParameterMetadata((JSONObject) parameterMeta));
         }
         return methodMetadata;
     }
 
-    private static MetaTinyV2Mapper.ParameterMetadata toParameterMetadata(final JSONObject obj) {
-        return new MetaTinyV2Mapper.ParameterMetadata(obj.getInt("index"), obj.getString("name"), toComment(obj));
+    private static ParameterMetaMapping toParameterMetadata(final JSONObject obj) {
+        return new ParameterMetaMapping(obj.getInt("index"), obj.getString("name"), toComment(obj));
     }
 
     @Nullable
-    private static String toComment(final JSONObject obj) {
+    private static String[] toComment(final JSONObject obj) {
         Object rawJavadoc = obj.opt("javadoc");
         if (rawJavadoc == null) return null;
-        String comment;
+        String[] comment;
         if (rawJavadoc instanceof String) {
-            comment = (String) rawJavadoc;
+            comment = new String[]{(String) rawJavadoc};
         } else if (rawJavadoc instanceof JSONArray) {
-            comment = String.join("\\n", obj.optJSONArray("javadoc", EMPTY_JSON_ARRAY).toList().stream().map(Object::toString).toArray(String[]::new));
+            comment = obj.optJSONArray("javadoc", EMPTY_JSON_ARRAY).toList().stream().map(Object::toString).toArray(String[]::new);
         } else {
             throw new IllegalStateException("Invalid comment type: " + rawJavadoc);
         }
-        if (comment.isBlank()) return null;
+        if (Arrays.stream(comment).allMatch(String::isBlank)) return null;
         return comment;
     }
 

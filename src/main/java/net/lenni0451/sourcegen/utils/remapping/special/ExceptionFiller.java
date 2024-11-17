@@ -1,7 +1,7 @@
 package net.lenni0451.sourcegen.utils.remapping.special;
 
-import net.lenni0451.classtransform.utils.ASMUtils;
-import net.lenni0451.classtransform.utils.MemberDeclaration;
+import net.lenni0451.commons.asm.info.MemberDeclaration;
+import net.lenni0451.commons.asm.io.ClassIO;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -36,7 +36,7 @@ public class ExceptionFiller {
         }
         for (Map.Entry<String, byte[]> entry : entries.entrySet()) {
             if (!entry.getKey().toLowerCase(Locale.ROOT).endsWith(".class")) continue;
-            ClassNode node = ASMUtils.fromBytes(entry.getValue());
+            ClassNode node = ClassIO.fromBytes(entry.getValue());
             boolean modified = false;
             for (MethodNode method : node.methods) {
                 String[] exceptionNames = exceptions.get(new MemberDeclaration(node.name, method.name, method.desc));
@@ -45,7 +45,7 @@ public class ExceptionFiller {
                     modified = true;
                 }
             }
-            if (modified) entry.setValue(ASMUtils.toStacklessBytes(node));
+            if (modified) entry.setValue(ClassIO.toStacklessBytes(node));
         }
     }
 
