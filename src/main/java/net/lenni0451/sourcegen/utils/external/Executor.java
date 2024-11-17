@@ -10,6 +10,7 @@ import java.util.Map;
 public class Executor {
 
     private static final boolean PRINT_COMMANDS = System.getProperty("sourcegen.printCommands", "false").equalsIgnoreCase("true");
+    private static final boolean PRINT_PROCESS_OUTPUT = System.getProperty("sourcegen.printProcessOutput", "false").equalsIgnoreCase("true");
 
     public static ProcessOutput execute(final File runDir, final String[]... cmdParts) throws IOException {
         int length = 0;
@@ -64,8 +65,10 @@ public class Executor {
             System.out.println();
             System.out.println("Process exited with error code " + exitCode);
             System.out.println("Command: " + String.join(" ", cmd));
-            System.out.println("Output:");
-            System.out.println(out);
+            if (!PRINT_PROCESS_OUTPUT) {
+                System.out.println("Output:");
+                System.out.println(out);
+            }
             System.exit(exitCode);
         }
         return new ProcessOutput(exitCode, out);
@@ -78,9 +81,11 @@ public class Executor {
                 int length;
                 while ((length = stdin.read(buffer)) != -1) {
                     os.write(buffer, 0, length);
+                    if (PRINT_PROCESS_OUTPUT) System.out.write(buffer, 0, length);
                 }
                 while ((length = stderr.read(buffer)) != -1) {
                     os.write(buffer, 0, length);
+                    if (PRINT_PROCESS_OUTPUT) System.err.write(buffer, 0, length);
                 }
             } catch (Throwable t) {
                 t.printStackTrace();
