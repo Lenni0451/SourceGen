@@ -106,6 +106,7 @@ public class LocalVariableFixer {
             if (!missingVariables.contains(parameterIndices[i])) continue;
             methodNode.localVariables.add(new LocalVariableNode("arg" + i, parameterTypes[i].getDescriptor(), null, start, end, parameterIndices[i]));
         }
+        methodNode.localVariables.sort(Comparator.comparingInt(o -> o.index));
     }
 
     private static String generateNewName(final Type type, final Set<String> alreadyGeneratedNames) {
