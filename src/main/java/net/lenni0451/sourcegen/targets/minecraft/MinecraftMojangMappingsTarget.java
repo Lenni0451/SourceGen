@@ -1,4 +1,4 @@
-package net.lenni0451.sourcegen.targets;
+package net.lenni0451.sourcegen.targets.minecraft;
 
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
@@ -13,6 +13,7 @@ import net.lenni0451.sourcegen.steps.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions.VersionRange;
+import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.utils.remapping.ProguardRemapper;
 import org.json.JSONObject;
 

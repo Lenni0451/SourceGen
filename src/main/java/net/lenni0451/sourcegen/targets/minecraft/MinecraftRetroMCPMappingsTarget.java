@@ -1,4 +1,4 @@
-package net.lenni0451.sourcegen.targets;
+package net.lenni0451.sourcegen.targets.minecraft;
 
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
@@ -13,6 +13,7 @@ import net.lenni0451.sourcegen.steps.git.PrepareRepoStep;
 import net.lenni0451.sourcegen.steps.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateRetroMCPVersions;
+import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 import org.json.JSONObject;
 
@@ -22,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RetroMCPTarget implements GeneratorTarget {
+public class MinecraftRetroMCPMappingsTarget implements GeneratorTarget {
 
     private static final File REPO_DIR = new File(Config.MinecraftRetroMCPMappings.repoName);
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "retromcp");
@@ -33,7 +34,7 @@ public class RetroMCPTarget implements GeneratorTarget {
 
     @Override
     public String getName() {
-        return "RetroMCP";
+        return "Minecraft (RetroMCP Mappings)";
     }
 
     @Override

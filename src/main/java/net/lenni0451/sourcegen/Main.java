@@ -4,7 +4,9 @@ import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.optconfig.ConfigLoader;
 import net.lenni0451.optconfig.access.impl.reflection.ReflectionClassAccess;
 import net.lenni0451.optconfig.provider.ConfigProvider;
-import net.lenni0451.sourcegen.targets.*;
+import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.targets.minecraft.*;
+import net.lenni0451.sourcegen.targets.other.CosmicReachTarget;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
@@ -18,7 +20,7 @@ public class Main {
     private static final List<GeneratorTarget> TARGETS = List.of(
             new MinecraftMojangMappingsTarget(),
             new CosmicReachTarget(),
-            new RetroMCPTarget(),
+            new MinecraftRetroMCPMappingsTarget(),
             new MinecraftFeatherMappingsTarget(),
             new MinecraftYarnMappingsTarget(),
             new MinecraftParchmentMappingsTarget()

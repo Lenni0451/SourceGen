@@ -1,4 +1,4 @@
-package net.lenni0451.sourcegen.targets;
+package net.lenni0451.sourcegen.targets.other;
 
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
@@ -10,6 +10,7 @@ import net.lenni0451.sourcegen.steps.git.PrepareRepoStep;
 import net.lenni0451.sourcegen.steps.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateCosmicReachVersions;
+import net.lenni0451.sourcegen.targets.GeneratorTarget;
 
 import java.io.File;
 import java.util.List;
