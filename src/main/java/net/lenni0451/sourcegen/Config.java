@@ -10,6 +10,29 @@ import java.util.List;
 @OptConfig
 public class Config {
 
+    @Section(name = "External")
+    public static class External {
+        @Option("GitPath")
+        @Description("The path to the git executable")
+        public static String gitPath = "git";
+
+        @Option("JavaPath")
+        @Description("The path to the java executable")
+        public static String javaPath = "java";
+
+        @Option("VineflowerJar")
+        @Description("The path to the vineflower jar file")
+        public static String vineflowerJar = "vineflower.jar";
+
+        @Option("VineflowerRam")
+        @Description("The amount of ram that should be allocated to vineflower")
+        public static String vineflowerRam = (Runtime.getRuntime().maxMemory() / 1024 / 1024) + "M";
+
+        @Option("VineflowerArgs")
+        @Description("The arguments that should be passed to vineflower")
+        public static String[] vineflowerArgs = {"-dgs=1", "-asc=1", "-ump=0", "-rsy=1", "-aoa=1"};
+    }
+
     @Section(name = "Exclusions", description = {
             "The versions on the exclusion list will not be decompiled",
             "This is recommended for april fools version because they contain many temporary changes which makes diffing the actual source code harder"
