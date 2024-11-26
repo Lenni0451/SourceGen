@@ -1,28 +1,14 @@
 package net.lenni0451.sourcegen;
 
-import net.lenni0451.optconfig.ConfigLoader;
-import net.lenni0451.optconfig.access.impl.reflection.ReflectionClassAccess;
 import net.lenni0451.optconfig.annotations.Description;
 import net.lenni0451.optconfig.annotations.OptConfig;
 import net.lenni0451.optconfig.annotations.Option;
 import net.lenni0451.optconfig.annotations.Section;
-import net.lenni0451.optconfig.provider.ConfigProvider;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 @OptConfig
 public class Config {
-
-    public static void load() throws IOException {
-        ConfigLoader<Config> configLoader = new ConfigLoader<>(Config.class);
-        configLoader.getConfigOptions()
-                .setResetInvalidOptions(true)
-                .setRewriteConfig(true)
-                .setClassAccessFactory(clazz -> new ReflectionClassAccess(clazz, true));
-        configLoader.loadStatic(ConfigProvider.file(new File("config.yml")));
-    }
 
     @Section(name = "Exclusions", description = {
             "The versions on the exclusion list will not be decompiled",

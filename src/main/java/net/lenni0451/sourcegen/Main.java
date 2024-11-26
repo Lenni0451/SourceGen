@@ -1,10 +1,14 @@
 package net.lenni0451.sourcegen;
 
 import net.lenni0451.commons.io.FileUtils;
+import net.lenni0451.optconfig.ConfigLoader;
+import net.lenni0451.optconfig.access.impl.reflection.ReflectionClassAccess;
+import net.lenni0451.optconfig.provider.ConfigProvider;
 import net.lenni0451.sourcegen.targets.*;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class Main {
@@ -21,7 +25,7 @@ public class Main {
     );
 
     public static void main(String[] args) throws Throwable {
-        Config.load();
+        loadConfig();
         checkRequirements();
         if (args.length != 1) {
             System.out.println("Please specify a target to generate!");
@@ -66,6 +70,15 @@ public class Main {
             System.out.println("Please download VineFlower and put 'vineflower.jar' into the working directory.");
             System.exit(-1);
         }
+    }
+
+    private static void loadConfig() throws IOException {
+        ConfigLoader<Config> configLoader = new ConfigLoader<>(Config.class);
+        configLoader.getConfigOptions()
+                .setResetInvalidOptions(true)
+                .setRewriteConfig(true)
+                .setClassAccessFactory(clazz -> new ReflectionClassAccess(clazz, true));
+        configLoader.loadStatic(ConfigProvider.file(new File("config.yml")));
     }
 
 }
