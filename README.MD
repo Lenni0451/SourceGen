@@ -25,7 +25,8 @@ After everything is configured, run the generator with the wanted target:
 ```shell
 java -jar SourceGen.jar <target>
 ```
-A list of available targets can be found by running the generator without any arguments.
+A list of available targets can be found by running the generator without any arguments.\
+Any new targets will be added to the bottom of the list to avoid breaking existing scripts.
 
 ## Default files
 If you want the generator to automatically add files to the repository, you can add them to the corresponding folder in the `defaults` directory.\
