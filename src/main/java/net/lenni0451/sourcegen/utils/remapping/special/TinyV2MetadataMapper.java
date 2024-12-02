@@ -161,7 +161,7 @@ public class TinyV2MetadataMapper {
             }
         }
 
-        if (!comments.isEmpty()) {
+        if (!commentLines.isEmpty()) {
             comments.add(commentLines.toArray(new String[0]));
             List<AnnotationNode> visibleAnnotations = methodNode.visibleAnnotations;
             if (visibleAnnotations == null) {
