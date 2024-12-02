@@ -80,7 +80,7 @@ public class Commands {
 
     public static class Vineflower {
 
-        private static final String[] BASE_COMMAND = {Config.External.javaPath, Config.External.vineflowerRam, "-jar", VINEFLOWER_JAR.getAbsolutePath()};
+        private static final String[] BASE_COMMAND = {Config.External.javaPath, "-Xmx" + Config.External.vineflowerRam, "-jar", VINEFLOWER_JAR.getAbsolutePath()};
 
         public static boolean exists() {
             return VINEFLOWER_JAR.exists();
