@@ -22,7 +22,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.*;
 
-public class MinecraftYarnMappingsTarget implements GeneratorTarget {
+public class MinecraftYarnMappingsTarget extends GeneratorTarget {
 
     private static final File REPO_DIR = new File(Config.MinecraftYarnMappings.repoName);
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_yarn_mappings");
@@ -31,9 +31,8 @@ public class MinecraftYarnMappingsTarget implements GeneratorTarget {
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
     private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
 
-    @Override
-    public String getName() {
-        return "Minecraft (Yarn Mappings)";
+    public MinecraftYarnMappingsTarget() {
+        super("Minecraft (Yarn Mappings)");
     }
 
     @Override

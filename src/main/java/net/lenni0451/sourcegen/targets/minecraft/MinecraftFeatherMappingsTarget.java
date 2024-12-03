@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MinecraftFeatherMappingsTarget implements GeneratorTarget {
+public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
 
     private static final File REPO_DIR = new File(Config.MinecraftFeatherMappings.repoName);
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_feather_mappings");
@@ -32,9 +32,8 @@ public class MinecraftFeatherMappingsTarget implements GeneratorTarget {
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
     private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
 
-    @Override
-    public String getName() {
-        return "Minecraft (Feather Mappings)";
+    public MinecraftFeatherMappingsTarget() {
+        super("Minecraft (Feather Mappings)");
     }
 
     @Override

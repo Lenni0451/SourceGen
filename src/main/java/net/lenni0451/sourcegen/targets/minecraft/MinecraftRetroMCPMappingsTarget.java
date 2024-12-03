@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MinecraftRetroMCPMappingsTarget implements GeneratorTarget {
+public class MinecraftRetroMCPMappingsTarget extends GeneratorTarget {
 
     private static final File REPO_DIR = new File(Config.MinecraftRetroMCPMappings.repoName);
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "retromcp");
@@ -32,9 +32,8 @@ public class MinecraftRetroMCPMappingsTarget implements GeneratorTarget {
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
     private static final File REMAPPED_JARr = new File(Main.WORK_DIR, "remapped.jar");
 
-    @Override
-    public String getName() {
-        return "Minecraft (RetroMCP Mappings)";
+    public MinecraftRetroMCPMappingsTarget() {
+        super("Minecraft (RetroMCP Mappings)");
     }
 
     @Override

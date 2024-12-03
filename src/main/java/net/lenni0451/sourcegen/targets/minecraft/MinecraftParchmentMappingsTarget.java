@@ -21,7 +21,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.*;
 
-public class MinecraftParchmentMappingsTarget implements GeneratorTarget {
+public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
 
     private static final File REPO_DIR = new File(Config.MinecraftParchmentMappings.repoName);
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_parchment_mappings");
@@ -31,9 +31,8 @@ public class MinecraftParchmentMappingsTarget implements GeneratorTarget {
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
     private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
 
-    @Override
-    public String getName() {
-        return "Minecraft (Mojang + Parchment Mappings)";
+    public MinecraftParchmentMappingsTarget() {
+        super("Minecraft (Mojang + Parchment Mappings)");
     }
 
     @Override

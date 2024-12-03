@@ -6,13 +6,21 @@ import net.lenni0451.sourcegen.steps.StepExecutor;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface GeneratorTarget {
+public abstract class GeneratorTarget {
 
-    String getName();
+    private final String name;
 
-    void addSteps(final List<GeneratorStep> steps);
+    public GeneratorTarget(final String name) {
+        this.name = name;
+    }
 
-    default void execute() throws Exception {
+    public final String getName() {
+        return this.name;
+    }
+
+    public abstract void addSteps(final List<GeneratorStep> steps);
+
+    public final void execute() throws Exception {
         List<GeneratorStep> steps = new ArrayList<>();
         this.addSteps(steps);
         new StepExecutor(steps).run();

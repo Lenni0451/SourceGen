@@ -15,7 +15,7 @@ import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import java.io.File;
 import java.util.List;
 
-public class CosmicReachTarget implements GeneratorTarget {
+public class CosmicReachTarget extends GeneratorTarget {
 
     private static final File REPO_DIR = new File(Config.CosmicReach.repoName);
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "cosmicreach");
@@ -23,9 +23,8 @@ public class CosmicReachTarget implements GeneratorTarget {
     private static final File NO_GAME_JAR = new File(Main.WORK_DIR, "no_game.jar");
     private static final File ONLY_GAME_JAR = new File(Main.WORK_DIR, "only_game.jar");
 
-    @Override
-    public String getName() {
-        return "CosmicReach (Client & Server)";
+    public CosmicReachTarget() {
+        super("CosmicReach (Client & Server)");
     }
 
     @Override

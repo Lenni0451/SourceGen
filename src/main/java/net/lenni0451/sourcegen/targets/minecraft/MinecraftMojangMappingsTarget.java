@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MinecraftMojangMappingsTarget implements GeneratorTarget {
+public class MinecraftMojangMappingsTarget extends GeneratorTarget {
 
     private static final File REPO_DIR = new File(Config.MinecraftMojangMappings.repoName);
     private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_mojang_mappings");
@@ -31,9 +31,8 @@ public class MinecraftMojangMappingsTarget implements GeneratorTarget {
     private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
     private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
 
-    @Override
-    public String getName() {
-        return "Minecraft (Mojang Mappings)";
+    public MinecraftMojangMappingsTarget() {
+        super("Minecraft (Mojang Mappings)");
     }
 
     @Override
