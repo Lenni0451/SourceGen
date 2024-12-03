@@ -36,7 +36,7 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
     }
 
     @Override
-    public void addSteps(List<GeneratorStep> steps) {
+    protected void addSteps(List<GeneratorStep> steps) {
         steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftYarnMappings.gitRepo, Config.MinecraftYarnMappings.branch));
         steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftYarnMappings.authorName, Config.MinecraftYarnMappings.authorEmail));
         steps.add(new LoadYarnMappings((subSteps, versionToUrl) -> {
@@ -79,6 +79,11 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
             }));
         }));
         steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftYarnMappings.branch));
+    }
+
+    @Override
+    protected GeneratorStep getErrorStep() {
+        return new PushRepoStep(REPO_DIR, Config.MinecraftYarnMappings.branch);
     }
 
 }

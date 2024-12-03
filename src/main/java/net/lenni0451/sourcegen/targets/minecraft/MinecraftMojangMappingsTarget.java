@@ -36,7 +36,7 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
     }
 
     @Override
-    public void addSteps(List<GeneratorStep> steps) {
+    protected void addSteps(List<GeneratorStep> steps) {
         steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftMojangMappings.gitRepo, Config.MinecraftMojangMappings.branch));
         steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftMojangMappings.authorName, Config.MinecraftMojangMappings.authorEmail));
         steps.add(new IterateMinecraftVersions(REPO_DIR, Config.MinecraftMojangMappings.branch, new VersionRange("1.14", null), (versionSteps, versionName, releaseTime, manifest) -> {
@@ -59,6 +59,11 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
             versionSteps.add(new CleanupStep(MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR));
         }));
         steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftMojangMappings.branch));
+    }
+
+    @Override
+    protected GeneratorStep getErrorStep() {
+        return new PushRepoStep(REPO_DIR, Config.MinecraftMojangMappings.branch);
     }
 
 }

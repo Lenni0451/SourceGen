@@ -18,12 +18,46 @@ public abstract class GeneratorTarget {
         return this.name;
     }
 
-    public abstract void addSteps(final List<GeneratorStep> steps);
+    protected abstract void addSteps(final List<GeneratorStep> steps);
+
+    /**
+     * Provide a step that should be executed in a shutdown hook if the generator had an error.<br>
+     * It is recommended to use this method to push already done work to prevent data loss.<br>
+     * This step will not be executed if the generator finished successfully.
+     *
+     * @return The error step
+     */
+    protected GeneratorStep getErrorStep() {
+        return null;
+    }
 
     public final void execute() throws Exception {
         List<GeneratorStep> steps = new ArrayList<>();
         this.addSteps(steps);
-        new StepExecutor(steps).run();
+
+        ErrorStepExecutor errorStepExecutor = new ErrorStepExecutor();
+        new StepExecutor(steps).run(); //Execute all steps
+        if (!Runtime.getRuntime().removeShutdownHook(errorStepExecutor)) { //If execution reaches this point, the generator finished successfully
+            System.out.println("Failed to remove error step executor from shutdown hook!");
+        }
+    }
+
+
+    private class ErrorStepExecutor extends Thread {
+        @Override
+        public void run() {
+            GeneratorStep errorStep = GeneratorTarget.this.getErrorStep();
+            if (errorStep == null) return;
+
+            System.out.println("The generator exited abnormally, executing error step...");
+            errorStep.printStep();
+            try {
+                errorStep.run();
+            } catch (Throwable t) {
+                System.out.println("Error while executing error step");
+                t.printStackTrace();
+            }
+        }
     }
 
 }

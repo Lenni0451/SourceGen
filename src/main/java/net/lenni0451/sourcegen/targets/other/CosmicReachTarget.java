@@ -28,7 +28,7 @@ public class CosmicReachTarget extends GeneratorTarget {
     }
 
     @Override
-    public void addSteps(List<GeneratorStep> steps) {
+    protected void addSteps(List<GeneratorStep> steps) {
         this.addSteps(steps, IterateCosmicReachVersions.VersionType.CLIENT, Config.CosmicReach.clientBranch);
         this.addSteps(steps, IterateCosmicReachVersions.VersionType.SERVER, Config.CosmicReach.serverBranch);
     }

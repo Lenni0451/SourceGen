@@ -37,7 +37,7 @@ public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
     }
 
     @Override
-    public void addSteps(List<GeneratorStep> steps) {
+    protected void addSteps(List<GeneratorStep> steps) {
         steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftFeatherMappings.gitRepo, Config.MinecraftFeatherMappings.branch));
         steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftFeatherMappings.authorName, Config.MinecraftFeatherMappings.authorEmail));
         steps.add(new LoadFeatherMappings((subSteps, versionToUrl) -> {
@@ -62,6 +62,11 @@ public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
             }));
         }));
         steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftFeatherMappings.branch));
+    }
+
+    @Override
+    protected GeneratorStep getErrorStep() {
+        return new PushRepoStep(REPO_DIR, Config.MinecraftFeatherMappings.branch);
     }
 
 }

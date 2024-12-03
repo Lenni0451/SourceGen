@@ -36,7 +36,7 @@ public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
     }
 
     @Override
-    public void addSteps(List<GeneratorStep> steps) {
+    protected void addSteps(List<GeneratorStep> steps) {
         steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftParchmentMappings.gitRepo, Config.MinecraftParchmentMappings.branch));
         steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftParchmentMappings.authorName, Config.MinecraftParchmentMappings.authorEmail));
         steps.add(new LoadParchmentVersions((subSteps, versionToUrl) -> {
@@ -67,6 +67,11 @@ public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
             }));
         }));
         steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftParchmentMappings.branch));
+    }
+
+    @Override
+    protected GeneratorStep getErrorStep() {
+        return new PushRepoStep(REPO_DIR, Config.MinecraftParchmentMappings.branch);
     }
 
 }

@@ -37,7 +37,7 @@ public class MinecraftRetroMCPMappingsTarget extends GeneratorTarget {
     }
 
     @Override
-    public void addSteps(List<GeneratorStep> steps) {
+    protected void addSteps(List<GeneratorStep> steps) {
         steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftRetroMCPMappings.gitRepo, Config.MinecraftRetroMCPMappings.branch));
         steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftRetroMCPMappings.authorName, Config.MinecraftRetroMCPMappings.authorEmail));
         steps.add(new IterateRetroMCPVersions(REPO_DIR, Config.MinecraftRetroMCPMappings.branch, (versionSteps, versionName, releaseTime, resourcesUrl, manifest) -> {
@@ -66,6 +66,11 @@ public class MinecraftRetroMCPMappingsTarget extends GeneratorTarget {
             versionSteps.add(new CleanupStep(RESOURCES_FILE, RESOURCES_DIR, CLIENT_JAR, REMAPPED_JARr));
         }));
         steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftRetroMCPMappings.branch));
+    }
+
+    @Override
+    protected GeneratorStep getErrorStep() {
+        return new PushRepoStep(REPO_DIR, Config.MinecraftRetroMCPMappings.branch);
     }
 
 }
