@@ -37,7 +37,7 @@ public abstract class GeneratorTarget {
 
         ErrorStepExecutor errorStepExecutor = new ErrorStepExecutor();
         new StepExecutor(steps).run(); //Execute all steps
-        if (!Runtime.getRuntime().removeShutdownHook(errorStepExecutor)) { //If execution reaches this point, the generator finished successfully
+        if (Runtime.getRuntime().removeShutdownHook(errorStepExecutor)) { //If execution reaches this point, the generator finished successfully
             System.out.println("Failed to remove error step executor from shutdown hook!");
         }
     }
