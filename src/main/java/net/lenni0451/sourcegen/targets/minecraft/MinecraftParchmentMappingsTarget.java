@@ -23,13 +23,13 @@ import java.util.*;
 
 public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
 
-    private static final File REPO_DIR = new File(Config.MinecraftParchmentMappings.repoName);
-    private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_parchment_mappings");
-    private static final File MAPPINGS_FILE = new File(Main.WORK_DIR, "mappings");
-    private static final File METADATA_JAR = new File(Main.WORK_DIR, "mappings.jar");
-    private static final File METADATA_FILE = new File(Main.WORK_DIR, "metadata.json");
-    private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
-    private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
+    private final File repoDir = new File(Config.MinecraftParchmentMappings.repoName);
+    private final File defaultsDir = new File(Main.DEFAULTS_DIR, "minecraft_parchment_mappings");
+    private final File mappingsFile = new File(Main.WORK_DIR, "mappings");
+    private final File metadataJar = new File(Main.WORK_DIR, "mappings.jar");
+    private final File metadataFile = new File(Main.WORK_DIR, "metadata.json");
+    private final File clientJar = new File(Main.WORK_DIR, "client.jar");
+    private final File remappedJar = new File(Main.WORK_DIR, "remapped.jar");
 
     public MinecraftParchmentMappingsTarget() {
         super("Minecraft (Mojang + Parchment Mappings)");
@@ -37,41 +37,48 @@ public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
 
     @Override
     protected void addSteps(List<GeneratorStep> steps) {
-        steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftParchmentMappings.gitRepo, Config.MinecraftParchmentMappings.branch));
-        steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftParchmentMappings.authorName, Config.MinecraftParchmentMappings.authorEmail));
+        steps.add(new PrepareRepoStep(this.repoDir, Config.MinecraftParchmentMappings.gitRepo, Config.MinecraftParchmentMappings.branch));
+        steps.add(new ChangeGitUserStep(this.repoDir, Config.MinecraftParchmentMappings.authorName, Config.MinecraftParchmentMappings.authorEmail));
         steps.add(new LoadParchmentVersions((subSteps, versionToUrl) -> {
-            subSteps.add(new IterateMinecraftVersions(REPO_DIR, Config.MinecraftParchmentMappings.branch, new IterateMinecraftVersions.VersionRange("1.16.5", null), ver -> versionToUrl.apply(ver) == null, false, (versionSteps, versionName, releaseTime, manifest) -> {
-                JSONObject downloads = manifest.getJSONObject("downloads");
-                String clientUrl = downloads.getJSONObject("client").getString("url");
-                String mappingsUrl = downloads.getJSONObject("client_mappings").getString("url");
-                String metadataUrl = versionToUrl.apply(versionName);
-                Map<String, byte[]> jarEntries = new HashMap<>();
-                List<String[]> comments = new ArrayList<>();
+            subSteps.add(new IterateMinecraftVersions(
+                    this.repoDir,
+                    Config.MinecraftParchmentMappings.branch,
+                    new IterateMinecraftVersions.VersionRange("1.16.5", null),
+                    ver -> versionToUrl.apply(ver) == null,
+                    false,
+                    (versionSteps, versionName, releaseTime, manifest) -> {
+                        JSONObject downloads = manifest.getJSONObject("downloads");
+                        String clientUrl = downloads.getJSONObject("client").getString("url");
+                        String mappingsUrl = downloads.getJSONObject("client_mappings").getString("url");
+                        String metadataUrl = versionToUrl.apply(versionName);
+                        Map<String, byte[]> jarEntries = new HashMap<>();
+                        List<String[]> comments = new ArrayList<>();
 
-                versionSteps.add(new CleanRepoStep(REPO_DIR));
-                versionSteps.add(new DownloadStep(mappingsUrl, MAPPINGS_FILE));
-                versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
-                versionSteps.add(new DownloadStep(metadataUrl, METADATA_JAR));
-                versionSteps.add(new UnzipSingleFileStep(METADATA_JAR, "parchment.json", METADATA_FILE));
-                versionSteps.add(new ReadJarEntriesStep(CLIENT_JAR, jarEntries));
-                versionSteps.add(new RemapStep(new ProguardRemapper(jarEntries, MAPPINGS_FILE)));
-                versionSteps.add(new FixLocalVariablesStep(jarEntries));
-                versionSteps.add(new ParchmentMetadataStep(jarEntries, METADATA_FILE, comments));
-                versionSteps.add(new WriteJarEntriesStep(jarEntries, REMAPPED_JAR));
-                versionSteps.add(new DecompileStandaloneStep(REMAPPED_JAR, REPO_DIR));
-                versionSteps.add(new ParchmentMetadataStep(REPO_DIR, comments));
-                versionSteps.add(new RemoveResourcesStep(REPO_DIR, new File(REPO_DIR, "version.json")));
-                versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
-                versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-                versionSteps.add(new CleanupStep(MAPPINGS_FILE, CLIENT_JAR, METADATA_JAR, METADATA_FILE, REMAPPED_JAR));
-            }));
+                        versionSteps.add(new CleanRepoStep(this.repoDir));
+                        versionSteps.add(new DownloadStep(mappingsUrl, this.mappingsFile));
+                        versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
+                        versionSteps.add(new DownloadStep(metadataUrl, this.metadataJar));
+                        versionSteps.add(new UnzipSingleFileStep(this.metadataJar, "parchment.json", this.metadataFile));
+                        versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
+                        versionSteps.add(new RemapStep(new ProguardRemapper(jarEntries, this.mappingsFile)));
+                        versionSteps.add(new FixLocalVariablesStep(jarEntries));
+                        versionSteps.add(new ParchmentMetadataStep(jarEntries, this.metadataFile, comments));
+                        versionSteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
+                        versionSteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
+                        versionSteps.add(new ParchmentMetadataStep(this.repoDir, comments));
+                        versionSteps.add(new RemoveResourcesStep(this.repoDir, new File(this.repoDir, "version.json")));
+                        versionSteps.add(new CopyDefaultsStep(this.repoDir, this.defaultsDir));
+                        versionSteps.add(new CommitChangesStep(this.repoDir, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
+                        versionSteps.add(new CleanupStep(this.mappingsFile, this.clientJar, this.metadataJar, this.metadataFile, this.remappedJar));
+                    }
+            ));
         }));
-        steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftParchmentMappings.branch));
+        steps.add(new PushRepoStep(this.repoDir, Config.MinecraftParchmentMappings.branch));
     }
 
     @Override
     protected GeneratorStep getErrorStep() {
-        return new PushRepoStep(REPO_DIR, Config.MinecraftParchmentMappings.branch);
+        return new PushRepoStep(this.repoDir, Config.MinecraftParchmentMappings.branch);
     }
 
 }

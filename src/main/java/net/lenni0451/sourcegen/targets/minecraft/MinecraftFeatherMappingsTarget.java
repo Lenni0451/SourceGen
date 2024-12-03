@@ -25,12 +25,12 @@ import java.util.Map;
 
 public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
 
-    private static final File REPO_DIR = new File(Config.MinecraftFeatherMappings.repoName);
-    private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_feather_mappings");
-    private static final File MAPPINGS_JAR = new File(Main.WORK_DIR, "mappings.jar");
-    private static final File MAPPINGS_FILE = new File(Main.WORK_DIR, "mappings.tiny");
-    private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
-    private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
+    private final File repoDir = new File(Config.MinecraftFeatherMappings.repoName);
+    private final File defaultsDir = new File(Main.DEFAULTS_DIR, "minecraft_feather_mappings");
+    private final File mappingsJar = new File(Main.WORK_DIR, "mappings.jar");
+    private final File mappingsFile = new File(Main.WORK_DIR, "mappings.tiny");
+    private final File clientJar = new File(Main.WORK_DIR, "client.jar");
+    private final File remappedJar = new File(Main.WORK_DIR, "remapped.jar");
 
     public MinecraftFeatherMappingsTarget() {
         super("Minecraft (Feather Mappings)");
@@ -38,35 +38,42 @@ public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
 
     @Override
     protected void addSteps(List<GeneratorStep> steps) {
-        steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftFeatherMappings.gitRepo, Config.MinecraftFeatherMappings.branch));
-        steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftFeatherMappings.authorName, Config.MinecraftFeatherMappings.authorEmail));
+        steps.add(new PrepareRepoStep(this.repoDir, Config.MinecraftFeatherMappings.gitRepo, Config.MinecraftFeatherMappings.branch));
+        steps.add(new ChangeGitUserStep(this.repoDir, Config.MinecraftFeatherMappings.authorName, Config.MinecraftFeatherMappings.authorEmail));
         steps.add(new LoadFeatherMappings((subSteps, versionToUrl) -> {
-            subSteps.add(new IterateMinecraftVersions(REPO_DIR, Config.MinecraftFeatherMappings.branch, new IterateMinecraftVersions.VersionRange(null, null), version -> versionToUrl.apply(version) == null, true, (versionSteps, versionName, releaseTime, manifest) -> {
-                JSONObject downloads = manifest.getJSONObject("downloads");
-                String clientUrl = downloads.getJSONObject("client").getString("url");
-                Map<String, byte[]> jarEntries = new HashMap<>();
+            subSteps.add(new IterateMinecraftVersions(
+                    this.repoDir,
+                    Config.MinecraftFeatherMappings.branch,
+                    new IterateMinecraftVersions.VersionRange(null, null),
+                    version -> versionToUrl.apply(version) == null,
+                    true,
+                    (versionSteps, versionName, releaseTime, manifest) -> {
+                        JSONObject downloads = manifest.getJSONObject("downloads");
+                        String clientUrl = downloads.getJSONObject("client").getString("url");
+                        Map<String, byte[]> jarEntries = new HashMap<>();
 
-                versionSteps.add(new CleanRepoStep(REPO_DIR));
-                versionSteps.add(new DownloadStep(versionToUrl.apply(versionName), MAPPINGS_JAR));
-                versionSteps.add(new UnzipSingleFileStep(MAPPINGS_JAR, "mappings/mappings.tiny", MAPPINGS_FILE));
-                versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
-                versionSteps.add(new ReadJarEntriesStep(CLIENT_JAR, jarEntries));
-                versionSteps.add(new RemapStep(new TinyV2Remapper(jarEntries, MAPPINGS_FILE)));
-                versionSteps.add(new FixLocalVariablesStep(jarEntries));
-                versionSteps.add(new WriteJarEntriesStep(jarEntries, REMAPPED_JAR));
-                versionSteps.add(new DecompileStandaloneStep(REMAPPED_JAR, REPO_DIR));
-                versionSteps.add(new RemoveResourcesStep(REPO_DIR));
-                versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
-                versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-                versionSteps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR));
-            }));
+                        versionSteps.add(new CleanRepoStep(this.repoDir));
+                        versionSteps.add(new DownloadStep(versionToUrl.apply(versionName), this.mappingsJar));
+                        versionSteps.add(new UnzipSingleFileStep(this.mappingsJar, "mappings/mappings.tiny", this.mappingsFile));
+                        versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
+                        versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
+                        versionSteps.add(new RemapStep(new TinyV2Remapper(jarEntries, this.mappingsFile)));
+                        versionSteps.add(new FixLocalVariablesStep(jarEntries));
+                        versionSteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
+                        versionSteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
+                        versionSteps.add(new RemoveResourcesStep(this.repoDir));
+                        versionSteps.add(new CopyDefaultsStep(this.repoDir, this.defaultsDir));
+                        versionSteps.add(new CommitChangesStep(this.repoDir, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
+                        versionSteps.add(new CleanupStep(this.mappingsJar, this.mappingsFile, this.clientJar, this.remappedJar));
+                    }
+            ));
         }));
-        steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftFeatherMappings.branch));
+        steps.add(new PushRepoStep(this.repoDir, Config.MinecraftFeatherMappings.branch));
     }
 
     @Override
     protected GeneratorStep getErrorStep() {
-        return new PushRepoStep(REPO_DIR, Config.MinecraftFeatherMappings.branch);
+        return new PushRepoStep(this.repoDir, Config.MinecraftFeatherMappings.branch);
     }
 
 }

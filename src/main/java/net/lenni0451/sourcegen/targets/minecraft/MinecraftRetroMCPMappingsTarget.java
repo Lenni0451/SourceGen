@@ -25,12 +25,12 @@ import java.util.Map;
 
 public class MinecraftRetroMCPMappingsTarget extends GeneratorTarget {
 
-    private static final File REPO_DIR = new File(Config.MinecraftRetroMCPMappings.repoName);
-    private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "retromcp");
-    private static final File RESOURCES_FILE = new File(Main.WORK_DIR, "resources.zip");
-    private static final File RESOURCES_DIR = new File(Main.WORK_DIR, "resources");
-    private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
-    private static final File REMAPPED_JARr = new File(Main.WORK_DIR, "remapped.jar");
+    private final File repoDir = new File(Config.MinecraftRetroMCPMappings.repoName);
+    private final File defaultsDir = new File(Main.DEFAULTS_DIR, "retromcp");
+    private final File resourcesFile = new File(Main.WORK_DIR, "resources.zip");
+    private final File resourcesDir = new File(Main.WORK_DIR, "resources");
+    private final File clientJar = new File(Main.WORK_DIR, "client.jar");
+    private final File remappedJar = new File(Main.WORK_DIR, "remapped.jar");
 
     public MinecraftRetroMCPMappingsTarget() {
         super("Minecraft (RetroMCP Mappings)");
@@ -38,39 +38,43 @@ public class MinecraftRetroMCPMappingsTarget extends GeneratorTarget {
 
     @Override
     protected void addSteps(List<GeneratorStep> steps) {
-        steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftRetroMCPMappings.gitRepo, Config.MinecraftRetroMCPMappings.branch));
-        steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftRetroMCPMappings.authorName, Config.MinecraftRetroMCPMappings.authorEmail));
-        steps.add(new IterateRetroMCPVersions(REPO_DIR, Config.MinecraftRetroMCPMappings.branch, (versionSteps, versionName, releaseTime, resourcesUrl, manifest) -> {
-            JSONObject downloads = manifest.getJSONObject("downloads");
-            String clientUrl = downloads.getJSONObject("client").getString("url");
+        steps.add(new PrepareRepoStep(this.repoDir, Config.MinecraftRetroMCPMappings.gitRepo, Config.MinecraftRetroMCPMappings.branch));
+        steps.add(new ChangeGitUserStep(this.repoDir, Config.MinecraftRetroMCPMappings.authorName, Config.MinecraftRetroMCPMappings.authorEmail));
+        steps.add(new IterateRetroMCPVersions(
+                this.repoDir,
+                Config.MinecraftRetroMCPMappings.branch,
+                (versionSteps, versionName, releaseTime, resourcesUrl, manifest) -> {
+                    JSONObject downloads = manifest.getJSONObject("downloads");
+                    String clientUrl = downloads.getJSONObject("client").getString("url");
 
-            versionSteps.add(new CleanRepoStep(REPO_DIR));
-            versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
-            if (resourcesUrl != null) {
-                Map<String, byte[]> jarEntries = new HashMap<>();
+                    versionSteps.add(new CleanRepoStep(this.repoDir));
+                    versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
+                    if (resourcesUrl != null) {
+                        Map<String, byte[]> jarEntries = new HashMap<>();
 
-                versionSteps.add(new ReadJarEntriesStep(CLIENT_JAR, jarEntries));
-                versionSteps.add(new DownloadStep(resourcesUrl, RESOURCES_FILE));
-                versionSteps.add(new UnzipStep(RESOURCES_FILE, RESOURCES_DIR));
-                versionSteps.add(new RemapStep(new TinyV2Remapper(jarEntries, new File(RESOURCES_DIR, "mappings.tiny"))));
-                versionSteps.add(new FillExceptionsStep(jarEntries, new File(RESOURCES_DIR, "exceptions.exc")));
-                versionSteps.add(new FixLocalVariablesStep(jarEntries));
-                versionSteps.add(new WriteJarEntriesStep(jarEntries, REMAPPED_JARr));
-                versionSteps.add(new DecompileStandaloneStep(REMAPPED_JARr, REPO_DIR));
-            } else {
-                versionSteps.add(new DecompileStandaloneStep(CLIENT_JAR, REPO_DIR));
-            }
-            versionSteps.add(new RemoveResourcesStep(REPO_DIR));
-            versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
-            versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-            versionSteps.add(new CleanupStep(RESOURCES_FILE, RESOURCES_DIR, CLIENT_JAR, REMAPPED_JARr));
-        }));
-        steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftRetroMCPMappings.branch));
+                        versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
+                        versionSteps.add(new DownloadStep(resourcesUrl, this.resourcesFile));
+                        versionSteps.add(new UnzipStep(this.resourcesFile, this.resourcesDir));
+                        versionSteps.add(new RemapStep(new TinyV2Remapper(jarEntries, new File(this.resourcesDir, "mappings.tiny"))));
+                        versionSteps.add(new FillExceptionsStep(jarEntries, new File(this.resourcesDir, "exceptions.exc")));
+                        versionSteps.add(new FixLocalVariablesStep(jarEntries));
+                        versionSteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
+                        versionSteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
+                    } else {
+                        versionSteps.add(new DecompileStandaloneStep(this.clientJar, this.repoDir));
+                    }
+                    versionSteps.add(new RemoveResourcesStep(this.repoDir));
+                    versionSteps.add(new CopyDefaultsStep(this.repoDir, this.defaultsDir));
+                    versionSteps.add(new CommitChangesStep(this.repoDir, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
+                    versionSteps.add(new CleanupStep(this.resourcesFile, this.resourcesDir, this.clientJar, this.remappedJar));
+                }
+        ));
+        steps.add(new PushRepoStep(this.repoDir, Config.MinecraftRetroMCPMappings.branch));
     }
 
     @Override
     protected GeneratorStep getErrorStep() {
-        return new PushRepoStep(REPO_DIR, Config.MinecraftRetroMCPMappings.branch);
+        return new PushRepoStep(this.repoDir, Config.MinecraftRetroMCPMappings.branch);
     }
 
 }

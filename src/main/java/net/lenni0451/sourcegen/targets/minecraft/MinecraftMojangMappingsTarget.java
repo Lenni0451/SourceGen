@@ -25,11 +25,11 @@ import java.util.Map;
 
 public class MinecraftMojangMappingsTarget extends GeneratorTarget {
 
-    private static final File REPO_DIR = new File(Config.MinecraftMojangMappings.repoName);
-    private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_mojang_mappings");
-    private static final File MAPPINGS_FILE = new File(Main.WORK_DIR, "mappings");
-    private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
-    private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
+    private final File repoDir = new File(Config.MinecraftMojangMappings.repoName);
+    private final File defaultsDir = new File(Main.DEFAULTS_DIR, "minecraft_mojang_mappings");
+    private final File mappingsFile = new File(Main.WORK_DIR, "mappings");
+    private final File clientJar = new File(Main.WORK_DIR, "client.jar");
+    private final File remappedJar = new File(Main.WORK_DIR, "remapped.jar");
 
     public MinecraftMojangMappingsTarget() {
         super("Minecraft (Mojang Mappings)");
@@ -37,33 +37,38 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
 
     @Override
     protected void addSteps(List<GeneratorStep> steps) {
-        steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftMojangMappings.gitRepo, Config.MinecraftMojangMappings.branch));
-        steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftMojangMappings.authorName, Config.MinecraftMojangMappings.authorEmail));
-        steps.add(new IterateMinecraftVersions(REPO_DIR, Config.MinecraftMojangMappings.branch, new VersionRange("1.14", null), (versionSteps, versionName, releaseTime, manifest) -> {
-            JSONObject downloads = manifest.getJSONObject("downloads");
-            String clientUrl = downloads.getJSONObject("client").getString("url");
-            String mappingsUrl = downloads.getJSONObject("client_mappings").getString("url");
-            Map<String, byte[]> jarEntries = new HashMap<>();
+        steps.add(new PrepareRepoStep(this.repoDir, Config.MinecraftMojangMappings.gitRepo, Config.MinecraftMojangMappings.branch));
+        steps.add(new ChangeGitUserStep(this.repoDir, Config.MinecraftMojangMappings.authorName, Config.MinecraftMojangMappings.authorEmail));
+        steps.add(new IterateMinecraftVersions(
+                this.repoDir,
+                Config.MinecraftMojangMappings.branch,
+                new VersionRange("1.14", null),
+                (versionSteps, versionName, releaseTime, manifest) -> {
+                    JSONObject downloads = manifest.getJSONObject("downloads");
+                    String clientUrl = downloads.getJSONObject("client").getString("url");
+                    String mappingsUrl = downloads.getJSONObject("client_mappings").getString("url");
+                    Map<String, byte[]> jarEntries = new HashMap<>();
 
-            versionSteps.add(new CleanRepoStep(REPO_DIR));
-            versionSteps.add(new DownloadStep(mappingsUrl, MAPPINGS_FILE));
-            versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
-            versionSteps.add(new ReadJarEntriesStep(CLIENT_JAR, jarEntries));
-            versionSteps.add(new RemapStep(new ProguardRemapper(jarEntries, MAPPINGS_FILE)));
-            versionSteps.add(new FixLocalVariablesStep(jarEntries));
-            versionSteps.add(new WriteJarEntriesStep(jarEntries, REMAPPED_JAR));
-            versionSteps.add(new DecompileStandaloneStep(REMAPPED_JAR, REPO_DIR));
-            versionSteps.add(new RemoveResourcesStep(REPO_DIR, new File(REPO_DIR, "version.json")));
-            versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
-            versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-            versionSteps.add(new CleanupStep(MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR));
-        }));
-        steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftMojangMappings.branch));
+                    versionSteps.add(new CleanRepoStep(this.repoDir));
+                    versionSteps.add(new DownloadStep(mappingsUrl, this.mappingsFile));
+                    versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
+                    versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
+                    versionSteps.add(new RemapStep(new ProguardRemapper(jarEntries, this.mappingsFile)));
+                    versionSteps.add(new FixLocalVariablesStep(jarEntries));
+                    versionSteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
+                    versionSteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
+                    versionSteps.add(new RemoveResourcesStep(this.repoDir, new File(this.repoDir, "version.json")));
+                    versionSteps.add(new CopyDefaultsStep(this.repoDir, this.defaultsDir));
+                    versionSteps.add(new CommitChangesStep(this.repoDir, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
+                    versionSteps.add(new CleanupStep(this.mappingsFile, this.clientJar, this.remappedJar));
+                }
+        ));
+        steps.add(new PushRepoStep(this.repoDir, Config.MinecraftMojangMappings.branch));
     }
 
     @Override
     protected GeneratorStep getErrorStep() {
-        return new PushRepoStep(REPO_DIR, Config.MinecraftMojangMappings.branch);
+        return new PushRepoStep(this.repoDir, Config.MinecraftMojangMappings.branch);
     }
 
 }

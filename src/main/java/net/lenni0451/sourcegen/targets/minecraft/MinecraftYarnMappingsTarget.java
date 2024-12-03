@@ -24,12 +24,12 @@ import java.util.*;
 
 public class MinecraftYarnMappingsTarget extends GeneratorTarget {
 
-    private static final File REPO_DIR = new File(Config.MinecraftYarnMappings.repoName);
-    private static final File DEFAULTS_DIR = new File(Main.DEFAULTS_DIR, "minecraft_yarn_mappings");
-    private static final File MAPPINGS_JAR = new File(Main.WORK_DIR, "mappings.jar");
-    private static final File MAPPINGS_FILE = new File(Main.WORK_DIR, "mappings.tiny");
-    private static final File CLIENT_JAR = new File(Main.WORK_DIR, "client.jar");
-    private static final File REMAPPED_JAR = new File(Main.WORK_DIR, "remapped.jar");
+    private final File repoDir = new File(Config.MinecraftYarnMappings.repoName);
+    private final File defaultsDir = new File(Main.DEFAULTS_DIR, "minecraft_yarn_mappings");
+    private final File mappingsJar = new File(Main.WORK_DIR, "mappings.jar");
+    private final File mappingsFile = new File(Main.WORK_DIR, "mappings.tiny");
+    private final File clientJar = new File(Main.WORK_DIR, "client.jar");
+    private final File remappedJar = new File(Main.WORK_DIR, "remapped.jar");
 
     public MinecraftYarnMappingsTarget() {
         super("Minecraft (Yarn Mappings)");
@@ -37,53 +37,60 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
 
     @Override
     protected void addSteps(List<GeneratorStep> steps) {
-        steps.add(new PrepareRepoStep(REPO_DIR, Config.MinecraftYarnMappings.gitRepo, Config.MinecraftYarnMappings.branch));
-        steps.add(new ChangeGitUserStep(REPO_DIR, Config.MinecraftYarnMappings.authorName, Config.MinecraftYarnMappings.authorEmail));
+        steps.add(new PrepareRepoStep(this.repoDir, Config.MinecraftYarnMappings.gitRepo, Config.MinecraftYarnMappings.branch));
+        steps.add(new ChangeGitUserStep(this.repoDir, Config.MinecraftYarnMappings.authorName, Config.MinecraftYarnMappings.authorEmail));
         steps.add(new LoadYarnMappings((subSteps, versionToUrl) -> {
-            subSteps.add(new IterateMinecraftVersions(REPO_DIR, Config.MinecraftYarnMappings.branch, new IterateMinecraftVersions.VersionRange(null, null), version -> versionToUrl.apply(version) == null, true, (versionSteps, versionName, releaseTime, manifest) -> {
-                JSONObject downloads = manifest.getJSONObject("downloads");
-                String clientUrl = downloads.getJSONObject("client").getString("url");
-                Map<String, byte[]> jarEntries = new HashMap<>();
-                List<String[]> comments = new ArrayList<>();
+            subSteps.add(new IterateMinecraftVersions(
+                    this.repoDir,
+                    Config.MinecraftYarnMappings.branch,
+                    new IterateMinecraftVersions.VersionRange(null, null),
+                    version -> versionToUrl.apply(version) == null,
+                    true,
+                    (versionSteps, versionName, releaseTime, manifest) -> {
+                        JSONObject downloads = manifest.getJSONObject("downloads");
+                        String clientUrl = downloads.getJSONObject("client").getString("url");
+                        Map<String, byte[]> jarEntries = new HashMap<>();
+                        List<String[]> comments = new ArrayList<>();
 
-                versionSteps.add(new CleanRepoStep(REPO_DIR));
-                versionSteps.add(new DownloadAlternativesStep(versionToUrl.apply(versionName), MAPPINGS_JAR));
-                versionSteps.add(new UnzipSingleFileStep(MAPPINGS_JAR, "mappings/mappings.tiny", MAPPINGS_FILE));
-                versionSteps.add(new DownloadStep(clientUrl, CLIENT_JAR));
-                versionSteps.add(new ReadJarEntriesStep(CLIENT_JAR, jarEntries));
-                versionSteps.add(new DetectTinyVersionStep(MAPPINGS_FILE, (version, tinySteps) -> {
-                    switch (version) {
-                        case V1 -> tinySteps.add(new RemapStep(new TinyV1Remapper(jarEntries, MAPPINGS_FILE)));
-                        case V2 -> tinySteps.add(new RemapStep(new TinyV2Remapper(jarEntries, MAPPINGS_FILE)));
-                        default -> throw new IllegalStateException("Unknown tiny mappings version: " + version);
+                        versionSteps.add(new CleanRepoStep(this.repoDir));
+                        versionSteps.add(new DownloadAlternativesStep(versionToUrl.apply(versionName), this.mappingsJar));
+                        versionSteps.add(new UnzipSingleFileStep(this.mappingsJar, "mappings/mappings.tiny", this.mappingsFile));
+                        versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
+                        versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
+                        versionSteps.add(new DetectTinyVersionStep(this.mappingsFile, (version, tinySteps) -> {
+                            switch (version) {
+                                case V1 -> tinySteps.add(new RemapStep(new TinyV1Remapper(jarEntries, this.mappingsFile)));
+                                case V2 -> tinySteps.add(new RemapStep(new TinyV2Remapper(jarEntries, this.mappingsFile)));
+                                default -> throw new IllegalStateException("Unknown tiny mappings version: " + version);
+                            }
+                            tinySteps.add(new FixLocalVariablesStep(jarEntries));
+                            switch (version) {
+                                case V1 -> {
+                                    tinySteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
+                                    tinySteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
+                                }
+                                case V2 -> {
+                                    tinySteps.add(new TinyV2MetadataStep(jarEntries, this.mappingsFile, comments));
+                                    tinySteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
+                                    tinySteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
+                                    tinySteps.add(new TinyV2MetadataStep(this.repoDir, comments));
+                                }
+                                default -> throw new IllegalStateException("Unknown tiny mappings version: " + version);
+                            }
+                        }));
+                        versionSteps.add(new RemoveResourcesStep(this.repoDir));
+                        versionSteps.add(new CopyDefaultsStep(this.repoDir, this.defaultsDir));
+                        versionSteps.add(new CommitChangesStep(this.repoDir, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
+                        versionSteps.add(new CleanupStep(this.mappingsJar, this.mappingsFile, this.clientJar, this.remappedJar));
                     }
-                    tinySteps.add(new FixLocalVariablesStep(jarEntries));
-                    switch (version) {
-                        case V1 -> {
-                            tinySteps.add(new WriteJarEntriesStep(jarEntries, REMAPPED_JAR));
-                            tinySteps.add(new DecompileStandaloneStep(REMAPPED_JAR, REPO_DIR));
-                        }
-                        case V2 -> {
-                            tinySteps.add(new TinyV2MetadataStep(jarEntries, MAPPINGS_FILE, comments));
-                            tinySteps.add(new WriteJarEntriesStep(jarEntries, REMAPPED_JAR));
-                            tinySteps.add(new DecompileStandaloneStep(REMAPPED_JAR, REPO_DIR));
-                            tinySteps.add(new TinyV2MetadataStep(REPO_DIR, comments));
-                        }
-                        default -> throw new IllegalStateException("Unknown tiny mappings version: " + version);
-                    }
-                }));
-                versionSteps.add(new RemoveResourcesStep(REPO_DIR));
-                versionSteps.add(new CopyDefaultsStep(REPO_DIR, DEFAULTS_DIR));
-                versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-                versionSteps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR));
-            }));
+            ));
         }));
-        steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftYarnMappings.branch));
+        steps.add(new PushRepoStep(this.repoDir, Config.MinecraftYarnMappings.branch));
     }
 
     @Override
     protected GeneratorStep getErrorStep() {
-        return new PushRepoStep(REPO_DIR, Config.MinecraftYarnMappings.branch);
+        return new PushRepoStep(this.repoDir, Config.MinecraftYarnMappings.branch);
     }
 
 }
