@@ -3,6 +3,7 @@ package net.lenni0451.sourcegen.steps.target;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
+import net.lenni0451.sourcegen.utils.ETA;
 import net.lenni0451.sourcegen.utils.NetUtils;
 import net.lenni0451.sourcegen.utils.external.Commands;
 import org.json.JSONArray;
@@ -53,18 +54,20 @@ public class IterateMinecraftVersions implements GeneratorStep {
         this.removeBuiltVersions(versions);
         this.filterPredicate(versions);
         this.resolveVersionManifest(versions);
+
         int i = 0;
+        ETA eta = new ETA();
         for (Map.Entry<OffsetDateTime, JSONObject> entry : versions.entrySet()) {
             JSONObject versionManifest = entry.getValue().getJSONObject("manifest");
             List<GeneratorStep> steps = new ArrayList<>();
             String versionName = entry.getValue().getString("id");
             this.stepProvider.provideSteps(steps, versionName, entry.getKey(), versionManifest);
-            System.out.println("Running steps for version " + versionName + " (" + (++i) + "/" + versions.size() + ")...");
-            long start = System.nanoTime();
+            System.out.println("Running steps for version " + versionName + " (" + (++i) + "/" + versions.size() + (eta.canEstimate() ? (" ETA: " + ETA.format(eta.getNextEstimation()) + "/" + ETA.format(eta.getEstimation(versions.size() - (i - 1)))) : "") + ")...");
+            eta.start();
             StepExecutor executor = new StepExecutor(steps);
             executor.run();
-            long end = System.nanoTime();
-            System.out.println("Finished steps for version " + versionName + " in " + (end - start) / 1_000_000 + "ms");
+            eta.stop();
+            System.out.println("Finished steps for version " + versionName + " in " + ETA.format(eta.getLastDuration()));
         }
     }
 
