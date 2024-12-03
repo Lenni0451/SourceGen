@@ -46,7 +46,7 @@ public class CosmicReachTarget extends GeneratorTarget {
             versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, releaseTime));
             versionSteps.add(new CleanupStep(RAW_JAR, NO_GAME_JAR, ONLY_GAME_JAR));
         }));
-        steps.add(new PushRepoStep(REPO_DIR));
+        steps.add(new PushRepoStep(REPO_DIR, branch));
     }
 
 }

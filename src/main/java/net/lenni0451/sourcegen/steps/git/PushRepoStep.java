@@ -8,9 +8,11 @@ import java.io.File;
 public class PushRepoStep implements GeneratorStep {
 
     private final File repoDir;
+    private final String branch;
 
-    public PushRepoStep(final File repoDir) {
+    public PushRepoStep(final File repoDir, final String branch) {
         this.repoDir = repoDir;
+        this.branch = branch;
     }
 
     @Override
@@ -20,7 +22,7 @@ public class PushRepoStep implements GeneratorStep {
 
     @Override
     public void run() throws Exception {
-        Commands.git(this.repoDir).push();
+        Commands.git(this.repoDir).push(this.branch);
     }
 
 }

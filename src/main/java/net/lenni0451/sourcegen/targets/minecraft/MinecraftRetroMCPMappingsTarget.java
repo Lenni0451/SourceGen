@@ -65,7 +65,7 @@ public class MinecraftRetroMCPMappingsTarget extends GeneratorTarget {
             versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
             versionSteps.add(new CleanupStep(RESOURCES_FILE, RESOURCES_DIR, CLIENT_JAR, REMAPPED_JARr));
         }));
-        steps.add(new PushRepoStep(REPO_DIR));
+        steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftRetroMCPMappings.branch));
     }
 
 }

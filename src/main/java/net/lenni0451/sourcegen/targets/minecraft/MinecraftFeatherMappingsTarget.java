@@ -61,7 +61,7 @@ public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
                 versionSteps.add(new CleanupStep(MAPPINGS_JAR, MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR));
             }));
         }));
-        steps.add(new PushRepoStep(REPO_DIR));
+        steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftFeatherMappings.branch));
     }
 
 }

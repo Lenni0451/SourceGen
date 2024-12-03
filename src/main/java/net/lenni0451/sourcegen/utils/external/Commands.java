@@ -72,8 +72,8 @@ public class Commands {
             Executor.execute(this.repoDir, env, Config.External.gitPath, "commit", "--allow-empty", "-m", message);
         }
 
-        public void push() throws IOException {
-            Executor.execute(this.repoDir, Config.External.gitPath, "push");
+        public void push(final String branch) throws IOException {
+            Executor.execute(this.repoDir, Config.External.gitPath, "push", "--set-upstream", "origin", branch);
         }
 
     }

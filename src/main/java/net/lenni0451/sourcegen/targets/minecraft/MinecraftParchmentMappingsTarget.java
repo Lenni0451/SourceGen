@@ -66,7 +66,7 @@ public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
                 versionSteps.add(new CleanupStep(MAPPINGS_FILE, CLIENT_JAR, METADATA_JAR, METADATA_FILE, REMAPPED_JAR));
             }));
         }));
-        steps.add(new PushRepoStep(REPO_DIR));
+        steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftParchmentMappings.branch));
     }
 
 }

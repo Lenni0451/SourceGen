@@ -58,7 +58,7 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
             versionSteps.add(new CommitChangesStep(REPO_DIR, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
             versionSteps.add(new CleanupStep(MAPPINGS_FILE, CLIENT_JAR, REMAPPED_JAR));
         }));
-        steps.add(new PushRepoStep(REPO_DIR));
+        steps.add(new PushRepoStep(REPO_DIR, Config.MinecraftMojangMappings.branch));
     }
 
 }
