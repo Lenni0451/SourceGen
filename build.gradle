@@ -43,7 +43,7 @@ dependencies {
     include "net.lenni0451.commons:asm:1.7.0-SNAPSHOT"
     include "net.lenni0451:optconfig:1.1.0"
     include "net.sf.jopt-simple:jopt-simple:5.0.4"
-    include "com.google.guava:guava:33.3.1-jre"
+    include "com.google.guava:guava:33.4.0-jre"
 }
 
 jar {
