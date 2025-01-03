@@ -33,7 +33,7 @@ dependencies {
     compileOnly "org.jetbrains:annotations:26.0.1"
     compileOnly(annotationProcessor("org.projectlombok:lombok:1.18.36"))
 
-    include "org.json:json:20240303"
+    include "org.json:json:20241224"
     include "org.ow2.asm:asm:9.7.1"
     include "org.ow2.asm:asm-tree:9.7.1"
     include "org.ow2.asm:asm-commons:9.7.1"
