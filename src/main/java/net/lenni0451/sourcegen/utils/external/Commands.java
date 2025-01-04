@@ -46,7 +46,7 @@ public class Commands {
         }
 
         public void rmAll() throws IOException {
-            Executor.execute(this.repoDir, Config.External.gitPath, "rm", "-rf", ".");
+            Executor.execute(this.repoDir, Collections.emptyMap(), new int[]{0, 128}, Config.External.gitPath, "rm", "-rf", ".");
         }
 
         public void setConfig(final String name, final String email) throws IOException {
