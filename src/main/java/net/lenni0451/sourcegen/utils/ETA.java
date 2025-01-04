@@ -6,6 +6,7 @@ import java.util.List;
 public class ETA {
 
     public static String format(final long ms) {
+        if (ms < 0) return "~";
         long seconds = ms / 1000;
         long minutes = seconds / 60;
         long hours = minutes / 60;
