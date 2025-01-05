@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -57,10 +57,10 @@ public class ParchmentMetadataConverter {
         return new ParameterMetaMapping(obj.getInt("index"), obj.getString("name"), toComment(obj));
     }
 
-    @Nullable
+    @Nonnull
     private static String[] toComment(final JSONObject obj) {
         Object rawJavadoc = obj.opt("javadoc");
-        if (rawJavadoc == null) return null;
+        if (rawJavadoc == null) return new String[0];
         String[] comment;
         if (rawJavadoc instanceof String) {
             comment = new String[]{(String) rawJavadoc};
@@ -69,7 +69,7 @@ public class ParchmentMetadataConverter {
         } else {
             throw new IllegalStateException("Invalid comment type: " + rawJavadoc);
         }
-        if (Arrays.stream(comment).allMatch(String::isBlank)) return null;
+        if (Arrays.stream(comment).allMatch(String::isBlank)) return new String[0];
         return comment;
     }
 
