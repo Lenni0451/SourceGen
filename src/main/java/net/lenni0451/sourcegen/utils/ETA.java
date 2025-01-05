@@ -76,7 +76,8 @@ public class ETA {
         double slope = (n * sumXY - sumX * sumY) / (double) (n * sumX2 - sumX * sumX);
         double intercept = (sumY - slope * sumX) / (double) n;
 
-        return Math.round(slope * n + intercept);
+        long estimation = Math.round(slope * n + intercept);
+        return Math.max(estimation, 0);
     }
 
 }
