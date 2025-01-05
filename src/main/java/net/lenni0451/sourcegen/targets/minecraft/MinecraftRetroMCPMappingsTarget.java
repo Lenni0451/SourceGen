@@ -15,7 +15,6 @@ import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateRetroMCPVersions;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Date;
@@ -43,20 +42,17 @@ public class MinecraftRetroMCPMappingsTarget extends GeneratorTarget {
         steps.add(new IterateRetroMCPVersions(
                 this.repoDir,
                 Config.MinecraftRetroMCPMappings.branch,
-                (versionSteps, versionName, releaseTime, resourcesUrl, manifest) -> {
-                    JSONObject downloads = manifest.getJSONObject("downloads");
-                    String clientUrl = downloads.getJSONObject("client").getString("url");
-
+                (versionSteps, versionData) -> {
                     versionSteps.add(new CleanRepoStep(this.repoDir));
-                    versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
-                    if (resourcesUrl != null) {
+                    versionSteps.add(new DownloadStep(versionData.clientUrl().get(), this.clientJar));
+                    if (versionData.resourcesUrl() != null) {
                         Map<String, byte[]> jarEntries = new HashMap<>();
 
                         versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
-                        versionSteps.add(new DownloadStep(resourcesUrl, this.resourcesFile));
+                        versionSteps.add(new DownloadStep(versionData.resourcesUrl(), this.resourcesFile));
                         versionSteps.add(new UnzipStep(this.resourcesFile, this.resourcesDir));
-                        versionSteps.add(new RemapStep(new TinyV2Remapper(jarEntries, new File(this.resourcesDir, "mappings.tiny"))));
-                        versionSteps.add(new FillExceptionsStep(jarEntries, new File(this.resourcesDir, "exceptions.exc")));
+                        versionSteps.add(new RemapStep(new TinyV2Remapper(jarEntries, new File(this.resourcesDir, versionData.mappingsName()))));
+                        versionSteps.add(new FillExceptionsStep(jarEntries, new File(this.resourcesDir, versionData.exceptionsName())));
                         versionSteps.add(new FixLocalVariablesStep(jarEntries));
                         versionSteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
                         versionSteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
@@ -65,7 +61,7 @@ public class MinecraftRetroMCPMappingsTarget extends GeneratorTarget {
                     }
                     versionSteps.add(new RemoveResourcesStep(this.repoDir));
                     versionSteps.add(new CopyDefaultsStep(this.repoDir, this.defaultsDir));
-                    versionSteps.add(new CommitChangesStep(this.repoDir, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
+                    versionSteps.add(new CommitChangesStep(this.repoDir, versionData.name(), new Date(versionData.time().toInstant().toEpochMilli())));
                     versionSteps.add(new CleanupStep(this.resourcesFile, this.resourcesDir, this.clientJar, this.remappedJar));
                 }
         ));

@@ -1,5 +1,7 @@
 package net.lenni0451.sourcegen.steps.target;
 
+import lombok.SneakyThrows;
+import net.lenni0451.commons.lazy.Lazy;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
@@ -13,9 +15,12 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class IterateRetroMCPVersions implements GeneratorStep {
+
+    private static final DateTimeFormatter RETROMCP_FORK_TIME = DateTimeFormatter.ofPattern("yyyy-M-d'T'HH:mm:ssX"); //2009-10-24T18:04:24Z
 
     private final File repoDir;
     private final String branch;
@@ -34,66 +39,90 @@ public class IterateRetroMCPVersions implements GeneratorStep {
 
     @Override
     public void run() throws Exception {
-        Map<OffsetDateTime, JSONObject> versions = this.loadVersions();
+        Set<VersionData> versions = this.loadVersions();
         this.removeBuiltVersions(versions);
-        this.resolveVersionManifest(versions);
 
         int i = 0;
         ETA eta = new ETA();
-        for (Map.Entry<OffsetDateTime, JSONObject> entry : versions.entrySet()) {
-            JSONObject versionManifest = entry.getValue().getJSONObject("manifest");
+        for (VersionData versionData : versions) {
             List<GeneratorStep> steps = new ArrayList<>();
-            String versionName = entry.getValue().getString("id");
-            this.stepProvider.provideSteps(steps, versionName, entry.getKey(), entry.getValue().optString("resources", null), versionManifest);
-            System.out.println("Running steps for version " + versionName + " (" + (++i) + "/" + versions.size() + (eta.canEstimate() ? (" ETA: " + ETA.format(eta.getNextEstimation()) + "/" + ETA.format(eta.getEstimation(versions.size() - (i - 1)))) : "") + ")...");
+            this.stepProvider.provideSteps(steps, versionData);
+            System.out.println("Running steps for version " + versionData.name + " (" + (++i) + "/" + versions.size() + (eta.canEstimate() ? (" ETA: " + ETA.format(eta.getNextEstimation()) + "/" + ETA.format(eta.getEstimation(versions.size() - (i - 1)))) : "") + ")...");
             eta.start();
             StepExecutor executor = new StepExecutor(steps);
             executor.run();
             eta.stop();
-            System.out.println("Finished steps for version " + versionName + " in " + ETA.format(eta.getLastDuration()));
+            System.out.println("Finished steps for version " + versionData.name + " in " + ETA.format(eta.getLastDuration()));
         }
     }
 
-    private Map<OffsetDateTime, JSONObject> loadVersions() throws IOException {
-        JSONArray versions = NetUtils.getJsonArray(Config.OnlineResources.retroMCPVersions);
-        Map<OffsetDateTime, JSONObject> sortedVersions = new TreeMap<>();
-        for (int i = 0; i < versions.length(); i++) {
-            JSONObject version = versions.getJSONObject(i);
-            if (Config.Exclusions.retroMCP.contains(version.getString("id"))) continue;
+    private Set<VersionData> loadVersions() throws IOException {
+        Set<String> addedVersions = new HashSet<>();
+        Set<VersionData> sortedVersions = new TreeSet<>(Comparator.comparing(o -> o.time));
+        { //RetroMCP
+            JSONArray versions = NetUtils.getJsonArray(Config.OnlineResources.retroMCPVersions);
+            for (int i = 0; i < versions.length(); i++) {
+                JSONObject version = versions.getJSONObject(i);
+                String id = version.getString("id");
+                if (Config.Exclusions.retroMCP.contains(id)) continue;
+                if (!addedVersions.add(id)) continue;
 
-            String time = version.getString("releaseTime");
-            sortedVersions.put(OffsetDateTime.parse(time), version);
+                String time = version.getString("releaseTime");
+                String resources = version.optString("resources", null);
+                sortedVersions.add(new VersionData(id, OffsetDateTime.parse(time), resources, new Lazy<>() {
+                    @Override
+                    @SneakyThrows
+                    protected String calculate() {
+                        String url = version.getString("url");
+                        JSONObject versionManifest = NetUtils.getJsonObject(url);
+                        JSONObject downloads = versionManifest.getJSONObject("downloads");
+                        JSONObject client = downloads.getJSONObject("client");
+                        return client.getString("url");
+                    }
+                }, "mappings.tiny", "exceptions.exc"));
+            }
+        }
+        { //RetroMCP fork
+            JSONObject versions = NetUtils.getJsonObject(Config.OnlineResources.retroMCPForkVersions);
+            for (String id : versions.keySet()) {
+                JSONObject version = versions.getJSONObject(id);
+                if (Config.Exclusions.retroMCPFork.contains(id)) continue;
+                if (!addedVersions.add(id)) continue;
+
+                String time = version.getString("client_timestamp");
+                String resources = version.optString("resources", null);
+                if (resources != null) resources = Config.OnlineResources.retroMCPForkData + resources;
+                sortedVersions.add(new VersionData(id, OffsetDateTime.parse(time, RETROMCP_FORK_TIME), resources, new Lazy<>() {
+                    @Override
+                    @SneakyThrows
+                    protected String calculate() {
+                        return version.getString("client_url");
+                    }
+                }, "client.tiny", "client.exc"));
+            }
         }
         return sortedVersions;
     }
 
-    private void removeBuiltVersions(final Map<OffsetDateTime, JSONObject> versions) throws IOException {
+    private void removeBuiltVersions(final Set<VersionData> versions) throws IOException {
         String lastBuiltVersion = Commands.git(this.repoDir).latestCommitMessage(this.branch);
-        boolean hasVersion = versions.values().stream().map(v -> v.getString("id")).toList().contains(lastBuiltVersion);
+        boolean hasVersion = versions.stream().map(v -> v.name).toList().contains(lastBuiltVersion);
         if (!hasVersion) return;
-        Iterator<Map.Entry<OffsetDateTime, JSONObject>> it = versions.entrySet().iterator();
+        Iterator<VersionData> it = versions.iterator();
         while (it.hasNext()) {
-            Map.Entry<OffsetDateTime, JSONObject> entry = it.next();
-            JSONObject version = entry.getValue();
-            String versionName = version.getString("id");
+            VersionData versionData = it.next();
             it.remove();
-            if (versionName.equalsIgnoreCase(lastBuiltVersion)) break;
+            if (versionData.name.equalsIgnoreCase(lastBuiltVersion)) break;
         }
     }
 
-    private void resolveVersionManifest(final Map<OffsetDateTime, JSONObject> versions) throws IOException {
-        for (Map.Entry<OffsetDateTime, JSONObject> entry : versions.entrySet()) {
-            JSONObject version = entry.getValue();
-            String url = version.getString("url");
-            JSONObject versionManifest = NetUtils.getJsonObject(url);
-            version.put("manifest", versionManifest);
-        }
-    }
 
+    public record VersionData(String name, OffsetDateTime time, @Nullable String resourcesUrl, Lazy<String> clientUrl, String mappingsName, String exceptionsName) {
+    }
 
     @FunctionalInterface
     public interface VersionStepProvider {
-        void provideSteps(final List<GeneratorStep> steps, final String versionName, final OffsetDateTime releaseTime, @Nullable final String resourcesUrl, final JSONObject manifest) throws Exception;
+        void provideSteps(final List<GeneratorStep> steps, final VersionData versionData) throws Exception;
     }
 
 }

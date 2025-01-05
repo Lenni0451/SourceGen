@@ -47,6 +47,9 @@ public class Config {
 
         @Option("RetroMCP")
         public static List<String> retroMCP = List.of("rd-20090515", "b1.4_01", "b1.5_01");
+
+        @Option("RetroMCPFork")
+        public static List<String> retroMCPFork = List.of("4k-2", "4k-021742", "minicraft-ld22", "c0.30_01c", "b1.2_02-20110517");
     }
 
     @Section(name = "MappingsSources")
@@ -62,6 +65,14 @@ public class Config {
         @Option("RetroMCPVersions")
         @Description("The URL to the retro mcp versions json file")
         public static String retroMCPVersions = "https://mcphackers.org/versionsV2/versions.json";
+
+        @Option("RetroMCPForkVersions")
+        @Description("The URL to the retro mcp fork versions json file")
+        public static String retroMCPForkVersions = "https://raw.githubusercontent.com/Blizzardfur-Maxxx/MCPHackers.github.io/main/versions/versions.json";
+
+        @Option("RetroMCPForkData")
+        @Description("The URL to the retro mcp fork data files")
+        public static String retroMCPForkData = "https://raw.githubusercontent.com/Blizzardfur-Maxxx/MCPHackers.github.io/main/versions/";
 
         @Option("FeatherMappings")
         @Description("The URL to the maven repository where the feather mappings are stored")
