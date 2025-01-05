@@ -17,7 +17,13 @@ public class TinyV1Remapper extends BaseRemapper {
         try {
             return this.load(new TinyV1MappingsLoader(mappings, "official", "named"));
         } catch (Throwable t) {
-            return this.load(new TinyV1MappingsLoader(mappings, "client", "named"));
+            try {
+                return this.load(new TinyV1MappingsLoader(mappings, "client", "named"));
+            } catch (Throwable t2) {
+                RuntimeException e = new RuntimeException("Failed to load mappings", t);
+                e.addSuppressed(t2);
+                throw e;
+            }
         }
     }
 
