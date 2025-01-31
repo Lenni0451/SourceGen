@@ -38,7 +38,7 @@ dependencies {
     include "org.ow2.asm:asm-tree:9.7.1"
     include "org.ow2.asm:asm-commons:9.7.1"
     include "org.ow2.asm:asm-analysis:9.7.1"
-    include "net.lenni0451.commons:core:1.7.0-SNAPSHOT"
+    include "net.lenni0451.commons:core:1.7.0"
     include "net.lenni0451.commons:httpclient:1.7.0"
     include "net.lenni0451.commons:asm:1.7.0-SNAPSHOT"
     include "net.lenni0451:optconfig:1.1.0"
