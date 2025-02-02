@@ -39,7 +39,7 @@ public abstract class BaseRemapper {
         Mappings mappings = loader.getMappings();
         if (this.isReverse()) mappings = mappings.reverse(Mappings.ReverseCacheMode.STANDALONE);
         ClassProvider classProvider = new MapClassProvider(this.entries, MapClassProvider.NameFormat.SLASH_CLASS).then(new DummyClassProvider());
-        ClassInfoProvider classInfoProvider = new ClassInfoProvider(classProvider);
+        ClassInfoProvider classInfoProvider = ClassInfoProvider.create(classProvider);
         MappingsFiller.fillAllSuperMembers(mappings, classInfoProvider);
         return mappings;
     }
