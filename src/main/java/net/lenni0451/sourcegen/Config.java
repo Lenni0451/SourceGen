@@ -56,7 +56,7 @@ public class Config {
     public static class OnlineResources {
         @Option("CosmicReachArchive")
         @Description("The URL to the cosmic reach archive json file")
-        public static String cosmicReachArchive = "https://raw.githubusercontent.com/CRModders/CosmicArchive/refs/heads/main/versions.json";
+        public static String cosmicReachArchive = "https://raw.githubusercontent.com/CRModders/CosmicArchive/refs/heads/main/versions_v2.json";
 
         @Option("MinecraftVersionManifest")
         @Description("The URL to the minecraft version manifest")
