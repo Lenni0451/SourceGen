@@ -50,6 +50,9 @@ public class Config {
 
         @Option("RetroMCPFork")
         public static List<String> retroMCPFork = List.of("4k-2", "4k-021742", "minicraft-ld22", "c0.30_01c", "b1.2_02-20110517");
+
+        @Option("Bedrock")
+        public static List<String> bedrock = List.of("0.13.0.0", "0.13.1.0", "0.13.2.0");
     }
 
     @Section(name = "MappingsSources")
@@ -89,6 +92,10 @@ public class Config {
         @Option("ParchmentMetadata")
         @Description("The URL to the parchment metadata json file")
         public static String parchmentMetadata = "https://ldtteam.jfrog.io/ui/api/v1/ui/v2/nativeBrowser/parchmentmc-public/org/parchmentmc/data/?recordNum=0";
+
+        @Option("BedrockVersions")
+        @Description("The URL to the bedrock versions json file")
+        public static String bedrockVersions = "https://raw.githubusercontent.com/ddf8196/mc-w10-versiondb-auto-update/refs/heads/master/versions.json.min";
 
         public static String getFeatherMappings(String suffix) {
             String url = featherMappings;
@@ -252,6 +259,29 @@ public class Config {
         @Option("Branch")
         @Description("The branch where the files should be stored")
         public static String branch = "parchment";
+    }
+
+    @Section(name = "MinecraftBedrockAssets")
+    public static class MinecraftBedrockAssets {
+        @Option("GitRepo")
+        @Description("The URL to the git repo where the decompiled files should be stored")
+        public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
+
+        @Option("RepoName")
+        @Description("The name of the local repository directory")
+        public static String repoName = "minecraft_bedrock_assets";
+
+        @Option("AuthorName")
+        @Description("The name of the author that should be used for the git commits")
+        public static String authorName = "mojang";
+
+        @Option("AuthorEmail")
+        @Description("The email of the author that should be used for the git commits")
+        public static String authorEmail = "noreply@mojang.com";
+
+        @Option("Branch")
+        @Description("The branch where the files should be stored")
+        public static String branch = "main";
     }
 
 }

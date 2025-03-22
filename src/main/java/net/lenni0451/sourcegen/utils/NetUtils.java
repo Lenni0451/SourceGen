@@ -2,6 +2,8 @@ package net.lenni0451.sourcegen.utils;
 
 import net.lenni0451.commons.httpclient.HttpClient;
 import net.lenni0451.commons.httpclient.HttpResponse;
+import net.lenni0451.commons.httpclient.constants.HttpHeaders;
+import net.lenni0451.commons.httpclient.content.impl.ByteArrayContent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,6 +20,10 @@ public class NetUtils {
 
     public static byte[] get(final String url) throws IOException {
         return HTTP_CLIENT.get(url).execute().getContent();
+    }
+
+    public static byte[] postInsecure(final String url, final String contentType, final byte[] data) throws IOException {
+        return HTTP_CLIENT.post(url).setContent(new ByteArrayContent(data)).setIgnoreInvalidSSL(true).setHeader(HttpHeaders.CONTENT_TYPE, contentType).execute().getContent();
     }
 
     public static void download(final String url, final File out) throws IOException {
