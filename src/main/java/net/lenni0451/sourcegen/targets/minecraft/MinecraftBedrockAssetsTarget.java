@@ -14,6 +14,7 @@ import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MinecraftBedrockAssetsTarget extends GeneratorTarget {
 
@@ -33,6 +34,7 @@ public class MinecraftBedrockAssetsTarget extends GeneratorTarget {
             versionSteps.add(new CleanRepoStep(this.repoDir));
             versionSteps.add(new DownloadMicrosoftStep(versionId, this.bedrockAppx));
             versionSteps.add(new UnzipSingleFolderStep(this.bedrockAppx, "data", this.repoDir));
+            versionSteps.add(new RemoveResourcesStep(this.repoDir, file -> !file.getName().toLowerCase(Locale.ROOT).endsWith(".brarchive")));
             versionSteps.add(new CopyDefaultsStep(this.repoDir, this.defaultsDir));
             versionSteps.add(new CommitChangesStep(this.repoDir, versionName, new Date()));
             versionSteps.add(new CleanupStep(this.bedrockAppx));
