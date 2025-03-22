@@ -4,14 +4,22 @@ import net.lenni0451.sourcegen.steps.GeneratorStep;
 
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
+import java.util.function.Predicate;
 
 public class RemoveResourcesStep implements GeneratorStep {
 
     private final File repoDir;
+    private final Predicate<File> shouldDelete;
     private final List<File> keepFiles;
 
     public RemoveResourcesStep(final File repoDir, final File... keepFiles) {
+        this(repoDir, file -> !file.getName().toLowerCase(Locale.ROOT).endsWith(".java"), keepFiles);
+    }
+
+    public RemoveResourcesStep(final File repoDir, final Predicate<File> shouldDelete, final File... keepFiles) {
         this.repoDir = repoDir;
+        this.shouldDelete = shouldDelete;
         this.keepFiles = List.of(keepFiles);
     }
 
@@ -24,7 +32,6 @@ public class RemoveResourcesStep implements GeneratorStep {
     public void run() throws Exception {
         for (File file : this.repoDir.listFiles()) {
             if (file.getName().equals(".git")) continue;
-            if (file.getName().equals("README.md")) continue;
             this.checkAndRemove(file);
         }
     }
@@ -38,7 +45,7 @@ public class RemoveResourcesStep implements GeneratorStep {
                 file.delete();
             }
         } else if (file.isFile()) {
-            if (!this.keepFiles.contains(file) && !file.getName().endsWith(".java")) {
+            if (!this.keepFiles.contains(file) && this.shouldDelete.test(file)) {
                 file.delete();
             }
         }
