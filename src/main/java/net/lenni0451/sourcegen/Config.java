@@ -284,4 +284,27 @@ public class Config {
         public static String branch = "main";
     }
 
+    @Section(name = "MinecraftAssets")
+    public static class MinecraftAssets {
+        @Option("GitRepo")
+        @Description("The URL to the git repo where the decompiled files should be stored")
+        public static String gitRepo = "https://github.com/ExampleDude/MinecraftAssets";
+
+        @Option("RepoName")
+        @Description("The name of the local repository directory")
+        public static String repoName = "minecraft_assets";
+
+        @Option("AuthorName")
+        @Description("The name of the author that should be used for the git commits")
+        public static String authorName = "mojang";
+
+        @Option("AuthorEmail")
+        @Description("The email of the author that should be used for the git commits")
+        public static String authorEmail = "noreply@mojang.com";
+
+        @Option("Branch")
+        @Description("The branch where the files should be stored")
+        public static String branch = "main";
+    }
+
 }

@@ -44,7 +44,7 @@ public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
                     this.repoDir,
                     Config.MinecraftParchmentMappings.branch,
                     new IterateMinecraftVersions.VersionRange("1.16.5", null),
-                    ver -> versionToUrl.apply(ver) == null,
+                    ver -> versionToUrl.apply(ver.getString("id")) == null,
                     false,
                     (versionSteps, versionName, releaseTime, manifest) -> {
                         JSONObject downloads = manifest.getJSONObject("downloads");

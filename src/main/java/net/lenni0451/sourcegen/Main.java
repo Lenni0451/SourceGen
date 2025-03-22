@@ -60,6 +60,7 @@ public class Main {
         TARGETS.add(new MinecraftFeatherMappingsTarget());
         TARGETS.add(new MinecraftYarnMappingsTarget());
         TARGETS.add(new MinecraftParchmentMappingsTarget());
+        TARGETS.add(new MinecraftAssetsTarget());
         TARGETS.add(new MinecraftBedrockAssetsTarget());
     }
 

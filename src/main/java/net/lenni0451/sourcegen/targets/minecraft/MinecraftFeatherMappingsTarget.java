@@ -45,7 +45,7 @@ public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
                     this.repoDir,
                     Config.MinecraftFeatherMappings.branch,
                     new IterateMinecraftVersions.VersionRange(null, null),
-                    version -> versionToUrl.apply(version) == null,
+                    version -> versionToUrl.apply(version.getString("id")) == null,
                     true,
                     (versionSteps, versionName, releaseTime, manifest) -> {
                         JSONObject downloads = manifest.getJSONObject("downloads");

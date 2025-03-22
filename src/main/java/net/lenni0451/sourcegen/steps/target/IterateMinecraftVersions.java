@@ -21,7 +21,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
     private final File repoDir;
     private final String branch;
     private final VersionRange versionRange;
-    private final Predicate<String> removeVersionIf;
+    private final Predicate<JSONObject> removeVersionIf;
     private final boolean keepVersionsWithoutMappings;
     private final VersionStepProvider stepProvider;
 
@@ -33,7 +33,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
         this(repoDir, branch, versionRange, version -> false, false, stepProvider);
     }
 
-    public IterateMinecraftVersions(final File repoDir, final String branch, final VersionRange versionRange, final Predicate<String> removeVersionIf, final boolean keepVersionsWithoutMappings, final VersionStepProvider stepProvider) {
+    public IterateMinecraftVersions(final File repoDir, final String branch, final VersionRange versionRange, final Predicate<JSONObject> removeVersionIf, final boolean keepVersionsWithoutMappings, final VersionStepProvider stepProvider) {
         this.repoDir = repoDir;
         this.branch = branch;
         this.versionRange = versionRange;
@@ -128,8 +128,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
         while (it.hasNext()) {
             Map.Entry<OffsetDateTime, JSONObject> entry = it.next();
             JSONObject version = entry.getValue();
-            String versionName = version.getString("id");
-            if (this.removeVersionIf.test(versionName)) it.remove();
+            if (this.removeVersionIf.test(version)) it.remove();
         }
     }
 
