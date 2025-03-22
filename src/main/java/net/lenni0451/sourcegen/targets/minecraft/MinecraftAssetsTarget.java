@@ -9,6 +9,7 @@ import net.lenni0451.sourcegen.steps.git.PrepareRepoStep;
 import net.lenni0451.sourcegen.steps.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
+import net.lenni0451.sourcegen.steps.transform.JsonBeautifyStep;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import org.json.JSONObject;
 
@@ -45,6 +46,7 @@ public class MinecraftAssetsTarget extends GeneratorTarget {
                     versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
                     versionSteps.add(new UnzipStep(this.clientJar, this.repoDir));
                     versionSteps.add(new RemoveResourcesStep(this.repoDir, f -> f.getName().toLowerCase(Locale.ROOT).endsWith(".class")));
+                    versionSteps.add(new JsonBeautifyStep(this.repoDir));
                     versionSteps.add(new CopyDefaultsStep(this.repoDir, this.defaultsDir));
                     versionSteps.add(new CommitChangesStep(this.repoDir, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
                     versionSteps.add(new CleanupStep(this.clientJar));
