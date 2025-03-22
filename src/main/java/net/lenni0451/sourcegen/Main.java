@@ -11,23 +11,18 @@ import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
 
     public static final File WORK_DIR = new File("work");
     public static final File DEFAULTS_DIR = new File("defaults");
-    private static final List<GeneratorTarget> TARGETS = List.of(
-            new MinecraftMojangMappingsTarget(),
-            new CosmicReachTarget(),
-            new MinecraftRetroMCPMappingsTarget(),
-            new MinecraftFeatherMappingsTarget(),
-            new MinecraftYarnMappingsTarget(),
-            new MinecraftParchmentMappingsTarget()
-    );
+    private static final List<GeneratorTarget> TARGETS = new ArrayList<>();
 
     public static void main(String[] args) throws Throwable {
         loadConfig();
+        loadGenerators();
         checkRequirements();
         if (args.length != 1) {
             System.out.println("Please specify a target to generate!");
@@ -56,6 +51,15 @@ public class Main {
         System.out.println("Generating target: " + target.getName());
         target.execute();
         System.out.println("Done!");
+    }
+
+    private static void loadGenerators() {
+        TARGETS.add(new MinecraftMojangMappingsTarget());
+        TARGETS.add(new CosmicReachTarget());
+        TARGETS.add(new MinecraftRetroMCPMappingsTarget());
+        TARGETS.add(new MinecraftFeatherMappingsTarget());
+        TARGETS.add(new MinecraftYarnMappingsTarget());
+        TARGETS.add(new MinecraftParchmentMappingsTarget());
     }
 
     private static void printTargets() {
