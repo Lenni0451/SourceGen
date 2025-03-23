@@ -261,15 +261,15 @@ public class Config {
         public static String branch = "parchment";
     }
 
-    @Section(name = "MinecraftBedrockAssets")
-    public static class MinecraftBedrockAssets {
+    @Section(name = "MinecraftAssets")
+    public static class MinecraftAssets {
         @Option("GitRepo")
         @Description("The URL to the git repo where the decompiled files should be stored")
-        public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
+        public static String gitRepo = "https://github.com/ExampleDude/MinecraftAssets";
 
         @Option("RepoName")
         @Description("The name of the local repository directory")
-        public static String repoName = "minecraft_bedrock_assets";
+        public static String repoName = "minecraft_assets";
 
         @Option("AuthorName")
         @Description("The name of the author that should be used for the git commits")
@@ -284,15 +284,15 @@ public class Config {
         public static String branch = "main";
     }
 
-    @Section(name = "MinecraftAssets")
-    public static class MinecraftAssets {
+    @Section(name = "MinecraftBedrockAssets")
+    public static class MinecraftBedrockAssets {
         @Option("GitRepo")
         @Description("The URL to the git repo where the decompiled files should be stored")
-        public static String gitRepo = "https://github.com/ExampleDude/MinecraftAssets";
+        public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
 
         @Option("RepoName")
         @Description("The name of the local repository directory")
-        public static String repoName = "minecraft_assets";
+        public static String repoName = "minecraft_bedrock_assets";
 
         @Option("AuthorName")
         @Description("The name of the author that should be used for the git commits")
