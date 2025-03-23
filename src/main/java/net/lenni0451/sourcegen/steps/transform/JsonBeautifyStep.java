@@ -28,19 +28,22 @@ public class JsonBeautifyStep implements GeneratorStep {
     public void run() throws Exception {
         for (File file : FileUtils.listFiles(this.repoDir)) {
             if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".json")) continue;
-
-            Object json;
-            try (FileInputStream fis = new FileInputStream(file)) {
-                json = new JSONTokener(fis).nextValue();
-            }
-            if (json instanceof JSONObject jsonObject) {
-                try (FileOutputStream fos = new FileOutputStream(file)) {
-                    fos.write(jsonObject.toString(4).getBytes());
+            try {
+                Object json;
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    json = new JSONTokener(fis).nextValue();
                 }
-            } else if (json instanceof JSONArray jsonArray) {
-                try (FileOutputStream fos = new FileOutputStream(file)) {
-                    fos.write(jsonArray.toString(4).getBytes());
+                if (json instanceof JSONObject jsonObject) {
+                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                        fos.write(jsonObject.toString(4).getBytes());
+                    }
+                } else if (json instanceof JSONArray jsonArray) {
+                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                        fos.write(jsonArray.toString(4).getBytes());
+                    }
                 }
+            } catch (Throwable t) {
+                System.out.println("Failed to beautify json file " + file.getAbsolutePath() + ": " + t.getMessage());
             }
         }
     }
