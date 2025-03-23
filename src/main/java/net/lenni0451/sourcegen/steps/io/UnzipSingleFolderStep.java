@@ -22,7 +22,7 @@ public class UnzipSingleFolderStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Unzipping " + folder + " from " + this.zipFile.getName() + " to " + this.targetFolder.getName() + "...");
+        System.out.println("Unzipping " + this.folder + " from " + this.zipFile.getName() + " to " + this.targetFolder.getName() + "...");
     }
 
     @Override
