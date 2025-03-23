@@ -74,7 +74,7 @@ public class IterateBedrockVersions implements GeneratorStep {
         while (it.hasNext()) {
             BedrockVersion version = it.next();
             it.remove();
-            if (version.id().equals(lastBuiltVersion)) break;
+            if (version.name().equals(lastBuiltVersion)) break;
         }
     }
 
