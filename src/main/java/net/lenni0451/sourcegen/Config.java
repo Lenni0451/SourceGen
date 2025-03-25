@@ -121,13 +121,21 @@ public class Config {
 
     @Section(name = "CosmicReach")
     public static class CosmicReach {
-        @Option("GitRepo")
+        @Option("ClientGitRepo")
         @Description("The URL to the git repo where the decompiled files should be stored")
-        public static String gitRepo = "https://github.com/ExampleDude/CosmicReachSources";
+        public static String clientGitRepo = "https://github.com/ExampleDude/CosmicReachSources";
 
-        @Option("RepoName")
+        @Option("ServerGitRepo")
+        @Description("The URL to the git repo where the decompiled files should be stored")
+        public static String serverGitRepo = "https://github.com/ExampleDude/CosmicReachSources";
+
+        @Option("ClientRepoName")
         @Description("The name of the local repository directory")
-        public static String repoName = "cosmicreach";
+        public static String clientRepoName = "cosmicreach";
+
+        @Option("ServerRepoName")
+        @Description("The name of the local repository directory")
+        public static String serverRepoName = "cosmicreach";
 
         @Option("AuthorName")
         @Description("The name of the author that should be used for the git commits")
