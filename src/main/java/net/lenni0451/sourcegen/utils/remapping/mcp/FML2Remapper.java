@@ -2,9 +2,8 @@ package net.lenni0451.sourcegen.utils.remapping.mcp;
 
 import net.lenni0451.commons.asm.info.MemberDeclaration;
 import net.lenni0451.commons.asm.mappings.Mappings;
-import net.lenni0451.commons.asm.mappings.loader.DirectMappingsLoader;
-import net.lenni0451.commons.asm.mappings.loader.MappingsLoader;
-import net.lenni0451.commons.asm.mappings.loader.SrgMappingsLoader;
+import net.lenni0451.commons.asm.mappings.loader.MappingsProvider;
+import net.lenni0451.commons.asm.mappings.loader.formats.SrgMappingsLoader;
 import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.sourcegen.utils.CsvReader;
 import net.lenni0451.sourcegen.utils.remapping.BaseRemapper;
@@ -19,7 +18,7 @@ public class FML2Remapper extends BaseRemapper {
     }
 
     @Override
-    protected MappingsLoader initLoader(File mappings) throws Exception {
+    protected MappingsProvider initProvider(File mappings) throws Exception {
         File srgConfig = FileUtils.create(mappings, "joined.srg");
         File methodsCsv = FileUtils.create(mappings, "methods.csv");
         File fieldsCsv = FileUtils.create(mappings, "fields.csv");
@@ -51,7 +50,7 @@ public class FML2Remapper extends BaseRemapper {
                 out.addFieldMapping(declaration.getOwner(), declaration.getName(), declaration.getDescriptor(), to);
             }
         }
-        return this.load(new DirectMappingsLoader(out));
+        return MappingsProvider.direct(out);
     }
 
     @Override

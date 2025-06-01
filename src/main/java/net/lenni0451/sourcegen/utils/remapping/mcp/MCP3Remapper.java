@@ -1,8 +1,7 @@
 package net.lenni0451.sourcegen.utils.remapping.mcp;
 
 import net.lenni0451.commons.asm.mappings.Mappings;
-import net.lenni0451.commons.asm.mappings.loader.DirectMappingsLoader;
-import net.lenni0451.commons.asm.mappings.loader.MappingsLoader;
+import net.lenni0451.commons.asm.mappings.loader.MappingsProvider;
 import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.sourcegen.utils.CsvReader;
 import net.lenni0451.sourcegen.utils.remapping.BaseRemapper;
@@ -17,7 +16,7 @@ public class MCP3Remapper extends BaseRemapper {
     }
 
     @Override
-    protected MappingsLoader initLoader(File mappings) throws Exception {
+    protected MappingsProvider initProvider(File mappings) throws Exception {
         File classesCsv = FileUtils.create(mappings, "conf", "classes.csv");
         File methodsCsv = FileUtils.create(mappings, "conf", "methods.csv");
         File fieldsCsv = FileUtils.create(mappings, "conf", "fields.csv");
@@ -37,7 +36,7 @@ public class MCP3Remapper extends BaseRemapper {
             if (!"0".equals(line.get("side"))) continue;
             out.addFieldMapping(line.get("owner"), line.get("from"), line.get("signature"), line.get("to"));
         }
-        return this.load(new DirectMappingsLoader(out));
+        return MappingsProvider.direct(out);
     }
 
     @Override

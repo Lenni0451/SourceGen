@@ -1,7 +1,7 @@
 package net.lenni0451.sourcegen.utils.remapping.mcp;
 
 import net.lenni0451.commons.asm.mappings.loader.MappingsLoader;
-import net.lenni0451.commons.asm.mappings.loader.RetroguardMappingsLoader;
+import net.lenni0451.commons.asm.mappings.loader.formats.RetroguardMappingsLoader;
 import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.sourcegen.utils.remapping.BaseRemapper;
 
@@ -15,7 +15,7 @@ public class MCP1Remapper extends BaseRemapper {
     }
 
     @Override
-    protected MappingsLoader initLoader(File mappings) {
+    protected MappingsLoader initProvider(File mappings) {
         return this.load(new RetroguardMappingsLoader(FileUtils.create(mappings, "conf", "minecraft.rgs")));
     }
 

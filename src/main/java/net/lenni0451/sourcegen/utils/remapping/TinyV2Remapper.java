@@ -1,7 +1,7 @@
 package net.lenni0451.sourcegen.utils.remapping;
 
-import net.lenni0451.commons.asm.mappings.loader.MappingsLoader;
-import net.lenni0451.commons.asm.mappings.loader.TinyV2MappingsLoader;
+import net.lenni0451.commons.asm.mappings.loader.MappingsProvider;
+import net.lenni0451.commons.asm.mappings.loader.formats.TinyV2MappingsLoader;
 
 import java.io.File;
 import java.util.Map;
@@ -13,7 +13,7 @@ public class TinyV2Remapper extends BaseRemapper {
     }
 
     @Override
-    protected MappingsLoader initLoader(File mappings) {
+    protected MappingsProvider initProvider(File mappings) {
         try {
             return this.load(new TinyV2MappingsLoader(mappings, "official", "named"));
         } catch (Throwable t) {

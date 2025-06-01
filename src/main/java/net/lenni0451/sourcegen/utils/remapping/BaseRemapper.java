@@ -7,6 +7,7 @@ import net.lenni0451.commons.asm.mappings.Mappings;
 import net.lenni0451.commons.asm.mappings.MappingsFiller;
 import net.lenni0451.commons.asm.mappings.Remapper;
 import net.lenni0451.commons.asm.mappings.loader.MappingsLoader;
+import net.lenni0451.commons.asm.mappings.loader.MappingsProvider;
 import net.lenni0451.commons.asm.provider.ClassProvider;
 import net.lenni0451.commons.asm.provider.DummyClassProvider;
 import net.lenni0451.commons.asm.provider.MapClassProvider;
@@ -33,12 +34,12 @@ public abstract class BaseRemapper {
         this.entries.putAll(output);
     }
 
-    protected abstract MappingsLoader initLoader(final File mappings) throws Exception;
+    protected abstract MappingsProvider initProvider(final File mappings) throws Exception;
 
     protected abstract boolean isReverse();
 
     private Mappings loadMappings() throws Exception {
-        MappingsLoader loader = this.initLoader(this.mappings);
+        MappingsProvider loader = this.initProvider(this.mappings);
         Mappings mappings = loader.getMappings();
         if (this.isReverse()) mappings = mappings.reverse(Mappings.ReverseCacheMode.STANDALONE);
         ClassProvider classProvider = new MapClassProvider(this.entries, MapClassProvider.NameFormat.SLASH_CLASS).then(new DummyClassProvider());

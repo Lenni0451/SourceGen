@@ -2,7 +2,7 @@ package net.lenni0451.sourcegen.utils.remapping.special;
 
 import net.lenni0451.commons.asm.ASMUtils;
 import net.lenni0451.commons.asm.io.ClassIO;
-import net.lenni0451.commons.asm.mappings.loader.TinyV2MappingsLoader;
+import net.lenni0451.commons.asm.mappings.loader.formats.TinyV2MappingsLoader;
 import net.lenni0451.commons.asm.mappings.meta.ClassMetaMapping;
 import net.lenni0451.commons.asm.mappings.meta.FieldMetaMapping;
 import net.lenni0451.commons.asm.mappings.meta.MethodMetaMapping;
