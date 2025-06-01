@@ -62,6 +62,7 @@ public class Main {
         TARGETS.add(new MinecraftParchmentMappingsTarget());
         TARGETS.add(new MinecraftAssetsTarget());
         TARGETS.add(new MinecraftBedrockAssetsTarget());
+        TARGETS.add(new MinecraftMCPMappingsTarget());
     }
 
     private static void printTargets() {

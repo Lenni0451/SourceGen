@@ -30,7 +30,7 @@ public class UnzipStep implements GeneratorStep {
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
                 if (entry.isDirectory()) continue;
-                File entryFile = new File(this.targetDir, entry.getName());
+                File entryFile = new File(this.targetDir, entry.getName().replace('\\', '/'));
                 entryFile.getParentFile().mkdirs();
                 try (FileOutputStream fos = new FileOutputStream(entryFile)) {
                     zf.getInputStream(entry).transferTo(fos);
