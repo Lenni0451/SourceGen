@@ -1,27 +1,12 @@
 plugins {
     id "java"
-    id "checkstyle"
-    id "idea"
-}
-
-base {
-    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-    compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
-
-    archivesName = project.maven_name ?: rootProject.maven_name
-    group = project.maven_group ?: rootProject.maven_group
-    version = project.maven_version ?: rootProject.maven_version
-}
-
-configurations {
-    include
-
-    implementation.extendsFrom include
-    api.extendsFrom include
+    id "base.application"
+    id "base.java"
+    id "base.checkstyle"
+    id "idea.exclude_run_dir"
 }
 
 repositories {
-    mavenCentral()
     maven {
         name = "lenni0451"
         url = "https://maven.lenni0451.net/everything"
@@ -29,52 +14,18 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.google.code.findbugs:jsr305:3.0.2"
-    compileOnly "org.jetbrains:annotations:26.0.2"
-    compileOnly(annotationProcessor("org.projectlombok:lombok:1.18.38"))
+    include libs.orgJson
+    include libs.optconfig
+    include libs.joptSimple
+    include libs.guava
+    include libs.bundles.asm
+    include libs.bundles.commons
 
-    include "org.json:json:20250517"
-    include "org.ow2.asm:asm:9.8"
-    include "org.ow2.asm:asm-tree:9.8"
-    include "org.ow2.asm:asm-commons:9.8"
-    include "org.ow2.asm:asm-analysis:9.8"
-    include "net.lenni0451.commons:core:1.7.2-SNAPSHOT"
-    include "net.lenni0451.commons:httpclient:1.7.2-SNAPSHOT"
-    include "net.lenni0451.commons:asm:1.7.2-SNAPSHOT"
-    include "net.lenni0451:optconfig:1.1.1"
-    include "net.sf.jopt-simple:jopt-simple:5.0.4"
-    include "com.google.guava:guava:33.4.8-jre"
-}
+    compileOnly libs.findbugs
+    compileOnly libs.jetbrainsAnnotations
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
 
-jar {
-    dependsOn configurations.include
-    from {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        configurations.include.collect {
-            zipTree(it)
-        }
-    } {
-        exclude "META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA"
-    }
-
-    manifest {
-        attributes(
-                "Main-Class": "net.lenni0451.sourcegen.Main",
-                "Multi-Release": "true"
-        )
-    }
-}
-
-checkstyle {
-    toolVersion = "10.16.0" //Latest version for Java 8: 9.3
-    configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-}
-build.dependsOn(check)
-
-idea {
-    module {
-        ["run"].each {
-            excludeDirs << file("$it")
-        }
-    }
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
 }
