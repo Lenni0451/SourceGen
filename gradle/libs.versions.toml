@@ -14,9 +14,9 @@ asm-tree = { module = "org.ow2.asm:asm-tree", version = "9.8" }
 asm-commons = { module = "org.ow2.asm:asm-commons", version = "9.8" }
 asm-analysis = { module = "org.ow2.asm:asm-analysis", version = "9.8" }
 
-commons-core = { module = "net.lenni0451.commons:core", version = "1.7.2-SNAPSHOT" }
-commons-httpclient = { module = "net.lenni0451.commons:httpclient", version = "1.7.2-SNAPSHOT" }
-commons-asm = { module = "net.lenni0451.commons:asm", version = "1.7.2-SNAPSHOT" }
+commons-core = { module = "net.lenni0451.commons:core", version = "1.8.0" }
+commons-httpclient = { module = "net.lenni0451.commons:httpclient", version = "1.8.0" }
+commons-asm = { module = "net.lenni0451.commons:asm", version = "1.8.0" }
 
 junit-bom = { module = "org.junit:junit-bom", version = "5.13.1" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
