@@ -2,7 +2,6 @@ package net.lenni0451.sourcegen;
 
 import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.optconfig.ConfigLoader;
-import net.lenni0451.optconfig.access.impl.reflection.ReflectionClassAccess;
 import net.lenni0451.optconfig.provider.ConfigProvider;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.minecraft.*;
@@ -38,7 +37,7 @@ public class Main {
             printTargets();
             return;
         }
-        if (targetIndex < 1 || targetIndex > TARGETS.size()) {
+        if (targetIndex < 1 || targetIndex > TARGETS.size() || TARGETS.get(targetIndex - 1) == null) {
             System.out.println("Invalid target index: " + targetIndex);
             printTargets();
             return;
@@ -61,7 +60,7 @@ public class Main {
         TARGETS.add(new MinecraftYarnMappingsTarget());
         TARGETS.add(new MinecraftParchmentMappingsTarget());
         TARGETS.add(new MinecraftAssetsTarget());
-        TARGETS.add(new MinecraftBedrockAssetsTarget());
+        TARGETS.add(null); //previously: Minecraft Bedrock Edition assets (removed due to UWP discontinuation)
         TARGETS.add(new MinecraftMCPMappingsTarget());
     }
 
@@ -69,6 +68,7 @@ public class Main {
         System.out.println("Available targets:");
         for (int i = 0; i < TARGETS.size(); i++) {
             GeneratorTarget target = TARGETS.get(i);
+            if (target == null) continue;
             System.out.println((i + 1) + ". " + target.getName());
         }
     }
@@ -85,8 +85,7 @@ public class Main {
         ConfigLoader<Config> configLoader = new ConfigLoader<>(Config.class);
         configLoader.getConfigOptions()
                 .setResetInvalidOptions(true)
-                .setRewriteConfig(true)
-                .setClassAccessFactory(clazz -> new ReflectionClassAccess(clazz, true));
+                .setRewriteConfig(true);
         configLoader.loadStatic(ConfigProvider.file(new File("config.yml")));
     }
 
