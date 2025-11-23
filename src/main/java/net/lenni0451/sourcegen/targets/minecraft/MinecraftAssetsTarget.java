@@ -38,6 +38,7 @@ public class MinecraftAssetsTarget extends GeneratorTarget {
                 new IterateMinecraftVersions.VersionRange(null, null),
                 v -> v.getString("type").equalsIgnoreCase("snapshot"),
                 true,
+                false,
                 (versionSteps, versionName, releaseTime, manifest) -> {
                     JSONObject downloads = manifest.getJSONObject("downloads");
                     String clientUrl = downloads.getJSONObject("client").getString("url");

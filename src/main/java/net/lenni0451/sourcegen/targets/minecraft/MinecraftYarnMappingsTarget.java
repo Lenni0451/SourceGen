@@ -46,6 +46,7 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
                     new IterateMinecraftVersions.VersionRange(null, null),
                     version -> versionToUrl.apply(version.getString("id")) == null,
                     true,
+                    false,
                     (versionSteps, versionName, releaseTime, manifest) -> {
                         JSONObject downloads = manifest.getJSONObject("downloads");
                         String clientUrl = downloads.getJSONObject("client").getString("url");

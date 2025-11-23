@@ -43,6 +43,9 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
                 this.repoDir,
                 Config.MinecraftMojangMappings.branch,
                 new VersionRange("1.14", null),
+                version -> false,
+                false,
+                false,
                 (versionSteps, versionName, releaseTime, manifest) -> {
                     JSONObject downloads = manifest.getJSONObject("downloads");
                     String clientUrl = downloads.getJSONObject("client").getString("url");

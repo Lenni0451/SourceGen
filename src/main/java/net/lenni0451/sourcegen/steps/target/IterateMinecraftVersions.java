@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.target;
 
+import lombok.RequiredArgsConstructor;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
@@ -16,6 +17,7 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 
+@RequiredArgsConstructor
 public class IterateMinecraftVersions implements GeneratorStep {
 
     private final File repoDir;
@@ -23,24 +25,8 @@ public class IterateMinecraftVersions implements GeneratorStep {
     private final VersionRange versionRange;
     private final Predicate<JSONObject> removeVersionIf;
     private final boolean keepVersionsWithoutMappings;
+    private final boolean ignoreExclusions;
     private final VersionStepProvider stepProvider;
-
-    public IterateMinecraftVersions(final File repoDir, final String branch, final VersionStepProvider stepProvider) {
-        this(repoDir, branch, new VersionRange(null, null), stepProvider);
-    }
-
-    public IterateMinecraftVersions(final File repoDir, final String branch, final VersionRange versionRange, final VersionStepProvider stepProvider) {
-        this(repoDir, branch, versionRange, version -> false, false, stepProvider);
-    }
-
-    public IterateMinecraftVersions(final File repoDir, final String branch, final VersionRange versionRange, final Predicate<JSONObject> removeVersionIf, final boolean keepVersionsWithoutMappings, final VersionStepProvider stepProvider) {
-        this.repoDir = repoDir;
-        this.branch = branch;
-        this.versionRange = versionRange;
-        this.removeVersionIf = removeVersionIf;
-        this.keepVersionsWithoutMappings = keepVersionsWithoutMappings;
-        this.stepProvider = stepProvider;
-    }
 
     @Override
     public void printStep() {
@@ -77,7 +63,7 @@ public class IterateMinecraftVersions implements GeneratorStep {
         Map<OffsetDateTime, JSONObject> sortedVersions = new TreeMap<>();
         for (int i = 0; i < versions.length(); i++) {
             JSONObject version = versions.getJSONObject(i);
-            if (Config.Exclusions.minecraft.contains(version.getString("id"))) continue;
+            if (!this.ignoreExclusions && Config.Exclusions.minecraft.contains(version.getString("id"))) continue;
 
             String time = version.getString("releaseTime");
             sortedVersions.put(OffsetDateTime.parse(time), version);
