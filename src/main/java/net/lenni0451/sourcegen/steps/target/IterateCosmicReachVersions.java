@@ -1,13 +1,13 @@
 package net.lenni0451.sourcegen.steps.target;
 
+import net.lenni0451.commons.gson.elements.GsonArray;
+import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.ETA;
 import net.lenni0451.sourcegen.utils.NetUtils;
 import net.lenni0451.sourcegen.utils.external.Commands;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -55,14 +55,14 @@ public class IterateCosmicReachVersions implements GeneratorStep {
     }
 
     private List<CosmicReachVersion> loadVersions() throws IOException {
-        JSONObject meta = NetUtils.getJsonObject(Config.OnlineResources.cosmicReachArchive);
-        JSONArray versions = meta.getJSONArray("versions");
+        GsonObject meta = NetUtils.getJsonObject(Config.OnlineResources.cosmicReachArchive);
+        GsonArray versions = meta.getArray("versions");
         List<CosmicReachVersion> cosmicReachVersions = new ArrayList<>();
-        for (int i = 0; i < versions.length(); i++) {
-            JSONObject version = versions.getJSONObject(i);
+        for (int i = 0; i < versions.size(); i++) {
+            GsonObject version = versions.getObject(i);
             if (Config.Exclusions.cosmicReach.contains(version.getString("id"))) continue;
-            JSONObject client = version.optJSONObject("client");
-            JSONObject server = version.optJSONObject("server");
+            GsonObject client = version.getObject("client");
+            GsonObject server = version.getObject("server");
             if (client == null && server == null) continue;
             cosmicReachVersions.add(new CosmicReachVersion(
                     version.getString("id"),

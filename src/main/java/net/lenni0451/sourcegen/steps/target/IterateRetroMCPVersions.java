@@ -1,6 +1,8 @@
 package net.lenni0451.sourcegen.steps.target;
 
 import lombok.SneakyThrows;
+import net.lenni0451.commons.gson.elements.GsonArray;
+import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.commons.lazy.Lazy;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
@@ -8,8 +10,6 @@ import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.ETA;
 import net.lenni0451.sourcegen.utils.NetUtils;
 import net.lenni0451.sourcegen.utils.external.Commands;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -60,37 +60,37 @@ public class IterateRetroMCPVersions implements GeneratorStep {
         Set<String> addedVersions = new HashSet<>();
         Set<VersionData> sortedVersions = new TreeSet<>(Comparator.comparing(o -> o.time));
         { //RetroMCP
-            JSONArray versions = NetUtils.getJsonArray(Config.OnlineResources.retroMCPVersions);
-            for (int i = 0; i < versions.length(); i++) {
-                JSONObject version = versions.getJSONObject(i);
+            GsonArray versions = NetUtils.getJsonArray(Config.OnlineResources.retroMCPVersions);
+            for (int i = 0; i < versions.size(); i++) {
+                GsonObject version = versions.getObject(i);
                 String id = version.getString("id");
                 if (Config.Exclusions.retroMCP.contains(id)) continue;
                 if (!addedVersions.add(id)) continue;
 
                 String time = version.getString("releaseTime");
-                String resources = version.optString("resources", null);
+                String resources = version.getString("resources");
                 sortedVersions.add(new VersionData(id, OffsetDateTime.parse(time), resources, new Lazy<>() {
                     @Override
                     @SneakyThrows
                     protected String calculate() {
                         String url = version.getString("url");
-                        JSONObject versionManifest = NetUtils.getJsonObject(url);
-                        JSONObject downloads = versionManifest.getJSONObject("downloads");
-                        JSONObject client = downloads.getJSONObject("client");
+                        GsonObject versionManifest = NetUtils.getJsonObject(url);
+                        GsonObject downloads = versionManifest.getObject("downloads");
+                        GsonObject client = downloads.getObject("client");
                         return client.getString("url");
                     }
                 }, "mappings.tiny", "exceptions.exc"));
             }
         }
         { //RetroMCP fork
-            JSONObject versions = NetUtils.getJsonObject(Config.OnlineResources.retroMCPForkVersions);
+            GsonObject versions = NetUtils.getJsonObject(Config.OnlineResources.retroMCPForkVersions);
             for (String id : versions.keySet()) {
-                JSONObject version = versions.getJSONObject(id);
+                GsonObject version = versions.getObject(id);
                 if (Config.Exclusions.retroMCPFork.contains(id)) continue;
                 if (!addedVersions.add(id)) continue;
 
                 String time = version.getString("client_timestamp");
-                String resources = version.optString("resources", null);
+                String resources = version.getString("resources");
                 if (resources != null) resources = Config.OnlineResources.retroMCPForkData + resources;
                 sortedVersions.add(new VersionData(id, OffsetDateTime.parse(time, RETROMCP_FORK_TIME), resources, new Lazy<>() {
                     @Override

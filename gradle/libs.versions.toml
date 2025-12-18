@@ -1,15 +1,14 @@
 [versions]
 asm = "9.8"
-commons = "1.9.0"
+commons = "1.9.1-SNAPSHOT"
 
 [libraries]
 findbugs = { module = "com.google.code.findbugs:jsr305", version = "3.0.2" }
 jetbrainsAnnotations = { module = "org.jetbrains:annotations", version = "26.0.2" }
 lombok = { module = "org.projectlombok:lombok", version = "1.18.38" }
-orgJson = { module = "org.json:json", version = "20250517" }
 optconfig = { module = "net.lenni0451:optconfig", version = "1.1.1" }
-joptSimple = { module = "net.sf.jopt-simple:jopt-simple", version = "5.0.4" }
 guava = { module = "com.google.guava:guava", version = "33.4.8-jre" }
+gson = { module = "com.google.code.gson:gson", version = "2.13.2" }
 
 asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
@@ -19,6 +18,7 @@ asm-analysis = { module = "org.ow2.asm:asm-analysis", version.ref = "asm" }
 commons-core = { module = "net.lenni0451.commons:core", version.ref = "commons" }
 commons-httpclient = { module = "net.lenni0451.commons:httpclient", version.ref = "commons" }
 commons-asm = { module = "net.lenni0451.commons:asm", version.ref = "commons" }
+commons-gson = { module = "net.lenni0451.commons:gson", version.ref = "commons" }
 
 junit-bom = { module = "org.junit:junit-bom", version = "5.13.1" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
@@ -26,6 +26,6 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 
 [bundles]
 asm = ["asm", "asm-tree", "asm-commons", "asm-analysis"]
-commons = ["commons-core", "commons-httpclient", "commons-asm"]
+commons = ["commons-core", "commons-httpclient", "commons-asm", "commons-gson"]
 
 [plugins]

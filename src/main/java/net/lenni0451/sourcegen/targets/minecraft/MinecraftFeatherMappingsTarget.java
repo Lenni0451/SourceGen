@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.targets.minecraft;
 
+import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
@@ -15,7 +16,6 @@ import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.target.LoadFeatherMappings;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Date;
@@ -49,8 +49,8 @@ public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
                     true,
                     false,
                     (versionSteps, versionName, releaseTime, manifest) -> {
-                        JSONObject downloads = manifest.getJSONObject("downloads");
-                        String clientUrl = downloads.getJSONObject("client").getString("url");
+                        GsonObject downloads = manifest.getObject("downloads");
+                        String clientUrl = downloads.getObject("client").getString("url");
                         Map<String, byte[]> jarEntries = new HashMap<>();
 
                         versionSteps.add(new CleanRepoStep(this.repoDir));

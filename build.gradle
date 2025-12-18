@@ -14,10 +14,9 @@ repositories {
 }
 
 dependencies {
-    include libs.orgJson
     include libs.optconfig
-    include libs.joptSimple
     include libs.guava
+    include libs.gson
     include libs.bundles.asm
     include libs.bundles.commons
 

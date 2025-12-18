@@ -1,17 +1,21 @@
 package net.lenni0451.sourcegen.steps.transform;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonWriter;
+import net.lenni0451.commons.gson.GsonParser;
+import net.lenni0451.commons.gson.elements.GsonElement;
 import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.StringWriter;
+import java.nio.file.Files;
 import java.util.Locale;
 
 public class JsonBeautifyStep implements GeneratorStep {
+
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private final File repoDir;
 
@@ -29,19 +33,13 @@ public class JsonBeautifyStep implements GeneratorStep {
         for (File file : FileUtils.listFiles(this.repoDir)) {
             if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".json")) continue;
             try {
-                Object json;
-                try (FileInputStream fis = new FileInputStream(file)) {
-                    json = new JSONTokener(fis).nextValue();
-                }
-                if (json instanceof JSONObject jsonObject) {
-                    try (FileOutputStream fos = new FileOutputStream(file)) {
-                        fos.write(jsonObject.toString(4).getBytes());
-                    }
-                } else if (json instanceof JSONArray jsonArray) {
-                    try (FileOutputStream fos = new FileOutputStream(file)) {
-                        fos.write(jsonArray.toString(4).getBytes());
-                    }
-                }
+                GsonElement element = GsonParser.parse(Files.readString(file.toPath()));
+                StringWriter stringWriter = new StringWriter();
+                JsonWriter jsonWriter = GSON.newJsonWriter(stringWriter);
+                jsonWriter.setIndent(" ".repeat(4));
+                GSON.toJson(element.getJsonElement(), jsonWriter);
+                jsonWriter.close();
+                Files.writeString(file.toPath(), stringWriter.toString());
             } catch (Throwable t) {
                 System.out.println("Failed to beautify json file " + file.getAbsolutePath() + ": " + t.getMessage());
             }

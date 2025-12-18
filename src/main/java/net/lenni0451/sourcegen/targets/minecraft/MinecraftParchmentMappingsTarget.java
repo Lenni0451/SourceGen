@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.targets.minecraft;
 
+import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
@@ -16,7 +17,6 @@ import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.target.LoadParchmentVersions;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.utils.remapping.ProguardRemapper;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.util.*;
@@ -48,9 +48,9 @@ public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
                     false,
                     false,
                     (versionSteps, versionName, releaseTime, manifest) -> {
-                        JSONObject downloads = manifest.getJSONObject("downloads");
-                        String clientUrl = downloads.getJSONObject("client").getString("url");
-                        String mappingsUrl = downloads.getJSONObject("client_mappings").getString("url");
+                        GsonObject downloads = manifest.getObject("downloads");
+                        String clientUrl = downloads.getObject("client").getString("url");
+                        String mappingsUrl = downloads.getObject("client_mappings").getString("url");
                         String metadataUrl = versionToUrl.apply(versionName);
                         Map<String, byte[]> jarEntries = new HashMap<>();
                         List<String[]> comments = new ArrayList<>();

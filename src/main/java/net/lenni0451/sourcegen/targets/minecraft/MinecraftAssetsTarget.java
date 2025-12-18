@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.targets.minecraft;
 
+import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
@@ -11,7 +12,6 @@ import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.transform.JsonBeautifyStep;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Date;
@@ -40,8 +40,8 @@ public class MinecraftAssetsTarget extends GeneratorTarget {
                 true,
                 false,
                 (versionSteps, versionName, releaseTime, manifest) -> {
-                    JSONObject downloads = manifest.getJSONObject("downloads");
-                    String clientUrl = downloads.getJSONObject("client").getString("url");
+                    GsonObject downloads = manifest.getObject("downloads");
+                    String clientUrl = downloads.getObject("client").getString("url");
 
                     versionSteps.add(new CleanRepoStep(this.repoDir));
                     versionSteps.add(new DownloadStep(clientUrl, this.clientJar));

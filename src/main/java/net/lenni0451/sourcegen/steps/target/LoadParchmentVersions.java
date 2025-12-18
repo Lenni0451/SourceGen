@@ -1,11 +1,11 @@
 package net.lenni0451.sourcegen.steps.target;
 
+import net.lenni0451.commons.gson.elements.GsonArray;
+import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.NetUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -44,11 +44,11 @@ public class LoadParchmentVersions implements GeneratorStep {
 
     private List<String> getVersions() throws Exception {
         List<String> versions = new ArrayList<>();
-        JSONObject json = NetUtils.getJsonObject(Config.OnlineResources.parchmentMetadata);
-        JSONArray data = json.getJSONArray("data");
-        for (int i = 0; i < data.length(); i++) {
-            JSONObject version = data.getJSONObject(i);
-            String name = version.optString("name");
+        GsonObject json = NetUtils.getJsonObject(Config.OnlineResources.parchmentMetadata);
+        GsonArray data = json.getArray("data");
+        for (int i = 0; i < data.size(); i++) {
+            GsonObject version = data.getObject(i);
+            String name = version.getString("name");
             if (name.startsWith("parchment-")) versions.add(name);
         }
         return versions;

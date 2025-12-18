@@ -1,11 +1,12 @@
 package net.lenni0451.sourcegen.utils;
 
+import net.lenni0451.commons.gson.GsonParser;
+import net.lenni0451.commons.gson.elements.GsonArray;
+import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.commons.httpclient.HttpClient;
 import net.lenni0451.commons.httpclient.HttpResponse;
 import net.lenni0451.commons.httpclient.constants.HttpHeaders;
 import net.lenni0451.commons.httpclient.content.impl.ByteArrayContent;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,14 +39,14 @@ public class NetUtils {
         }
     }
 
-    public static JSONObject getJsonObject(final String url) throws IOException {
+    public static GsonObject getJsonObject(final String url) throws IOException {
         String response = new String(get(url), StandardCharsets.UTF_8);
-        return new JSONObject(response);
+        return GsonParser.parse(response).asObject();
     }
 
-    public static JSONArray getJsonArray(final String url) throws IOException {
+    public static GsonArray getJsonArray(final String url) throws IOException {
         String response = new String(get(url), StandardCharsets.UTF_8);
-        return new JSONArray(response);
+        return GsonParser.parse(response).asArray();
     }
 
 }

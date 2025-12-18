@@ -4,9 +4,10 @@ import net.lenni0451.commons.asm.mappings.meta.ClassMetaMapping;
 import net.lenni0451.commons.asm.mappings.meta.FieldMetaMapping;
 import net.lenni0451.commons.asm.mappings.meta.MethodMetaMapping;
 import net.lenni0451.commons.asm.mappings.meta.ParameterMetaMapping;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import net.lenni0451.commons.gson.GsonParser;
+import net.lenni0451.commons.gson.elements.GsonArray;
+import net.lenni0451.commons.gson.elements.GsonElement;
+import net.lenni0451.commons.gson.elements.GsonObject;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -18,54 +19,58 @@ import java.util.List;
 
 public class ParchmentMetadataConverter {
 
-    private static final JSONArray EMPTY_JSON_ARRAY = new JSONArray();
-
     public static List<ClassMetaMapping> toTinyV2Metadata(final File mappings) throws IOException {
         List<ClassMetaMapping> metadata = new ArrayList<>();
-        JSONObject obj = new JSONObject(new JSONTokener(Files.readString(mappings.toPath())));
-        JSONArray classes = obj.getJSONArray("classes");
-        for (Object classMeta : classes) {
-            metadata.add(toClassMetadata((JSONObject) classMeta));
+        GsonObject obj = GsonParser.parse(Files.readString(mappings.toPath())).asObject();
+        GsonArray classes = obj.getArray("classes");
+        for (GsonElement classMeta : classes) {
+            metadata.add(toClassMetadata(classMeta.asObject()));
         }
         return metadata;
     }
 
-    private static ClassMetaMapping toClassMetadata(final JSONObject obj) {
+    private static ClassMetaMapping toClassMetadata(final GsonObject obj) {
         ClassMetaMapping classMetadata = new ClassMetaMapping(obj.getString("name"), toComment(obj), new ArrayList<>(), new ArrayList<>());
-        for (Object fieldMeta : obj.optJSONArray("fields", EMPTY_JSON_ARRAY)) {
-            classMetadata.getFields().add(toFieldMetadata((JSONObject) fieldMeta));
-        }
-        for (Object methodMeta : obj.optJSONArray("methods", EMPTY_JSON_ARRAY)) {
-            classMetadata.getMethods().add(toMethodMetadata((JSONObject) methodMeta));
-        }
+        obj.optArray("fields").ifPresent(fields -> {
+            for (GsonElement fieldMeta : fields) {
+                classMetadata.getFields().add(toFieldMetadata(fieldMeta.asObject()));
+            }
+        });
+        obj.optArray("methods").ifPresent(methods -> {
+            for (GsonElement methodMeta : methods) {
+                classMetadata.getMethods().add(toMethodMetadata(methodMeta.asObject()));
+            }
+        });
         return classMetadata;
     }
 
-    private static FieldMetaMapping toFieldMetadata(final JSONObject obj) {
+    private static FieldMetaMapping toFieldMetadata(final GsonObject obj) {
         return new FieldMetaMapping(obj.getString("name"), obj.getString("descriptor"), toComment(obj));
     }
 
-    private static MethodMetaMapping toMethodMetadata(final JSONObject obj) {
+    private static MethodMetaMapping toMethodMetadata(final GsonObject obj) {
         MethodMetaMapping methodMetadata = new MethodMetaMapping(obj.getString("name"), obj.getString("descriptor"), toComment(obj), new ArrayList<>());
-        for (Object parameterMeta : obj.optJSONArray("parameters", EMPTY_JSON_ARRAY)) {
-            methodMetadata.getParameters().add(toParameterMetadata((JSONObject) parameterMeta));
-        }
+        obj.optArray("parameters").ifPresent(parameters -> {
+            for (GsonElement parameterMeta : parameters) {
+                methodMetadata.getParameters().add(toParameterMetadata(parameterMeta.asObject()));
+            }
+        });
         return methodMetadata;
     }
 
-    private static ParameterMetaMapping toParameterMetadata(final JSONObject obj) {
+    private static ParameterMetaMapping toParameterMetadata(final GsonObject obj) {
         return new ParameterMetaMapping(obj.getInt("index"), obj.getString("name"), toComment(obj));
     }
 
     @Nonnull
-    private static String[] toComment(final JSONObject obj) {
-        Object rawJavadoc = obj.opt("javadoc");
+    private static String[] toComment(final GsonObject obj) {
+        GsonElement rawJavadoc = obj.get("javadoc");
         if (rawJavadoc == null) return new String[0];
         String[] comment;
-        if (rawJavadoc instanceof String) {
-            comment = new String[]{(String) rawJavadoc};
-        } else if (rawJavadoc instanceof JSONArray) {
-            comment = obj.optJSONArray("javadoc", EMPTY_JSON_ARRAY).toList().stream().map(Object::toString).toArray(String[]::new);
+        if (rawJavadoc.isPrimitive()) {
+            comment = new String[]{rawJavadoc.asString()};
+        } else if (rawJavadoc.isArray()) {
+            comment = obj.optArray("javadoc").stream().flatMap(GsonArray::stream).map(GsonElement::asString).toArray(String[]::new);
         } else {
             throw new IllegalStateException("Invalid comment type: " + rawJavadoc);
         }

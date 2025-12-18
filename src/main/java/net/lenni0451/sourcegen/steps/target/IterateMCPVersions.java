@@ -1,19 +1,17 @@
 package net.lenni0451.sourcegen.steps.target;
 
+import net.lenni0451.commons.gson.GsonParser;
+import net.lenni0451.commons.gson.elements.GsonArray;
+import net.lenni0451.commons.gson.elements.GsonElement;
+import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.ETA;
 import net.lenni0451.sourcegen.utils.NetUtils;
 import net.lenni0451.sourcegen.utils.external.Commands;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -36,21 +34,20 @@ public class IterateMCPVersions implements GeneratorStep {
 
     @Override
     public void run() throws Exception {
-        List<JSONObject> versions = this.loadVersions();
+        List<GsonObject> versions = this.loadVersions();
         this.removeBuiltVersions(versions);
         this.resolveClientManifest(versions);
         this.resolveVersionManifest(versions);
 
         int i = 0;
         ETA eta = new ETA();
-        for (JSONObject entry : versions) {
+        for (GsonObject entry : versions) {
             List<String> mappingsDownloads = new ArrayList<>();
-            if (entry.get("url") instanceof JSONArray) {
-                JSONArray mappings = entry.getJSONArray("url");
-                for (Object mapping : mappings) {
-                    mappingsDownloads.add(mapping.toString());
+            if (entry.get("url") instanceof GsonArray) {
+                for (GsonElement mapping : entry.getArray("url")) {
+                    mappingsDownloads.add(mapping.asString());
                 }
-            } else if (entry.get("url") instanceof String) {
+            } else if (entry.get("url").isPrimitive()) {
                 mappingsDownloads.add(entry.getString("url"));
             } else {
                 throw new IllegalStateException("Invalid mappings format in MCP version entry: " + entry);
@@ -67,59 +64,61 @@ public class IterateMCPVersions implements GeneratorStep {
         }
     }
 
-    private List<JSONObject> loadVersions() throws IOException {
+    private List<GsonObject> loadVersions() throws IOException {
         File mcpsFile = new File("mcps.json");
         if (!mcpsFile.exists()) {
             throw new IOException("Could not find MCP versions file: " + mcpsFile.getAbsolutePath() + ". This file needs to be manually supplied.");
         }
         try (InputStream is = new FileInputStream(mcpsFile)) {
-            List<JSONObject> versions = new ArrayList<>();
-            JSONArray array = new JSONArray(new JSONTokener(is));
-            for (Object o : array) versions.add((JSONObject) o);
+            List<GsonObject> versions = new ArrayList<>();
+            GsonArray array = GsonParser.parse(new InputStreamReader(is)).asArray();
+            for (GsonElement gsonElement : array) {
+                versions.add(gsonElement.asObject());
+            }
             return versions;
         }
     }
 
-    private void removeBuiltVersions(final List<JSONObject> versions) throws IOException {
+    private void removeBuiltVersions(final List<GsonObject> versions) throws IOException {
         String lastBuiltVersion = Commands.git(this.repoDir).latestCommitMessage(this.branch);
         boolean hasVersion = versions.stream().map(v -> v.getString("id")).toList().contains(lastBuiltVersion);
         if (!hasVersion) return;
-        Iterator<JSONObject> it = versions.iterator();
+        Iterator<GsonObject> it = versions.iterator();
         while (it.hasNext()) {
-            JSONObject version = it.next();
+            GsonObject version = it.next();
             String versionName = version.getString("id");
             it.remove();
             if (versionName.equalsIgnoreCase(lastBuiltVersion)) break;
         }
     }
 
-    private void resolveClientManifest(final List<JSONObject> versions) throws IOException {
-        JSONObject meta = NetUtils.getJsonObject(Config.OnlineResources.minecraftVersionManifest);
-        JSONArray versionManifests = meta.getJSONArray("versions");
+    private void resolveClientManifest(final List<GsonObject> versions) throws IOException {
+        GsonObject meta = NetUtils.getJsonObject(Config.OnlineResources.minecraftVersionManifest);
+        GsonArray versionManifests = meta.getArray("versions");
         Map<String, VersionInfo> versionManifestURLs = new HashMap<>();
-        for (int i = 0; i < versionManifests.length(); i++) {
-            JSONObject versionManifest = versionManifests.getJSONObject(i);
+        for (int i = 0; i < versionManifests.size(); i++) {
+            GsonObject versionManifest = versionManifests.getObject(i);
             String id = versionManifest.getString("id");
             String releaseTime = versionManifest.getString("releaseTime");
             String url = versionManifest.getString("url");
             versionManifestURLs.put(id, new VersionInfo(releaseTime, url));
         }
-        for (JSONObject version : versions) {
+        for (GsonObject version : versions) {
             String versionName = version.getString("id");
             VersionInfo info = versionManifestURLs.get(versionName);
             if (info == null) throw new IllegalStateException("Could not find version manifest URL for version " + versionName);
-            version.put("releaseTime", info.releaseTime);
-            version.put("manifestUrl", info.manifestUrl);
+            version.add("releaseTime", info.releaseTime);
+            version.add("manifestUrl", info.manifestUrl);
         }
     }
 
-    private void resolveVersionManifest(final List<JSONObject> versions) throws IOException {
-        for (JSONObject version : versions) {
+    private void resolveVersionManifest(final List<GsonObject> versions) throws IOException {
+        for (GsonObject version : versions) {
             String url = version.getString("manifestUrl");
-            JSONObject versionManifest = NetUtils.getJsonObject(url);
-            JSONObject downloads = versionManifest.getJSONObject("downloads");
-            JSONObject client = downloads.getJSONObject("client");
-            version.put("client", client.getString("url"));
+            GsonObject versionManifest = NetUtils.getJsonObject(url);
+            GsonObject downloads = versionManifest.getObject("downloads");
+            GsonObject client = downloads.getObject("client");
+            version.add("client", client.getString("url"));
         }
     }
 
