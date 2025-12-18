@@ -46,17 +46,17 @@ public class Config {
         public static List<String> minecraft = List.of("15w14a", "1.RV-Pre1", "3D Shareware v1.34", "20w14infinite", "22w13oneblockatatime", "23w13a_or_b", "24w14potato", "25w14craftmine");
 
         @Option("RetroMCP")
-        public static List<String> retroMCP = List.of("rd-20090515", "b1.4_01", "b1.5_01");
+        public static List<String> retroMCP = List.of();
 
         @Option("RetroMCPFork")
-        public static List<String> retroMCPFork = List.of("4k-2", "4k-021742", "minicraft-ld22", "c0.30_01c", "b1.2_02-20110517");
+        public static List<String> retroMCPFork = List.of("legend-of-chambered-1");
     }
 
     @Section(name = "MappingsSources")
     public static class OnlineResources {
         @Option("CosmicReachArchive")
         @Description("The URL to the cosmic reach archive json file")
-        public static String cosmicReachArchive = "https://raw.githubusercontent.com/CRModders/CosmicArchive/refs/heads/main/versions_v2.json";
+        public static String cosmicReachArchive = "https://raw.githubusercontent.com/PuzzlesHQ/CRArchive/refs/heads/main/versions.json";
 
         @Option("MinecraftVersionManifest")
         @Description("The URL to the minecraft version manifest")
