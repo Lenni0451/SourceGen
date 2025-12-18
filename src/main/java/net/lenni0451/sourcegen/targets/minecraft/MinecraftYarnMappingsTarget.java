@@ -1,6 +1,5 @@
 package net.lenni0451.sourcegen.targets.minecraft;
 
-import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
@@ -45,11 +44,8 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
                     Config.MinecraftYarnMappings.branch,
                     new IterateMinecraftVersions.VersionRange(null, null),
                     version -> versionToUrl.apply(version.getString("id")) == null,
-                    true,
                     false,
-                    (versionSteps, versionName, releaseTime, manifest) -> {
-                        GsonObject downloads = manifest.getObject("downloads");
-                        String clientUrl = downloads.getObject("client").getString("url");
+                    (versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl) -> {
                         Map<String, byte[]> jarEntries = new HashMap<>();
                         List<String[]> comments = new ArrayList<>();
 

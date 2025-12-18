@@ -1,6 +1,5 @@
 package net.lenni0451.sourcegen.targets.minecraft;
 
-import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
@@ -18,6 +17,7 @@ import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.utils.remapping.ProguardRemapper;
 
 import java.io.File;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,31 +42,39 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
         steps.add(new IterateMinecraftVersions(
                 this.repoDir,
                 Config.MinecraftMojangMappings.branch,
-                new VersionRange("1.14", null),
+                new VersionRange("1.14.4", null), //First version with official mappings
                 version -> false,
                 false,
-                false,
-                (versionSteps, versionName, releaseTime, manifest) -> {
-                    GsonObject downloads = manifest.getObject("downloads");
-                    String clientUrl = downloads.getObject("client").getString("url");
-                    String mappingsUrl = downloads.getObject("client_mappings").getString("url");
-                    Map<String, byte[]> jarEntries = new HashMap<>();
-
-                    versionSteps.add(new CleanRepoStep(this.repoDir));
-                    versionSteps.add(new DownloadStep(mappingsUrl, this.mappingsFile));
-                    versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
-                    versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
-                    versionSteps.add(new RemapStep(new ProguardRemapper(jarEntries, this.mappingsFile)));
-                    versionSteps.add(new FixLocalVariablesStep(jarEntries));
-                    versionSteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
-                    versionSteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
-                    versionSteps.add(new RemoveResourcesStep(this.repoDir, new File(this.repoDir, "version.json")));
-                    versionSteps.add(new CopyDefaultsStep(this.repoDir, this.defaultsDir));
-                    versionSteps.add(new CommitChangesStep(this.repoDir, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
-                    versionSteps.add(new CleanupStep(this.mappingsFile, this.clientJar, this.remappedJar));
+                (versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl) -> {
+                    this.addVersionSteps(versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl);
+                    if (versionName.equals("1.21.11")) {
+                        //Transition from obfuscated to deobfuscated jars
+                        //Generate the sources for 1.21.11 twice to make diffing easier
+                        //Maybe this can be put into the config at some point to make the process more flexible
+                        this.addVersionSteps(versionSteps, versionName, releaseTime, "https://piston-data.mojang.com/v1/objects/4509ee9b65f226be61142d37bf05f8d28b03417b/client.jar", null);
+                    }
                 }
         ));
         steps.add(new PushRepoStep(this.repoDir, Config.MinecraftMojangMappings.branch));
+    }
+
+    private void addVersionSteps(final List<GeneratorStep> versionSteps, final String versionName, final OffsetDateTime releaseTime, final String clientUrl, final String clientMappingsUrl) {
+        Map<String, byte[]> jarEntries = new HashMap<>();
+
+        versionSteps.add(new CleanRepoStep(this.repoDir));
+        versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
+        versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
+        if (clientMappingsUrl != null) {
+            versionSteps.add(new DownloadStep(clientMappingsUrl, this.mappingsFile));
+            versionSteps.add(new RemapStep(new ProguardRemapper(jarEntries, this.mappingsFile)));
+            versionSteps.add(new FixLocalVariablesStep(jarEntries));
+        }
+        versionSteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
+        versionSteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
+        versionSteps.add(new RemoveResourcesStep(this.repoDir, new File(this.repoDir, "version.json")));
+        versionSteps.add(new CopyDefaultsStep(this.repoDir, this.defaultsDir));
+        versionSteps.add(new CommitChangesStep(this.repoDir, versionName, new Date(releaseTime.toInstant().toEpochMilli())));
+        versionSteps.add(new CleanupStep(this.mappingsFile, this.clientJar, this.remappedJar));
     }
 
     @Override

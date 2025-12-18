@@ -24,7 +24,6 @@ public class IterateMinecraftVersions implements GeneratorStep {
     private final String branch;
     private final VersionRange versionRange;
     private final Predicate<GsonObject> removeVersionIf;
-    private final boolean keepVersionsWithoutMappings;
     private final boolean ignoreExclusions;
     private final VersionStepProvider stepProvider;
 
@@ -47,7 +46,8 @@ public class IterateMinecraftVersions implements GeneratorStep {
             GsonObject versionManifest = entry.getValue().getObject("manifest");
             List<GeneratorStep> steps = new ArrayList<>();
             String versionName = entry.getValue().getString("id");
-            this.stepProvider.provideSteps(steps, versionName, entry.getKey(), versionManifest);
+            GsonObject downloads = versionManifest.getObject("downloads");
+            this.stepProvider.provideSteps(steps, versionName, entry.getKey(), downloads.getObject("client").getString("url"), downloads.optObject("client_mappings").map(o -> o.getString("url")).orElse(null));
             System.out.println("Running steps for version " + versionName + " (" + (++i) + "/" + versions.size() + (eta.canEstimate() ? (" ETA: " + ETA.format(eta.getNextEstimation()) + "/" + ETA.format(eta.getEstimation(versions.size() - (i - 1)))) : "") + ")...");
             eta.start();
             StepExecutor executor = new StepExecutor(steps);
@@ -119,25 +119,18 @@ public class IterateMinecraftVersions implements GeneratorStep {
     }
 
     private void resolveVersionManifest(final Map<OffsetDateTime, GsonObject> versions) throws IOException {
-        Iterator<Map.Entry<OffsetDateTime, GsonObject>> it = versions.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<OffsetDateTime, GsonObject> entry = it.next();
+        for (Map.Entry<OffsetDateTime, GsonObject> entry : versions.entrySet()) {
             GsonObject version = entry.getValue();
             String url = version.getString("url");
             GsonObject versionManifest = NetUtils.getJsonObject(url);
-            GsonObject downloads = versionManifest.getObject("downloads");
-            if (!downloads.has("client_mappings") && !this.keepVersionsWithoutMappings) {
-                it.remove();
-            } else {
-                version.add("manifest", versionManifest);
-            }
+            version.add("manifest", versionManifest);
         }
     }
 
 
     @FunctionalInterface
     public interface VersionStepProvider {
-        void provideSteps(final List<GeneratorStep> versionSteps, final String versionName, final OffsetDateTime releaseTime, final GsonObject manifest) throws Exception;
+        void provideSteps(final List<GeneratorStep> versionSteps, final String versionName, final OffsetDateTime releaseTime, final String clientUrl, @Nullable final String clientMappingsUrl) throws Exception;
     }
 
     public record VersionRange(@Nullable String minVersion, @Nullable String maxVersion) {

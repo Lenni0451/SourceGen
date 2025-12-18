@@ -1,6 +1,5 @@
 package net.lenni0451.sourcegen.targets.minecraft;
 
-import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
@@ -46,23 +45,21 @@ public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
                     new IterateMinecraftVersions.VersionRange("1.16.5", null),
                     ver -> versionToUrl.apply(ver.getString("id")) == null,
                     false,
-                    false,
-                    (versionSteps, versionName, releaseTime, manifest) -> {
-                        GsonObject downloads = manifest.getObject("downloads");
-                        String clientUrl = downloads.getObject("client").getString("url");
-                        String mappingsUrl = downloads.getObject("client_mappings").getString("url");
+                    (versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl) -> {
                         String metadataUrl = versionToUrl.apply(versionName);
                         Map<String, byte[]> jarEntries = new HashMap<>();
                         List<String[]> comments = new ArrayList<>();
 
                         versionSteps.add(new CleanRepoStep(this.repoDir));
-                        versionSteps.add(new DownloadStep(mappingsUrl, this.mappingsFile));
                         versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
                         versionSteps.add(new DownloadStep(metadataUrl, this.metadataJar));
                         versionSteps.add(new UnzipSingleFileStep(this.metadataJar, "parchment.json", this.metadataFile));
                         versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
-                        versionSteps.add(new RemapStep(new ProguardRemapper(jarEntries, this.mappingsFile)));
-                        versionSteps.add(new FixLocalVariablesStep(jarEntries));
+                        if (clientMappingsUrl != null) {
+                            versionSteps.add(new DownloadStep(clientMappingsUrl, this.mappingsFile));
+                            versionSteps.add(new RemapStep(new ProguardRemapper(jarEntries, this.mappingsFile)));
+                            versionSteps.add(new FixLocalVariablesStep(jarEntries));
+                        }
                         versionSteps.add(new ParchmentMetadataStep(jarEntries, this.metadataFile, comments));
                         versionSteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
                         versionSteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));

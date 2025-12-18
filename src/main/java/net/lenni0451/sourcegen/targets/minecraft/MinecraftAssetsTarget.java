@@ -1,6 +1,5 @@
 package net.lenni0451.sourcegen.targets.minecraft;
 
-import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
@@ -38,11 +37,7 @@ public class MinecraftAssetsTarget extends GeneratorTarget {
                 new IterateMinecraftVersions.VersionRange(null, null),
                 v -> v.getString("type").equalsIgnoreCase("snapshot"),
                 true,
-                false,
-                (versionSteps, versionName, releaseTime, manifest) -> {
-                    GsonObject downloads = manifest.getObject("downloads");
-                    String clientUrl = downloads.getObject("client").getString("url");
-
+                (versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl) -> {
                     versionSteps.add(new CleanRepoStep(this.repoDir));
                     versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
                     versionSteps.add(new UnzipStep(this.clientJar, this.repoDir));
