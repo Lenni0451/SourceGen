@@ -11,7 +11,10 @@ import net.lenni0451.sourcegen.utils.ETA;
 import net.lenni0451.sourcegen.utils.NetUtils;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -65,11 +68,7 @@ public class IterateMCPVersions implements GeneratorStep {
     }
 
     private List<GsonObject> loadVersions() throws IOException {
-        File mcpsFile = new File("mcps.json");
-        if (!mcpsFile.exists()) {
-            throw new IOException("Could not find MCP versions file: " + mcpsFile.getAbsolutePath() + ". This file needs to be manually supplied.");
-        }
-        try (InputStream is = new FileInputStream(mcpsFile)) {
+        try (InputStream is = IterateMCPVersions.class.getClassLoader().getResourceAsStream("mcps.json")) {
             List<GsonObject> versions = new ArrayList<>();
             GsonArray array = GsonParser.parse(new InputStreamReader(is)).asArray();
             for (GsonElement gsonElement : array) {
