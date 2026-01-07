@@ -1,6 +1,6 @@
 [versions]
 asm = "9.8"
-commons = "1.9.1-SNAPSHOT"
+commons = "1.9.1"
 
 [libraries]
 findbugs = { module = "com.google.code.findbugs:jsr305", version = "3.0.2" }
