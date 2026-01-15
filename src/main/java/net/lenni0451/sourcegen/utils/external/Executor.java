@@ -11,6 +11,7 @@ public class Executor {
 
     private static final boolean PRINT_COMMANDS = System.getProperty("sourcegen.printCommands", "false").equalsIgnoreCase("true");
     private static final boolean PRINT_PROCESS_OUTPUT = System.getProperty("sourcegen.printProcessOutput", "false").equalsIgnoreCase("true");
+    private static final int[] DEFAULT_ALLOWED_EXIT_CODES = {0};
 
     public static ProcessOutput execute(final File runDir, final String[]... cmdParts) throws IOException {
         int length = 0;
@@ -29,7 +30,7 @@ public class Executor {
     }
 
     public static ProcessOutput execute(final File runDir, final Map<String, String> env, final String... cmd) throws IOException {
-        return execute(runDir, env, new int[]{0}, cmd);
+        return execute(runDir, env, DEFAULT_ALLOWED_EXIT_CODES, cmd);
     }
 
     public static ProcessOutput execute(final File runDir, final Map<String, String> env, final int[] allowedExitCodes, final String... cmd) throws IOException {

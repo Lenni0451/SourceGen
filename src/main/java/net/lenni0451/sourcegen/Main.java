@@ -6,6 +6,7 @@ import net.lenni0451.optconfig.provider.ConfigProvider;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.minecraft.*;
 import net.lenni0451.sourcegen.targets.other.CosmicReachTarget;
+import net.lenni0451.sourcegen.targets.other.HytaleServerTarget;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
@@ -62,6 +63,7 @@ public class Main {
         TARGETS.add(new MinecraftAssetsTarget());
         TARGETS.add(null); //previously: Minecraft Bedrock Edition assets (removed due to UWP discontinuation)
         TARGETS.add(new MinecraftMCPMappingsTarget());
+        TARGETS.add(new HytaleServerTarget());
     }
 
     private static void printTargets() {
@@ -77,6 +79,12 @@ public class Main {
         if (!Commands.Vineflower.exists()) {
             System.out.println("VineFlower is not present in the working directory.");
             System.out.println("Please download VineFlower and put 'vineflower.jar' into the working directory.");
+            System.exit(-1);
+        }
+        if (!Commands.HytaleDownloader.exists()) {
+            System.out.println("Hytale Downloader is not present in the working directory.");
+            System.out.println("Please download the Hytale Downloader executable and put it into the working directory.");
+            System.out.println("Make sure you have authenticated it properly by running it once.");
             System.exit(-1);
         }
     }

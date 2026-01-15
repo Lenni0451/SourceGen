@@ -31,6 +31,10 @@ public class Config {
         @Option("VineflowerArgs")
         @Description("The arguments that should be passed to vineflower")
         public static String[] vineflowerArgs = {"-dgs=1", "-asc=1", "-ump=0", "-rsy=1", "-aoa=1"};
+
+        @Option("HytaleDownloaderExecutable")
+        @Description("The name of the Hytale downloader executable")
+        public static String hytaleDownloaderExecutable = "hytale-downloader";
     }
 
     @Section(name = "Exclusions", description = {
@@ -306,6 +310,29 @@ public class Config {
         @Option("Branch")
         @Description("The branch where the files should be stored")
         public static String branch = "mcp";
+    }
+
+    @Section(name = "HytaleServer")
+    public static class HytaleServer {
+        @Option("GitRepo")
+        @Description("The URL to the git repo where the decompiled files should be stored")
+        public static String gitRepo = "https://github.com/ExampleDude/HytaleServerSources";
+
+        @Option("RepoName")
+        @Description("The name of the local repository directory")
+        public static String repoName = "hytale_server";
+
+        @Option("AuthorName")
+        @Description("The name of the author that should be used for the git commits")
+        public static String authorName = "Hypixel Studios";
+
+        @Option("AuthorEmail")
+        @Description("The email of the author that should be used for the git commits")
+        public static String authorEmail = "hypixel@hytale.com";
+
+        @Option("Branch")
+        @Description("The branch where the files should be stored")
+        public static String branch = "server";
     }
 
 }

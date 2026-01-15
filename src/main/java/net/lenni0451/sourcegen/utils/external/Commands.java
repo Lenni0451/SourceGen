@@ -12,6 +12,7 @@ public class Commands {
 
     private static final File CURRENT_DIR = new File(".");
     private static final File VINEFLOWER_JAR = new File(Config.External.vineflowerJar);
+    private static final File HYTALE_DOWNLOADER_EXECUTABLE = new File(Config.External.hytaleDownloaderExecutable);
 
     public static Git git(final File repoDir) {
         return new Git(repoDir);
@@ -94,6 +95,23 @@ public class Commands {
         public static void decompileWithLib(final File input, final File library, final File output) throws IOException {
             String[] args = {"-e=" + library.getAbsolutePath(), input.getAbsolutePath(), output.getAbsolutePath()};
             Executor.execute(CURRENT_DIR, BASE_COMMAND, Config.External.vineflowerArgs, args);
+        }
+
+    }
+
+    public static class HytaleDownloader {
+
+        public static boolean exists() {
+            return HYTALE_DOWNLOADER_EXECUTABLE.exists();
+        }
+
+        public static String getLatestVersion() throws IOException {
+            String response = Executor.execute(CURRENT_DIR, HYTALE_DOWNLOADER_EXECUTABLE.getAbsolutePath(), "-skip-update-check", "-print-version").output();
+            return response.trim();
+        }
+
+        public static void downloadLatestVersion(final String fileName) throws IOException {
+            Executor.execute(CURRENT_DIR, HYTALE_DOWNLOADER_EXECUTABLE.getAbsolutePath(), "-skip-update-check", "-download-path", fileName);
         }
 
     }
