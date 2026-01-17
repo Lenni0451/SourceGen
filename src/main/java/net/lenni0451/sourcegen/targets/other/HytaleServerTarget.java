@@ -7,6 +7,7 @@ import net.lenni0451.sourcegen.steps.decompile.DecompileWithLibStep;
 import net.lenni0451.sourcegen.steps.git.ChangeGitUserStep;
 import net.lenni0451.sourcegen.steps.git.CommitChangesStep;
 import net.lenni0451.sourcegen.steps.git.PrepareRepoStep;
+import net.lenni0451.sourcegen.steps.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateHytaleServerVersions;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
@@ -34,7 +35,7 @@ public class HytaleServerTarget extends GeneratorTarget {
         steps.add(new ChangeGitUserStep(this.repoDir, Config.HytaleServer.authorName, Config.HytaleServer.authorEmail));
         steps.add(new IterateHytaleServerVersions(this.repoDir, Config.HytaleServer.branch, (versionSteps, versionName) -> {
             versionSteps.add(new CleanRepoStep(this.repoDir));
-            versionSteps.add(new DownloadLatestHytaleServerStep(this.repoDir));
+            versionSteps.add(new DownloadLatestHytaleServerStep(this.serverArchive));
             versionSteps.add(new UnzipSingleFileStep(this.serverArchive, "Server/HytaleServer.jar", this.rawJar));
             versionSteps.add(new ModifyJarStep(this.rawJar, this.noGameJar, entry -> keep(entry)));
             versionSteps.add(new ModifyJarStep(this.rawJar, this.onlyGameJar, entry -> !keep(entry)));
@@ -43,7 +44,7 @@ public class HytaleServerTarget extends GeneratorTarget {
             versionSteps.add(new CommitChangesStep(this.repoDir, versionName, Calendar.getInstance().getTime()));
             versionSteps.add(new CleanupStep(this.serverArchive, this.rawJar, this.noGameJar, this.onlyGameJar));
         }));
-//        steps.add(new PushRepoStep(this.repoDir, Config.HytaleServer.branch));
+        steps.add(new PushRepoStep(this.repoDir, Config.HytaleServer.branch));
     }
 
     private static boolean keep(final String entry) {
