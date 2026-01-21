@@ -19,7 +19,7 @@ public class LocalVariableFixer {
                 ClassNode node = ClassIO.fromBytes(entry.getValue());
                 for (MethodNode method : node.methods) {
                     fixParameters(method);
-                    fixLocalVariableTable(method);
+                    fixLocalVariableTable(node, method);
                     Set<String> names = new HashSet<>();
                     if (method.localVariables != null) {
                         int[] parameterIndices = ASMUtils.parameterIndices(method);
@@ -67,17 +67,18 @@ public class LocalVariableFixer {
         }
     }
 
-    private static void fixLocalVariableTable(final MethodNode methodNode) {
+    private static void fixLocalVariableTable(final ClassNode classNode, final MethodNode methodNode) {
         if (Modifier.isAbstract(methodNode.access) || Modifier.isNative(methodNode.access)) {
             methodNode.localVariables = null;
             return;
         }
+        boolean hasThis = !Modifier.isStatic(methodNode.access);
 
         if (methodNode.localVariables == null) methodNode.localVariables = new ArrayList<>();
         Type[] parameterTypes = Types.argumentTypes(methodNode);
         int[] parameterIndices = ASMUtils.parameterIndices(methodNode);
         List<Integer> missingVariables = new ArrayList<>();
-        if (!Modifier.isStatic(methodNode.access)) {
+        if (hasThis) {
             boolean found = false;
             for (LocalVariableNode localVariable : methodNode.localVariables) {
                 if (localVariable.index == 0) {
@@ -102,6 +103,10 @@ public class LocalVariableFixer {
         LabelNode end = new LabelNode();
         methodNode.instructions.insert(start);
         methodNode.instructions.add(end);
+        if (hasThis && missingVariables.contains(0)) {
+            methodNode.localVariables.add(new LocalVariableNode("this", "L" + classNode.name + ";", null, start, end, 0));
+            missingVariables.remove(0);
+        }
         for (int i = 0; i < parameterTypes.length; i++) {
             if (!missingVariables.contains(parameterIndices[i])) continue;
             methodNode.localVariables.add(new LocalVariableNode("arg" + i, parameterTypes[i].getDescriptor(), null, start, end, parameterIndices[i]));
