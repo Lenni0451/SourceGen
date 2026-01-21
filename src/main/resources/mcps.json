@@ -375,7 +375,7 @@
     {
         "id": "1.16.4",
         "url": [
-            "https://maven.lenni0451.net/#/mcp/de/oceanlabs/mcp/mcp_snapshot/20210309-1.16.4",
+            "https://maven.lenni0451.net/mcp/de/oceanlabs/mcp/mcp_snapshot/20210309-1.16.4/mcp_snapshot-20210309-1.16.4.zip",
             "https://maven.lenni0451.net/mcp/de/oceanlabs/mcp/mcp_config/1.16.4/mcp_config-1.16.4.zip"
         ],
         "mappings": "FML3"
