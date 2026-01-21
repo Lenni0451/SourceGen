@@ -13,6 +13,7 @@ import net.lenni0451.sourcegen.steps.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateMCPVersions;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.targets.Requirements;
 import net.lenni0451.sourcegen.utils.remapping.mcp.*;
 
 import java.io.File;
@@ -31,7 +32,7 @@ public class MinecraftMCPMappingsTarget extends GeneratorTarget {
     private final File remappedJar = new File(Main.WORK_DIR, "remapped.jar");
 
     public MinecraftMCPMappingsTarget() {
-        super("Minecraft (MCP Mappings)");
+        super("Minecraft (MCP Mappings)", Requirements.VINEFLOWER);
     }
 
     @Override

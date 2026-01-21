@@ -11,6 +11,7 @@ import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.transform.JsonBeautifyStep;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.targets.Requirements;
 
 import java.io.File;
 import java.util.Date;
@@ -24,7 +25,7 @@ public class MinecraftAssetsTarget extends GeneratorTarget {
     private final File clientJar = new File(Main.WORK_DIR, "client.jar");
 
     public MinecraftAssetsTarget() {
-        super("Minecraft Assets");
+        super("Minecraft Assets", Requirements.VINEFLOWER);
     }
 
     @Override

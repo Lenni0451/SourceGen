@@ -11,6 +11,7 @@ import net.lenni0451.sourcegen.steps.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateHytaleServerVersions;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.targets.Requirements;
 
 import java.io.File;
 import java.util.Calendar;
@@ -26,7 +27,7 @@ public class HytaleServerTarget extends GeneratorTarget {
     private final File onlyGameJar = new File(Main.WORK_DIR, "only_game.jar");
 
     public HytaleServerTarget() {
-        super("Hytale Server");
+        super("Hytale Server", Requirements.VINEFLOWER, Requirements.HYTALE_DOWNLOADER);
     }
 
     @Override

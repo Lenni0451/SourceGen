@@ -4,10 +4,10 @@ import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.optconfig.ConfigLoader;
 import net.lenni0451.optconfig.provider.ConfigProvider;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.targets.Requirements;
 import net.lenni0451.sourcegen.targets.minecraft.*;
 import net.lenni0451.sourcegen.targets.other.CosmicReachTarget;
 import net.lenni0451.sourcegen.targets.other.HytaleServerTarget;
-import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +23,6 @@ public class Main {
     public static void main(String[] args) throws Throwable {
         loadConfig();
         loadGenerators();
-        checkRequirements();
         if (args.length != 1) {
             System.out.println("Please specify a target to generate!");
             printTargets();
@@ -48,6 +47,12 @@ public class Main {
         WORK_DIR.mkdirs();
         DEFAULTS_DIR.mkdirs();
         GeneratorTarget target = TARGETS.get(targetIndex - 1);
+        for (Requirements requirement : target.getRequirements()) {
+            if (!requirement.isPresent()) {
+                System.out.println(requirement.getMessage());
+                return;
+            }
+        }
         System.out.println("Generating target: " + target.getName());
         target.execute();
         System.out.println("Done!");
@@ -72,20 +77,6 @@ public class Main {
             GeneratorTarget target = TARGETS.get(i);
             if (target == null) continue;
             System.out.println((i + 1) + ". " + target.getName());
-        }
-    }
-
-    private static void checkRequirements() {
-        if (!Commands.Vineflower.exists()) {
-            System.out.println("VineFlower is not present in the working directory.");
-            System.out.println("Please download VineFlower and put 'vineflower.jar' into the working directory.");
-            System.exit(-1);
-        }
-        if (!Commands.HytaleDownloader.exists()) {
-            System.out.println("Hytale Downloader is not present in the working directory.");
-            System.out.println("Please download the Hytale Downloader executable and put it into the working directory.");
-            System.out.println("Make sure you have authenticated it properly by running it once.");
-            System.exit(-1);
         }
     }
 

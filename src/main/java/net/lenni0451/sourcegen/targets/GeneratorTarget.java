@@ -9,13 +9,19 @@ import java.util.List;
 public abstract class GeneratorTarget {
 
     private final String name;
+    private final Requirements[] requirements;
 
-    public GeneratorTarget(final String name) {
+    public GeneratorTarget(final String name, final Requirements... requirements) {
         this.name = name;
+        this.requirements = requirements;
     }
 
     public final String getName() {
         return this.name;
+    }
+
+    public final Requirements[] getRequirements() {
+        return this.requirements;
     }
 
     protected abstract void addSteps(final List<GeneratorStep> steps);

@@ -11,6 +11,7 @@ import net.lenni0451.sourcegen.steps.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateCosmicReachVersions;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.targets.Requirements;
 
 import java.io.File;
 import java.util.List;
@@ -22,7 +23,7 @@ public class CosmicReachTarget extends GeneratorTarget {
     private final File onlyGameJar = new File(Main.WORK_DIR, "only_game.jar");
 
     public CosmicReachTarget() {
-        super("CosmicReach (Client & Server)");
+        super("CosmicReach (Client & Server)", Requirements.VINEFLOWER);
     }
 
     @Override

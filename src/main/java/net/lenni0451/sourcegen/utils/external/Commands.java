@@ -83,10 +83,6 @@ public class Commands {
 
         private static final String[] BASE_COMMAND = {Config.External.javaPath, "-Xmx" + Config.External.vineflowerRam, "-jar", VINEFLOWER_JAR.getAbsolutePath()};
 
-        public static boolean exists() {
-            return VINEFLOWER_JAR.exists();
-        }
-
         public static void decompileStandalone(final File input, final File output) throws IOException {
             String[] args = {input.getAbsolutePath(), output.getAbsolutePath()};
             Executor.execute(CURRENT_DIR, BASE_COMMAND, Config.External.vineflowerArgs, args);
@@ -100,10 +96,6 @@ public class Commands {
     }
 
     public static class HytaleDownloader {
-
-        public static boolean exists() {
-            return HYTALE_DOWNLOADER_EXECUTABLE.exists();
-        }
 
         public static String getLatestVersion() throws IOException {
             String response = Executor.execute(CURRENT_DIR, HYTALE_DOWNLOADER_EXECUTABLE.getAbsolutePath(), "-skip-update-check", "-print-version").output();

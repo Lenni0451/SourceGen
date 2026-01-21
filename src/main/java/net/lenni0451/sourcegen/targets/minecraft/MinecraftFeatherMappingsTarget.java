@@ -14,6 +14,7 @@ import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.target.LoadFeatherMappings;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.targets.Requirements;
 import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 
 import java.io.File;
@@ -32,7 +33,7 @@ public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
     private final File remappedJar = new File(Main.WORK_DIR, "remapped.jar");
 
     public MinecraftFeatherMappingsTarget() {
-        super("Minecraft (Feather Mappings)");
+        super("Minecraft (Feather Mappings)", Requirements.VINEFLOWER);
     }
 
     @Override

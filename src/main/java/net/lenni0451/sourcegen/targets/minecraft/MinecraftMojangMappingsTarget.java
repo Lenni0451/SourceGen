@@ -14,6 +14,7 @@ import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions.VersionRange;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.targets.Requirements;
 import net.lenni0451.sourcegen.utils.remapping.ProguardRemapper;
 
 import java.io.File;
@@ -32,7 +33,7 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
     private final File remappedJar = new File(Main.WORK_DIR, "remapped.jar");
 
     public MinecraftMojangMappingsTarget() {
-        super("Minecraft (Mojang Mappings)");
+        super("Minecraft (Mojang Mappings)", Requirements.VINEFLOWER);
     }
 
     @Override

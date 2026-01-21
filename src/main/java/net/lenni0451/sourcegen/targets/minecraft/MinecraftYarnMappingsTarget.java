@@ -15,6 +15,7 @@ import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.target.LoadYarnMappings;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
+import net.lenni0451.sourcegen.targets.Requirements;
 import net.lenni0451.sourcegen.utils.remapping.TinyV1Remapper;
 import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 
@@ -31,7 +32,7 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
     private final File remappedJar = new File(Main.WORK_DIR, "remapped.jar");
 
     public MinecraftYarnMappingsTarget() {
-        super("Minecraft (Yarn Mappings)");
+        super("Minecraft (Yarn Mappings)", Requirements.VINEFLOWER);
     }
 
     @Override
