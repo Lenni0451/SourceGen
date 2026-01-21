@@ -22,7 +22,16 @@ public class DownloadStep implements GeneratorStep {
 
     @Override
     public void run() throws Exception {
-        NetUtils.download(this.url, this.output);
+        for (int i = 0; i < 5; i++) {
+            try {
+                NetUtils.download(this.url, this.output);
+                break;
+            } catch (Throwable t) {
+                System.out.println("Failed to download file from " + this.url + " (Attempt " + (i + 1) + "/5): " + t.getMessage());
+                if (i == 4) throw t;
+                Thread.sleep(1000);
+            }
+        }
     }
 
 }
