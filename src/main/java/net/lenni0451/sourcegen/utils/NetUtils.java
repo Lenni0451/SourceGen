@@ -7,6 +7,7 @@ import net.lenni0451.commons.httpclient.HttpClient;
 import net.lenni0451.commons.httpclient.HttpResponse;
 import net.lenni0451.commons.httpclient.constants.HttpHeaders;
 import net.lenni0451.commons.httpclient.content.impl.ByteArrayContent;
+import net.lenni0451.commons.httpclient.executor.ExecutorType;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 public class NetUtils {
 
-    private static final HttpClient HTTP_CLIENT = new HttpClient()
+    private static final HttpClient HTTP_CLIENT = new HttpClient(ExecutorType.URL_CONNECTION)
             .setHeader("User-Agent", "Mozilla/5.0");
 
     public static byte[] get(final String url) throws IOException {
