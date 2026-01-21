@@ -25,7 +25,7 @@ public class LocalVariableFixer {
                         int[] parameterIndices = ASMUtils.parameterIndices(method);
                         for (int i = 0; i < method.localVariables.size(); i++) {
                             LocalVariableNode localVariable = method.localVariables.get(i);
-                            if (!Modifier.isStatic(method.access) && i == 0) {
+                            if (!Modifier.isStatic(method.access) && localVariable.index == 0) {
                                 localVariable.name = "this";
                             } else {
                                 localVariable.name = generateNewName(Type.getType(localVariable.desc), names);
