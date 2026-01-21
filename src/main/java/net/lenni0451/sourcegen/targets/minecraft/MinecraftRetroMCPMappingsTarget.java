@@ -3,6 +3,7 @@ package net.lenni0451.sourcegen.targets.minecraft;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
+import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.steps.decompile.DecompileStandaloneStep;
 import net.lenni0451.sourcegen.steps.decompile.FillExceptionsStep;
 import net.lenni0451.sourcegen.steps.decompile.FixLocalVariablesStep;
@@ -13,6 +14,7 @@ import net.lenni0451.sourcegen.steps.git.PrepareRepoStep;
 import net.lenni0451.sourcegen.steps.git.PushRepoStep;
 import net.lenni0451.sourcegen.steps.io.*;
 import net.lenni0451.sourcegen.steps.target.IterateRetroMCPVersions;
+import net.lenni0451.sourcegen.steps.util.IfFileExistsStep;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.Requirements;
 import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
@@ -52,9 +54,17 @@ public class MinecraftRetroMCPMappingsTarget extends GeneratorTarget {
                         versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
                         versionSteps.add(new DownloadStep(versionData.resourcesUrl(), this.resourcesFile));
                         versionSteps.add(new UnzipStep(this.resourcesFile, this.resourcesDir));
-                        versionSteps.add(new RemapStep(new TinyV2Remapper(jarEntries, new File(this.resourcesDir, versionData.mappingsName()))));
-                        versionSteps.add(new FillExceptionsStep(jarEntries, new File(this.resourcesDir, versionData.exceptionsName())));
-                        versionSteps.add(new FixLocalVariablesStep(jarEntries));
+                        versionSteps.add(new IfFileExistsStep(
+                                new File(this.resourcesDir, versionData.mappingsName()),
+                                file -> new StepExecutor(
+                                        new RemapStep(new TinyV2Remapper(jarEntries, file)),
+                                        new FixLocalVariablesStep(jarEntries)
+                                )
+                        ));
+                        versionSteps.add(new IfFileExistsStep(
+                                new File(this.resourcesDir, versionData.exceptionsName()),
+                                file -> new FillExceptionsStep(jarEntries, file)
+                        ));
                         versionSteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
                         versionSteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
                     } else {
