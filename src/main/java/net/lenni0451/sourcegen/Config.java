@@ -53,7 +53,7 @@ public class Config {
         public static List<String> retroMCP = List.of("c0.0.13a-launcher", "c0.0.11a-launcher", "pc-132011-launcher", "pc-152252-launcher", "pc-161148-launcher", "pc-132128-launcher");
 
         @Option("RetroMCPFork")
-        public static List<String> retroMCPFork = List.of("legend-of-chambered-1", "minicraft-ld22", "4k-2", "4k-021742");
+        public static List<String> retroMCPFork = List.of("legend-of-chambered-1", "minicraft-ld22", "4k-2", "4k-021742", "c0.30_01c"/*TODO: Maybe remove later if it gets fixed*/);
     }
 
     @Section(name = "MappingsSources")
