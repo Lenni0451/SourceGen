@@ -6,10 +6,7 @@ import net.lenni0451.commons.gson.elements.GsonElement;
 import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
-import net.lenni0451.sourcegen.steps.StepExecutor;
-import net.lenni0451.sourcegen.utils.ETA;
 import net.lenni0451.sourcegen.utils.NetUtils;
-import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,56 +15,22 @@ import java.io.InputStreamReader;
 import java.time.OffsetDateTime;
 import java.util.*;
 
-public class IterateMCPVersions implements GeneratorStep {
+public class IterateMCPVersions extends IterateVersionsStep<GsonObject> {
 
-    private final File repoDir;
-    private final String branch;
     private final VersionStepProvider stepProvider;
 
     public IterateMCPVersions(final File repoDir, final String branch, final VersionStepProvider stepProvider) {
-        this.repoDir = repoDir;
-        this.branch = branch;
+        super(repoDir, branch);
         this.stepProvider = stepProvider;
     }
 
     @Override
-    public void printStep() {
-        System.out.println("Searching for MCP versions...");
+    protected String getName() {
+        return "MCP";
     }
 
     @Override
-    public void run() throws Exception {
-        List<GsonObject> versions = this.loadVersions();
-        this.removeBuiltVersions(versions);
-        this.resolveClientManifest(versions);
-        this.resolveVersionManifest(versions);
-
-        int i = 0;
-        ETA eta = new ETA();
-        for (GsonObject entry : versions) {
-            List<String> mappingsDownloads = new ArrayList<>();
-            if (entry.get("url") instanceof GsonArray) {
-                for (GsonElement mapping : entry.getArray("url")) {
-                    mappingsDownloads.add(mapping.asString());
-                }
-            } else if (entry.get("url").isPrimitive()) {
-                mappingsDownloads.add(entry.getString("url"));
-            } else {
-                throw new IllegalStateException("Invalid mappings format in MCP version entry: " + entry);
-            }
-            List<GeneratorStep> steps = new ArrayList<>();
-            String versionName = entry.getString("id");
-            this.stepProvider.provideSteps(steps, versionName, OffsetDateTime.parse(entry.getString("releaseTime")), entry.getString("client"), mappingsDownloads, entry.getString("mappings"));
-            System.out.println("Running steps for version " + versionName + " (" + (++i) + "/" + versions.size() + (eta.canEstimate() ? (" ETA: " + ETA.format(eta.getNextEstimation()) + "/" + ETA.format(eta.getEstimation(versions.size() - (i - 1)))) : "") + ")...");
-            eta.start();
-            StepExecutor executor = new StepExecutor(steps);
-            executor.run();
-            eta.stop();
-            System.out.println("Finished steps for version " + versionName + " in " + ETA.format(eta.getLastDuration()));
-        }
-    }
-
-    private List<GsonObject> loadVersions() throws IOException {
+    protected Collection<GsonObject> loadVersions() throws IOException {
         try (InputStream is = IterateMCPVersions.class.getClassLoader().getResourceAsStream("mcps.json")) {
             List<GsonObject> versions = new ArrayList<>();
             GsonArray array = GsonParser.parse(new InputStreamReader(is)).asArray();
@@ -78,20 +41,35 @@ public class IterateMCPVersions implements GeneratorStep {
         }
     }
 
-    private void removeBuiltVersions(final List<GsonObject> versions) throws IOException {
-        String lastBuiltVersion = Commands.git(this.repoDir).latestCommitMessage(this.branch);
-        boolean hasVersion = versions.stream().map(v -> v.getString("id")).toList().contains(lastBuiltVersion);
-        if (!hasVersion) return;
-        Iterator<GsonObject> it = versions.iterator();
-        while (it.hasNext()) {
-            GsonObject version = it.next();
-            String versionName = version.getString("id");
-            it.remove();
-            if (versionName.equalsIgnoreCase(lastBuiltVersion)) break;
-        }
+    @Override
+    protected void processVersions(Collection<GsonObject> versions) throws Exception {
+        super.removeBuiltVersions(versions);
+        this.resolveClientManifest(versions);
+        this.resolveVersionManifest(versions);
     }
 
-    private void resolveClientManifest(final List<GsonObject> versions) throws IOException {
+    @Override
+    protected String getVersionId(GsonObject version) {
+        return version.getString("id");
+    }
+
+    @Override
+    protected void provideSteps(List<GeneratorStep> steps, GsonObject version) throws Exception {
+        List<String> mappingsDownloads = new ArrayList<>();
+        if (version.get("url") instanceof GsonArray) {
+            for (GsonElement mapping : version.getArray("url")) {
+                mappingsDownloads.add(mapping.asString());
+            }
+        } else if (version.get("url").isPrimitive()) {
+            mappingsDownloads.add(version.getString("url"));
+        } else {
+            throw new IllegalStateException("Invalid mappings format in MCP version entry: " + version);
+        }
+        String versionName = version.getString("id");
+        this.stepProvider.provideSteps(steps, versionName, OffsetDateTime.parse(version.getString("releaseTime")), version.getString("client"), mappingsDownloads, version.getString("mappings"));
+    }
+
+    private void resolveClientManifest(final Collection<GsonObject> versions) throws IOException {
         GsonObject meta = NetUtils.getJsonObject(Config.OnlineResources.minecraftVersionManifest);
         GsonArray versionManifests = meta.getArray("versions");
         Map<String, VersionInfo> versionManifestURLs = new HashMap<>();
@@ -111,7 +89,7 @@ public class IterateMCPVersions implements GeneratorStep {
         }
     }
 
-    private void resolveVersionManifest(final List<GsonObject> versions) throws IOException {
+    private void resolveVersionManifest(final Collection<GsonObject> versions) throws IOException {
         for (GsonObject version : versions) {
             String url = version.getString("manifestUrl");
             GsonObject versionManifest = NetUtils.getJsonObject(url);

@@ -8,45 +8,35 @@ import net.lenni0451.sourcegen.utils.NetUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LoadFeatherMappings extends LoadContextStep<Function<String, String>> {
+public class LoadNostalgiaMappings extends LoadContextStep<Function<String, String[]>> {
 
     private static final Pattern BUILD_PATTERN = Pattern.compile("(.*)\\+build\\.(\\d+)$");
-    private static final String PRE_RELEASE_PATTERN = "(\\S+) Pre-Release (\\d+)";
 
     private final VersionStepProvider stepProvider;
 
-    public LoadFeatherMappings(final VersionStepProvider stepProvider) {
+    public LoadNostalgiaMappings(final VersionStepProvider stepProvider) {
         this.stepProvider = stepProvider;
     }
 
     @Override
     public void printStep() {
-        System.out.println("Loading Feather mappings...");
+        System.out.println("Loading Nostalgia mappings...");
     }
 
     @Override
-    protected Function<String, String> loadContext() throws Exception {
-        List<String> rawVersions = NetUtils.getMavenVersions(Config.OnlineResources.getFeatherMappings("maven-metadata.xml"));
+    protected Function<String, String[]> loadContext() throws Exception {
+        List<String> rawVersions = NetUtils.getMavenVersions(Config.OnlineResources.getNostalgiaMappings("maven-metadata.xml"));
         Map<String, MavenVersion> parsedVersions = this.parseVersions(rawVersions);
-
-        return version -> {
-            MavenVersion ver = parsedVersions.get(version);
-            if (ver == null) {
-                Matcher matcher = Pattern.compile(PRE_RELEASE_PATTERN).matcher(version);
-                if (!matcher.find()) return null;
-                ver = parsedVersions.get(matcher.group(1));
-            }
-            if (ver == null) return null;
-            return ver.url();
-        };
+        return version -> Optional.ofNullable(parsedVersions.get(version)).map(MavenVersion::mergeUrls).orElse(null);
     }
 
     @Override
-    protected void provideSteps(List<GeneratorStep> steps, Function<String, String> context) throws Exception {
+    protected void provideSteps(List<GeneratorStep> steps, Function<String, String[]> context) throws Exception {
         this.stepProvider.provideSteps(steps, context);
     }
 
@@ -60,8 +50,9 @@ public class LoadFeatherMappings extends LoadContextStep<Function<String, String
             int build = Integer.parseInt(matcher.group(2));
             if (!parsedVersions.containsKey(minecraftVersion) || parsedVersions.get(minecraftVersion).build < build) {
                 String encodedVersion = UrlEscapers.urlFragmentEscaper().escape(version);
-                String url = Config.OnlineResources.getFeatherMappings(encodedVersion + "/feather-" + encodedVersion + "-mergedv2.jar");
-                parsedVersions.put(minecraftVersion, new MavenVersion(build, url));
+                String v1Url = Config.OnlineResources.getNostalgiaMappings(encodedVersion + "/nostalgia-" + encodedVersion + ".jar");
+                String mergedUrl = Config.OnlineResources.getNostalgiaMappings(encodedVersion + "/nostalgia-" + encodedVersion + "-mergedv2.jar");
+                parsedVersions.put(minecraftVersion, new MavenVersion(build, v1Url, mergedUrl));
             }
         }
         return parsedVersions;
@@ -70,10 +61,13 @@ public class LoadFeatherMappings extends LoadContextStep<Function<String, String
 
     @FunctionalInterface
     public interface VersionStepProvider {
-        void provideSteps(final List<GeneratorStep> subSteps, final Function<String, String> versionToUrl);
+        void provideSteps(final List<GeneratorStep> subSteps, final Function<String, String[]> versionToUrl);
     }
 
-    private record MavenVersion(int build, String url) {
+    private record MavenVersion(int build, String v1Url, String mergedUrl) {
+        public String[] mergeUrls() {
+            return new String[]{this.mergedUrl, this.v1Url};
+        }
     }
 
 }

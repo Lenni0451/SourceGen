@@ -56,7 +56,7 @@ public class Config {
 
         @Hidden
         @Option("RetroMCPFork")
-        public static List<String> retroMCPFork = List.of("legend-of-chambered-1", "minicraft-ld22", "4k-2", "4k-021742", "c0.30_01c"/*TODO: Maybe remove later if it gets fixed*/);
+        public static List<String> retroMCPFork = List.of("legend-of-chambered-1", "minicraft-ld22", "4k-2", "4k-021742", "c0.30_01c"/*TODO: Maybe remove later if it gets fixed*/, "0x10c");
     }
 
     @Section(name = "MappingsSources")
@@ -97,6 +97,10 @@ public class Config {
         @Description("The URL to the parchment metadata json file")
         public static String parchmentMetadata = "https://ldtteam.jfrog.io/ui/api/v1/ui/v2/nativeBrowser/parchmentmc-public/org/parchmentmc/data/?recordNum=0";
 
+        @Option("NostalgiaMappings")
+        @Description("The URL to the maven repository where the nostalgia mappings are stored")
+        public static String nostalgiaMappings = "https://mvn.devos.one/releases/me/alphamode/nostalgia/";
+
         public static String getFeatherMappings(String suffix) {
             String url = featherMappings;
             if (!url.endsWith("/")) url += "/";
@@ -113,6 +117,13 @@ public class Config {
 
         public static String getParchmentMappings(String suffix) {
             String url = parchmentMappings;
+            if (!url.endsWith("/")) url += "/";
+            while (suffix.startsWith("/")) suffix = suffix.substring(1);
+            return url + suffix;
+        }
+
+        public static String getNostalgiaMappings(String suffix) {
+            String url = nostalgiaMappings;
             if (!url.endsWith("/")) url += "/";
             while (suffix.startsWith("/")) suffix = suffix.substring(1);
             return url + suffix;
@@ -336,6 +347,29 @@ public class Config {
         @Option("Branch")
         @Description("The branch where the files should be stored")
         public static String branch = "server";
+    }
+
+    @Section(name = "MinecraftNostalgiaMappings")
+    public static class MinecraftNostalgiaMappings {
+        @Option("GitRepo")
+        @Description("The URL to the git repo where the decompiled files should be stored")
+        public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
+
+        @Option("RepoName")
+        @Description("The name of the local repository directory")
+        public static String repoName = "minecraft";
+
+        @Option("AuthorName")
+        @Description("The name of the author that should be used for the git commits")
+        public static String authorName = "mojang";
+
+        @Option("AuthorEmail")
+        @Description("The email of the author that should be used for the git commits")
+        public static String authorEmail = "noreply@mojang.com";
+
+        @Option("Branch")
+        @Description("The branch where the files should be stored")
+        public static String branch = "nostalgia";
     }
 
 }

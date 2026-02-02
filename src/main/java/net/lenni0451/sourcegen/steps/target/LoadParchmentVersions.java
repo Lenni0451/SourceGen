@@ -4,21 +4,15 @@ import net.lenni0451.commons.gson.elements.GsonArray;
 import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
-import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.NetUtils;
-import org.w3c.dom.Document;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class LoadParchmentVersions implements GeneratorStep {
+public class LoadParchmentVersions extends LoadContextStep<Function<String, String>> {
 
     private final VersionStepProvider stepProvider;
 
@@ -32,14 +26,15 @@ public class LoadParchmentVersions implements GeneratorStep {
     }
 
     @Override
-    public void run() throws Exception {
+    protected Function<String, String> loadContext() throws Exception {
         List<String> rawVersions = this.getVersions();
         Map<String, String> parsedVersions = this.getVersionUrls(rawVersions);
+        return version -> parsedVersions.get("parchment-" + version);
+    }
 
-        List<GeneratorStep> steps = new ArrayList<>();
-        this.stepProvider.provideSteps(steps, version -> parsedVersions.get("parchment-" + version));
-        StepExecutor executor = new StepExecutor(steps);
-        executor.run();
+    @Override
+    protected void provideSteps(List<GeneratorStep> steps, Function<String, String> context) throws Exception {
+        this.stepProvider.provideSteps(steps, context);
     }
 
     private List<String> getVersions() throws Exception {
@@ -58,18 +53,10 @@ public class LoadParchmentVersions implements GeneratorStep {
         Map<String, String> urls = new HashMap<>();
         for (String version : versions) {
             String metadataUrl = Config.OnlineResources.getParchmentMappings(version + "/maven-metadata.xml");
-            String latestVersion = this.getLatestVersion(metadataUrl);
+            String latestVersion = NetUtils.getMavenLatestVersion(metadataUrl);
             urls.put(version, Config.OnlineResources.getParchmentMappings(version + "/" + latestVersion + "/" + version + "-" + latestVersion + ".zip"));
         }
         return urls;
-    }
-
-    private String getLatestVersion(final String metadataUrl) throws Exception {
-        String xml = new String(NetUtils.get(metadataUrl), StandardCharsets.UTF_8);
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-        return document.getElementsByTagName("latest").item(0).getTextContent();
     }
 
 

@@ -58,6 +58,11 @@ public class Main {
         System.out.println("Done!");
     }
 
+    /**
+     * Load all available generators.<br>
+     * When adding a new generator, add it to the <b>end</b> of this list to keep the target indices stable.<br>
+     * If a generator is removed, replace it with null to keep the target indices stable.
+     */
     private static void loadGenerators() {
         TARGETS.add(new MinecraftMojangMappingsTarget());
         TARGETS.add(new CosmicReachTarget());
@@ -69,6 +74,7 @@ public class Main {
         TARGETS.add(null); //previously: Minecraft Bedrock Edition assets (removed due to UWP discontinuation)
         TARGETS.add(new MinecraftMCPMappingsTarget());
         TARGETS.add(new HytaleServerTarget());
+        TARGETS.add(new MinecraftNostalgiaMappingsTarget());
     }
 
     private static void printTargets() {

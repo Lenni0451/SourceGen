@@ -3,21 +3,17 @@ package net.lenni0451.sourcegen.steps.target;
 import com.google.common.net.UrlEscapers;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
-import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.NetUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LoadYarnMappings implements GeneratorStep {
+public class LoadYarnMappings extends LoadContextStep<Function<String, String[]>> {
 
     private static final Pattern BUILD_PATTERN = Pattern.compile("(.*)\\+build\\.(\\d+)$");
     private static final Pattern SMALL_BUILD_PATTERN = Pattern.compile("(.*)\\.(\\d+)$");
@@ -34,27 +30,15 @@ public class LoadYarnMappings implements GeneratorStep {
     }
 
     @Override
-    public void run() throws Exception {
-        List<String> rawVersions = this.getVersions();
+    protected Function<String, String[]> loadContext() throws Exception {
+        List<String> rawVersions = NetUtils.getMavenVersions(Config.OnlineResources.getYarnMappings("maven-metadata.xml"));
         Map<String, MavenVersion> parsedVersions = this.parseVersions(rawVersions);
-
-        List<GeneratorStep> steps = new ArrayList<>();
-        this.stepProvider.provideSteps(steps, version -> Optional.ofNullable(parsedVersions.get(version)).map(MavenVersion::mergeUrls).orElse(null));
-        StepExecutor executor = new StepExecutor(steps);
-        executor.run();
+        return version -> Optional.ofNullable(parsedVersions.get(version)).map(MavenVersion::mergeUrls).orElse(null);
     }
 
-    private List<String> getVersions() throws Exception {
-        String xml = new String(NetUtils.get(Config.OnlineResources.getYarnMappings("maven-metadata.xml")), StandardCharsets.UTF_8);
-        List<String> versions = new ArrayList<>();
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-        NodeList versionNodes = document.getElementsByTagName("version");
-        for (int i = 0; i < versionNodes.getLength(); i++) {
-            versions.add(versionNodes.item(i).getTextContent());
-        }
-        return versions;
+    @Override
+    protected void provideSteps(List<GeneratorStep> steps, Function<String, String[]> context) throws Exception {
+        this.stepProvider.provideSteps(steps, context);
     }
 
     private Map<String, MavenVersion> parseVersions(final List<String> versions) {

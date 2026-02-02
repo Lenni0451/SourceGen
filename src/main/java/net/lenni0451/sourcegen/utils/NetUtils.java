@@ -8,12 +8,15 @@ import net.lenni0451.commons.httpclient.HttpResponse;
 import net.lenni0451.commons.httpclient.constants.HttpHeaders;
 import net.lenni0451.commons.httpclient.content.impl.ByteArrayContent;
 import net.lenni0451.commons.httpclient.executor.ExecutorType;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NetUtils {
 
@@ -48,6 +51,35 @@ public class NetUtils {
     public static GsonArray getJsonArray(final String url) throws IOException {
         String response = new String(get(url), StandardCharsets.UTF_8);
         return GsonParser.parse(response).asArray();
+    }
+
+    public static List<String> getMavenVersions(final String url) throws IOException {
+        try {
+            String xml = new String(get(url), StandardCharsets.UTF_8);
+            List<String> versions = new ArrayList<>();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+            NodeList versionNodes = document.getElementsByTagName("version");
+            for (int i = 0; i < versionNodes.getLength(); i++) {
+                versions.add(versionNodes.item(i).getTextContent());
+            }
+            return versions;
+        } catch (Exception e) {
+            throw new IOException("Failed to parse maven metadata from " + url, e);
+        }
+    }
+
+    public static String getMavenLatestVersion(final String url) throws IOException {
+        try {
+            String xml = new String(get(url), StandardCharsets.UTF_8);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+            return document.getElementsByTagName("latest").item(0).getTextContent();
+        } catch (Exception e) {
+            throw new IOException("Failed to parse maven metadata from " + url, e);
+        }
     }
 
 }

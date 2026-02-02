@@ -6,10 +6,7 @@ import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.commons.lazy.Lazy;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
-import net.lenni0451.sourcegen.steps.StepExecutor;
-import net.lenni0451.sourcegen.utils.ETA;
 import net.lenni0451.sourcegen.utils.NetUtils;
-import net.lenni0451.sourcegen.utils.external.Commands;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -18,45 +15,24 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class IterateRetroMCPVersions implements GeneratorStep {
+public class IterateRetroMCPVersions extends IterateVersionsStep<IterateRetroMCPVersions.VersionData> {
 
     private static final DateTimeFormatter RETROMCP_FORK_TIME = DateTimeFormatter.ofPattern("yyyy-M-d'T'HH:mm:ssX"); //2009-10-24T18:04:24Z
 
-    private final File repoDir;
-    private final String branch;
     private final VersionStepProvider stepProvider;
 
     public IterateRetroMCPVersions(final File repoDir, final String branch, final VersionStepProvider stepProvider) {
-        this.repoDir = repoDir;
-        this.branch = branch;
+        super(repoDir, branch);
         this.stepProvider = stepProvider;
     }
 
     @Override
-    public void printStep() {
-        System.out.println("Searching for RetroMCP versions...");
+    protected String getName() {
+        return "RetroMCP";
     }
 
     @Override
-    public void run() throws Exception {
-        Set<VersionData> versions = this.loadVersions();
-        this.removeBuiltVersions(versions);
-
-        int i = 0;
-        ETA eta = new ETA();
-        for (VersionData versionData : versions) {
-            List<GeneratorStep> steps = new ArrayList<>();
-            this.stepProvider.provideSteps(steps, versionData);
-            System.out.println("Running steps for version " + versionData.name + " (" + (++i) + "/" + versions.size() + (eta.canEstimate() ? (" ETA: " + ETA.format(eta.getNextEstimation()) + "/" + ETA.format(eta.getEstimation(versions.size() - (i - 1)))) : "") + ")...");
-            eta.start();
-            StepExecutor executor = new StepExecutor(steps);
-            executor.run();
-            eta.stop();
-            System.out.println("Finished steps for version " + versionData.name + " in " + ETA.format(eta.getLastDuration()));
-        }
-    }
-
-    private Set<VersionData> loadVersions() throws IOException {
+    protected Collection<VersionData> loadVersions() throws IOException {
         Set<String> addedVersions = new HashSet<>();
         Set<VersionData> sortedVersions = new TreeSet<>(Comparator.comparing(o -> o.time));
         { //RetroMCP
@@ -104,16 +80,19 @@ public class IterateRetroMCPVersions implements GeneratorStep {
         return sortedVersions;
     }
 
-    private void removeBuiltVersions(final Set<VersionData> versions) throws IOException {
-        String lastBuiltVersion = Commands.git(this.repoDir).latestCommitMessage(this.branch);
-        boolean hasVersion = versions.stream().map(v -> v.name).toList().contains(lastBuiltVersion);
-        if (!hasVersion) return;
-        Iterator<VersionData> it = versions.iterator();
-        while (it.hasNext()) {
-            VersionData versionData = it.next();
-            it.remove();
-            if (versionData.name.equalsIgnoreCase(lastBuiltVersion)) break;
-        }
+    @Override
+    protected void processVersions(Collection<VersionData> versions) throws Exception {
+        super.removeBuiltVersions(versions);
+    }
+
+    @Override
+    protected String getVersionId(VersionData version) {
+        return version.name();
+    }
+
+    @Override
+    protected void provideSteps(List<GeneratorStep> steps, VersionData version) throws Exception {
+        this.stepProvider.provideSteps(steps, version);
     }
 
 

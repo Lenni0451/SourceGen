@@ -1,14 +1,10 @@
 package net.lenni0451.sourcegen.steps.target;
 
-import lombok.RequiredArgsConstructor;
 import net.lenni0451.commons.gson.elements.GsonArray;
 import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
-import net.lenni0451.sourcegen.steps.StepExecutor;
-import net.lenni0451.sourcegen.utils.ETA;
 import net.lenni0451.sourcegen.utils.NetUtils;
-import net.lenni0451.sourcegen.utils.external.Commands;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -17,47 +13,28 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 
-@RequiredArgsConstructor
-public class IterateMinecraftVersions implements GeneratorStep {
+public class IterateMinecraftVersions extends IterateVersionsStep<GsonObject> {
 
-    private final File repoDir;
-    private final String branch;
     private final VersionRange versionRange;
     private final Predicate<GsonObject> removeVersionIf;
     private final boolean ignoreExclusions;
     private final VersionStepProvider stepProvider;
 
-    @Override
-    public void printStep() {
-        System.out.println("Searching for Minecraft versions...");
+    public IterateMinecraftVersions(final File repoDir, final String branch, final VersionRange versionRange, final Predicate<GsonObject> removeVersionIf, final boolean ignoreExclusions, final VersionStepProvider stepProvider) {
+        super(repoDir, branch);
+        this.versionRange = versionRange;
+        this.removeVersionIf = removeVersionIf;
+        this.ignoreExclusions = ignoreExclusions;
+        this.stepProvider = stepProvider;
     }
 
     @Override
-    public void run() throws Exception {
-        Map<OffsetDateTime, GsonObject> versions = this.loadVersions();
-        this.filterVersionRange(versions);
-        this.removeBuiltVersions(versions);
-        this.filterPredicate(versions);
-        this.resolveVersionManifest(versions);
-
-        int i = 0;
-        ETA eta = new ETA();
-        for (Map.Entry<OffsetDateTime, GsonObject> entry : versions.entrySet()) {
-            GsonObject versionManifest = entry.getValue().getObject("manifest");
-            List<GeneratorStep> steps = new ArrayList<>();
-            String versionName = entry.getValue().getString("id");
-            GsonObject downloads = versionManifest.getObject("downloads");
-            this.stepProvider.provideSteps(steps, versionName, entry.getKey(), downloads.getObject("client").getString("url"), downloads.optObject("client_mappings").map(o -> o.getString("url")).orElse(null));
-            System.out.println("Running steps for version " + versionName + " (" + (++i) + "/" + versions.size() + (eta.canEstimate() ? (" ETA: " + ETA.format(eta.getNextEstimation()) + "/" + ETA.format(eta.getEstimation(versions.size() - (i - 1)))) : "") + ")...");
-            eta.start();
-            StepExecutor executor = new StepExecutor(steps);
-            executor.run();
-            eta.stop();
-            System.out.println("Finished steps for version " + versionName + " in " + ETA.format(eta.getLastDuration()));
-        }
+    protected String getName() {
+        return "Minecraft";
     }
 
-    private Map<OffsetDateTime, GsonObject> loadVersions() throws IOException {
+    @Override
+    protected Collection<GsonObject> loadVersions() throws Exception {
         GsonObject meta = NetUtils.getJsonObject(Config.OnlineResources.minecraftVersionManifest);
         GsonArray versions = meta.getArray("versions");
         Map<OffsetDateTime, GsonObject> sortedVersions = new TreeMap<>();
@@ -68,40 +45,45 @@ public class IterateMinecraftVersions implements GeneratorStep {
             String time = version.getString("releaseTime");
             sortedVersions.put(OffsetDateTime.parse(time), version);
         }
-        return sortedVersions;
+        return sortedVersions.values();
     }
 
-    private void removeBuiltVersions(final Map<OffsetDateTime, GsonObject> versions) throws IOException {
-        String lastBuiltVersion = Commands.git(this.repoDir).latestCommitMessage(this.branch);
-        boolean hasVersion = versions.values().stream().map(v -> v.getString("id")).toList().contains(lastBuiltVersion);
-        if (!hasVersion) return;
-        Iterator<Map.Entry<OffsetDateTime, GsonObject>> it = versions.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<OffsetDateTime, GsonObject> entry = it.next();
-            GsonObject version = entry.getValue();
-            String versionName = version.getString("id");
-            it.remove();
-            if (versionName.equalsIgnoreCase(lastBuiltVersion)) break;
-        }
+    @Override
+    protected void processVersions(Collection<GsonObject> versions) throws Exception {
+        this.filterVersionRange(versions);
+        super.removeBuiltVersions(versions);
+        this.filterPredicate(versions);
+        this.resolveVersionManifest(versions);
     }
 
-    private void filterVersionRange(final Map<OffsetDateTime, GsonObject> versions) {
+    @Override
+    protected String getVersionId(GsonObject version) {
+        return version.getString("id");
+    }
+
+    @Override
+    protected void provideSteps(List<GeneratorStep> steps, GsonObject version) throws Exception {
+        String versionName = version.getString("id");
+        GsonObject versionManifest = version.getObject("manifest");
+        GsonObject downloads = versionManifest.getObject("downloads");
+        this.stepProvider.provideSteps(steps, versionName, OffsetDateTime.parse(version.getString("releaseTime")), downloads.getObject("client").getString("url"), downloads.optObject("client_mappings").map(o -> o.getString("url")).orElse(null));
+    }
+
+    private void filterVersionRange(final Collection<GsonObject> versions) {
         if (this.versionRange.minVersion != null) {
-            Iterator<Map.Entry<OffsetDateTime, GsonObject>> it = versions.entrySet().iterator();
+            Iterator<GsonObject> it = versions.iterator();
             while (it.hasNext()) {
-                Map.Entry<OffsetDateTime, GsonObject> entry = it.next();
-                GsonObject version = entry.getValue();
+                GsonObject version = it.next();
                 String versionName = version.getString("id");
                 if (versionName.equals(this.versionRange.minVersion)) break;
                 it.remove();
             }
         }
         if (this.versionRange.maxVersion != null) {
-            Iterator<Map.Entry<OffsetDateTime, GsonObject>> it = versions.entrySet().iterator();
+            Iterator<GsonObject> it = versions.iterator();
             boolean remove = false;
             while (it.hasNext()) {
-                Map.Entry<OffsetDateTime, GsonObject> entry = it.next();
-                GsonObject version = entry.getValue();
+                GsonObject version = it.next();
                 String versionName = version.getString("id");
                 if (remove) it.remove();
                 else if (versionName.equals(this.versionRange.maxVersion)) remove = true;
@@ -109,18 +91,16 @@ public class IterateMinecraftVersions implements GeneratorStep {
         }
     }
 
-    private void filterPredicate(final Map<OffsetDateTime, GsonObject> versions) {
-        Iterator<Map.Entry<OffsetDateTime, GsonObject>> it = versions.entrySet().iterator();
+    private void filterPredicate(final Collection<GsonObject> versions) {
+        Iterator<GsonObject> it = versions.iterator();
         while (it.hasNext()) {
-            Map.Entry<OffsetDateTime, GsonObject> entry = it.next();
-            GsonObject version = entry.getValue();
+            GsonObject version = it.next();
             if (this.removeVersionIf.test(version)) it.remove();
         }
     }
 
-    private void resolveVersionManifest(final Map<OffsetDateTime, GsonObject> versions) throws IOException {
-        for (Map.Entry<OffsetDateTime, GsonObject> entry : versions.entrySet()) {
-            GsonObject version = entry.getValue();
+    private void resolveVersionManifest(final Collection<GsonObject> versions) throws IOException {
+        for (GsonObject version : versions) {
             String url = version.getString("url");
             GsonObject versionManifest = NetUtils.getJsonObject(url);
             version.add("manifest", versionManifest);
