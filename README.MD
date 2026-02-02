@@ -1,18 +1,24 @@
 # SourceGen
 Generator for source diff repos.\
-Supports:
+<b>The generator has only been tested on Linux. While I didn't intentionally break compatibility with other OSes, I can't guarantee that it will work on them.</b>
+
+## Supported Targets
 - Minecraft Mojang mappings
+- Minecraft assets
 - Minecraft Mojang + Parchment mappings
 - Minecraft Yarn mappings
 - Minecraft Feather mappings
 - Minecraft RetroMCP mappings
+- Minecraft MCP mappings
 - CosmicReach
+- Hytale Server
 
 ## Prerequisites
 To use this generator, you need to have the following installed:
 - Java 17 or higher
 - Git
 - [VineFlower](https://github.com/Vineflower/vineflower) (`vineflower.jar` in the run directory)
+- Hytale Downloader (for Hytale Server target) (`hytale-downloader` in the run directory)
 - A git repository where the source code is pushed to
 
 > <b>NOTE:</b>\

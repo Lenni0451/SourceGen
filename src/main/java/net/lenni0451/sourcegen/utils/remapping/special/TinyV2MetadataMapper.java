@@ -98,21 +98,33 @@ public class TinyV2MetadataMapper {
     }
 
     private static TinyV2MappingsLoader loadMapper(final File mappings) {
+        List<Throwable> tries = new ArrayList<>();
         try {
             TinyV2MappingsLoader mapper = new TinyV2MappingsLoader(mappings, "official", "named").enableMetaParsing();
             mapper.load();
             return mapper;
         } catch (Throwable t) {
-            try {
-                TinyV2MappingsLoader mapper = new TinyV2MappingsLoader(mappings, "client", "named").enableMetaParsing();
-                mapper.load();
-                return mapper;
-            } catch (Throwable t2) {
-                RuntimeException e = new RuntimeException("Failed to load mappings", t);
-                e.addSuppressed(t2);
-                throw e;
-            }
+            tries.add(t);
         }
+        try {
+            TinyV2MappingsLoader mapper = new TinyV2MappingsLoader(mappings, "client", "named").enableMetaParsing();
+            mapper.load();
+            return mapper;
+        } catch (Throwable t) {
+            tries.add(t);
+        }
+        try {
+            TinyV2MappingsLoader mapper = new TinyV2MappingsLoader(mappings, "clientOfficial", "named").enableMetaParsing();
+            mapper.load();
+            return mapper;
+        } catch (Throwable t) {
+            tries.add(t);
+        }
+        IllegalStateException e = new IllegalStateException("Failed to load TinyV2 mappings with known namespaces");
+        for (Throwable t : tries) {
+            e.addSuppressed(t);
+        }
+        throw e;
     }
 
     private static void applyClassComment(final ClassMetaMapping metadata, final ClassNode classNode, final List<String[]> comments) {
