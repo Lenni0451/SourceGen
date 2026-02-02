@@ -45,7 +45,7 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
                 this.repoDir,
                 Config.MinecraftMojangMappings.branch,
                 new VersionRange("1.14.4", null), //First version with official mappings
-                version -> false,
+                version -> Config.Exclusions.minecraftOfficial.contains(version.getString("id")),
                 false,
                 (versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl) -> {
                     this.addVersionSteps(versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl);

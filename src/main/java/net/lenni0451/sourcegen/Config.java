@@ -51,6 +51,11 @@ public class Config {
         public static List<String> minecraft = List.of("15w14a", "1.RV-Pre1", "3D Shareware v1.34", "20w14infinite", "22w13oneblockatatime", "23w13a_or_b", "24w14potato", "25w14craftmine");
 
         @Hidden
+        @Option("MinecraftOfficial")
+        @Description("This list is only for official Mojang mappings")
+        public static List<String> minecraftOfficial = List.of("19w34a", "19w35a");
+
+        @Hidden
         @Option("RetroMCP")
         public static List<String> retroMCP = List.of("c0.0.13a-launcher", "c0.0.11a-launcher", "pc-132011-launcher", "pc-152252-launcher", "pc-161148-launcher", "pc-132128-launcher");
 
