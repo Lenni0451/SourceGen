@@ -3,6 +3,7 @@ plugins {
     id "base.application"
     id "base.java"
     id "base.checkstyle"
+    id "base.junit"
     id "idea.exclude_run_dir"
 }
 
