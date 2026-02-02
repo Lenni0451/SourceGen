@@ -1,9 +1,6 @@
 package net.lenni0451.sourcegen;
 
-import net.lenni0451.optconfig.annotations.Description;
-import net.lenni0451.optconfig.annotations.OptConfig;
-import net.lenni0451.optconfig.annotations.Option;
-import net.lenni0451.optconfig.annotations.Section;
+import net.lenni0451.optconfig.annotations.*;
 
 import java.util.List;
 
@@ -39,19 +36,25 @@ public class Config {
 
     @Section(name = "Exclusions", description = {
             "The versions on the exclusion list will not be decompiled",
-            "This is recommended for april fools version because they contain many temporary changes which makes diffing the actual source code harder"
+            "This is recommended for april fools version because they contain many temporary changes which makes diffing the actual source code harder",
+            "All options in this section are hidden by default, because they change often and would require manual updates",
+            "The exclusions you can define are: CosmicReach, Minecraft, RetroMCP, RetroMCPFork"
     })
     public static class Exclusions {
+        @Hidden
         @Option("CosmicReach")
         public static List<String> cosmicReach = List.of("0.1.17b red", "0.1.17b blue");
 
+        @Hidden
         @Option("Minecraft")
         @Description("This list is for Mojang mappings, Feather mappings, Yarn mappings and Parchment mappings")
         public static List<String> minecraft = List.of("15w14a", "1.RV-Pre1", "3D Shareware v1.34", "20w14infinite", "22w13oneblockatatime", "23w13a_or_b", "24w14potato", "25w14craftmine");
 
+        @Hidden
         @Option("RetroMCP")
         public static List<String> retroMCP = List.of("c0.0.13a-launcher", "c0.0.11a-launcher", "pc-132011-launcher", "pc-152252-launcher", "pc-161148-launcher", "pc-132128-launcher");
 
+        @Hidden
         @Option("RetroMCPFork")
         public static List<String> retroMCPFork = List.of("legend-of-chambered-1", "minicraft-ld22", "4k-2", "4k-021742", "c0.30_01c"/*TODO: Maybe remove later if it gets fixed*/);
     }
