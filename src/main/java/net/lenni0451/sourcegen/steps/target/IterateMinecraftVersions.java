@@ -52,7 +52,7 @@ public class IterateMinecraftVersions extends IterateVersionsStep<GsonObject> {
     protected void processVersions(Collection<GsonObject> versions) throws Exception {
         this.filterVersionRange(versions);
         super.removeBuiltVersions(versions);
-        this.filterPredicate(versions);
+        versions.removeIf(this.removeVersionIf);
         this.resolveVersionManifest(versions);
     }
 
@@ -88,14 +88,6 @@ public class IterateMinecraftVersions extends IterateVersionsStep<GsonObject> {
                 if (remove) it.remove();
                 else if (versionName.equals(this.versionRange.maxVersion)) remove = true;
             }
-        }
-    }
-
-    private void filterPredicate(final Collection<GsonObject> versions) {
-        Iterator<GsonObject> it = versions.iterator();
-        while (it.hasNext()) {
-            GsonObject version = it.next();
-            if (this.removeVersionIf.test(version)) it.remove();
         }
     }
 
