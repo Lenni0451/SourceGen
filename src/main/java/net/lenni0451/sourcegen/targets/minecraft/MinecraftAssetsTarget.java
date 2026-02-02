@@ -13,6 +13,7 @@ import net.lenni0451.sourcegen.steps.transform.JsonBeautifyStep;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.Requirements;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
@@ -52,6 +53,7 @@ public class MinecraftAssetsTarget extends GeneratorTarget {
         steps.add(new PushRepoStep(this.repoDir, Config.MinecraftAssets.branch));
     }
 
+    @Nullable
     @Override
     protected GeneratorStep getErrorStep() {
         return new PushRepoStep(this.repoDir, Config.MinecraftAssets.branch);

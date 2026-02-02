@@ -18,6 +18,7 @@ import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.Requirements;
 import net.lenni0451.sourcegen.utils.remapping.ProguardRemapper;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.*;
 
@@ -75,6 +76,7 @@ public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
         steps.add(new PushRepoStep(this.repoDir, Config.MinecraftParchmentMappings.branch));
     }
 
+    @Nullable
     @Override
     protected GeneratorStep getErrorStep() {
         return new PushRepoStep(this.repoDir, Config.MinecraftParchmentMappings.branch);

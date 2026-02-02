@@ -17,6 +17,7 @@ import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.Requirements;
 import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
@@ -69,6 +70,7 @@ public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
         steps.add(new PushRepoStep(this.repoDir, Config.MinecraftFeatherMappings.branch));
     }
 
+    @Nullable
     @Override
     protected GeneratorStep getErrorStep() {
         return new PushRepoStep(this.repoDir, Config.MinecraftFeatherMappings.branch);

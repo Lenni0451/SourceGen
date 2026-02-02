@@ -3,6 +3,7 @@ package net.lenni0451.sourcegen.targets;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,7 @@ public abstract class GeneratorTarget {
      *
      * @return The error step
      */
+    @Nullable
     protected GeneratorStep getErrorStep() {
         return null;
     }

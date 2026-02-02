@@ -17,6 +17,7 @@ import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.Requirements;
 import net.lenni0451.sourcegen.utils.remapping.ProguardRemapper;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.time.OffsetDateTime;
 import java.util.Date;
@@ -78,6 +79,7 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
         versionSteps.add(new CleanupStep(this.mappingsFile, this.clientJar, this.remappedJar));
     }
 
+    @Nullable
     @Override
     protected GeneratorStep getErrorStep() {
         return new PushRepoStep(this.repoDir, Config.MinecraftMojangMappings.branch);
