@@ -39,7 +39,7 @@ public class MinecraftAssetsTarget extends GeneratorTarget {
                 new IterateMinecraftVersions.VersionRange(null, null),
                 v -> v.getString("type").equalsIgnoreCase("snapshot"),
                 true,
-                (versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl) -> {
+                (versionSteps, versionName, releaseTime, clientUrl, serverUrl, clientMappingsUrl, serverMappingsUrl) -> {
                     versionSteps.add(new CleanRepoStep(this.repoDir));
                     versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
                     versionSteps.add(new UnzipStep(this.clientJar, this.repoDir));

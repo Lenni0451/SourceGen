@@ -17,6 +17,7 @@ import net.lenni0451.sourcegen.steps.target.IterateRetroMCPVersions;
 import net.lenni0451.sourcegen.steps.util.IfFileExistsStep;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.Requirements;
+import net.lenni0451.sourcegen.utils.remapping.TinyNamespace;
 import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 
 import javax.annotation.Nullable;
@@ -58,7 +59,7 @@ public class MinecraftRetroMCPMappingsTarget extends GeneratorTarget {
                         versionSteps.add(new IfFileExistsStep(
                                 new File(this.resourcesDir, versionData.mappingsName()),
                                 file -> new StepExecutor(
-                                        new RemapStep(new TinyV2Remapper(jarEntries, file)),
+                                        new RemapStep(new TinyV2Remapper(jarEntries, file, new TinyNamespace("client", "named"))),
                                         new FixLocalVariablesStep(jarEntries)
                                 )
                         ));

@@ -47,7 +47,7 @@ public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
                     new IterateMinecraftVersions.VersionRange("1.16.5", null),
                     ver -> versionToUrl.apply(ver.getString("id")) == null,
                     false,
-                    (versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl) -> {
+                    (versionSteps, versionName, releaseTime, clientUrl, serverUrl, clientMappingsUrl, serverMappingsUrl) -> {
                         String metadataUrl = versionToUrl.apply(versionName);
                         Map<String, byte[]> jarEntries = new HashMap<>();
                         List<String[]> comments = new ArrayList<>();

@@ -16,6 +16,7 @@ import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.target.LoadYarnMappings;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.Requirements;
+import net.lenni0451.sourcegen.utils.remapping.TinyNamespace;
 import net.lenni0451.sourcegen.utils.remapping.TinyV1Remapper;
 import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 
@@ -47,7 +48,7 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
                     new IterateMinecraftVersions.VersionRange(null, null),
                     version -> versionToUrl.apply(version.getString("id")) == null,
                     false,
-                    (versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl) -> {
+                    (versionSteps, versionName, releaseTime, clientUrl, serverUrl, clientMappingsUrl, serverMappingsUrl) -> {
                         Map<String, byte[]> jarEntries = new HashMap<>();
                         List<String[]> comments = new ArrayList<>();
 
@@ -58,8 +59,8 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
                         versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
                         versionSteps.add(new DetectTinyVersionStep(this.mappingsFile, (version, tinySteps) -> {
                             switch (version) {
-                                case V1 -> tinySteps.add(new RemapStep(new TinyV1Remapper(jarEntries, this.mappingsFile)));
-                                case V2 -> tinySteps.add(new RemapStep(new TinyV2Remapper(jarEntries, this.mappingsFile)));
+                                case V1 -> tinySteps.add(new RemapStep(new TinyV1Remapper(jarEntries, this.mappingsFile, new TinyNamespace("official", "named"))));
+                                case V2 -> tinySteps.add(new RemapStep(new TinyV2Remapper(jarEntries, this.mappingsFile, new TinyNamespace("official", "named"))));
                                 default -> throw new IllegalStateException("Unknown tiny mappings version: " + version);
                             }
                             tinySteps.add(new FixLocalVariablesStep(jarEntries));

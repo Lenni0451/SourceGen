@@ -10,27 +10,22 @@ import java.util.Map;
 
 public class TinyV2Remapper extends BaseRemapper {
 
-    public TinyV2Remapper(final Map<String, byte[]> entries, final File mappings) {
+    private final TinyNamespace[] namespaces;
+
+    public TinyV2Remapper(final Map<String, byte[]> entries, final File mappings, final TinyNamespace initialNamespace, final TinyNamespace... namespaces) {
         super(entries, mappings);
+        this.namespaces = TinyNamespace.merge(initialNamespace, namespaces);
     }
 
     @Override
     protected MappingsProvider initProvider(File mappings) {
         List<Throwable> tries = new ArrayList<>();
-        try {
-            return this.load(new TinyV2MappingsLoader(mappings, "official", "named"));
-        } catch (Throwable t) {
-            tries.add(t);
-        }
-        try {
-            return this.load(new TinyV2MappingsLoader(mappings, "client", "named"));
-        } catch (Throwable t) {
-            tries.add(t);
-        }
-        try {
-            return this.load(new TinyV2MappingsLoader(mappings, "clientOfficial", "named"));
-        } catch (Throwable t) {
-            tries.add(t);
+        for (TinyNamespace namespace : this.namespaces) {
+            try {
+                return this.load(new TinyV2MappingsLoader(mappings, namespace.from(), namespace.to()));
+            } catch (Throwable t) {
+                tries.add(t);
+            }
         }
         IllegalStateException e = new IllegalStateException("Failed to load TinyV2 mappings with known namespaces");
         for (Throwable t : tries) {

@@ -47,7 +47,7 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
                 new VersionRange("1.14.4", null), //First version with official mappings
                 version -> Config.Exclusions.minecraftOfficial.contains(version.getString("id")),
                 false,
-                (versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl) -> {
+                (versionSteps, versionName, releaseTime, clientUrl, serverUrl, clientMappingsUrl, serverMappingsUrl) -> {
                     this.addVersionSteps(versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl);
                     if (versionName.equals("1.21.11")) {
                         //Transition from obfuscated to deobfuscated jars

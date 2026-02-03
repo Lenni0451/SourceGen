@@ -66,7 +66,15 @@ public class IterateMinecraftVersions extends IterateVersionsStep<GsonObject> {
         String versionName = version.getString("id");
         GsonObject versionManifest = version.getObject("manifest");
         GsonObject downloads = versionManifest.getObject("downloads");
-        this.stepProvider.provideSteps(steps, versionName, OffsetDateTime.parse(version.getString("releaseTime")), downloads.getObject("client").getString("url"), downloads.optObject("client_mappings").map(o -> o.getString("url")).orElse(null));
+        this.stepProvider.provideSteps(
+                steps,
+                versionName,
+                OffsetDateTime.parse(version.getString("releaseTime")),
+                downloads.getObject("client").getString("url"),
+                downloads.optObject("server").map(o -> o.getString("url")).orElse(null),
+                downloads.optObject("client_mappings").map(o -> o.getString("url")).orElse(null),
+                downloads.optObject("server_mappings").map(o -> o.getString("url")).orElse(null)
+        );
     }
 
     private void filterVersionRange(final Collection<GsonObject> versions) {
@@ -102,7 +110,7 @@ public class IterateMinecraftVersions extends IterateVersionsStep<GsonObject> {
 
     @FunctionalInterface
     public interface VersionStepProvider {
-        void provideSteps(final List<GeneratorStep> versionSteps, final String versionName, final OffsetDateTime releaseTime, final String clientUrl, @Nullable final String clientMappingsUrl) throws Exception;
+        void provideSteps(final List<GeneratorStep> versionSteps, final String versionName, final OffsetDateTime releaseTime, final String clientUrl, @Nullable final String serverUrl, @Nullable final String clientMappingsUrl, @Nullable final String serverMappingsUrl) throws Exception;
     }
 
     public record VersionRange(@Nullable String minVersion, @Nullable String maxVersion) {

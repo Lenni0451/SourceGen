@@ -15,6 +15,7 @@ import net.lenni0451.sourcegen.steps.target.IterateMinecraftVersions;
 import net.lenni0451.sourcegen.steps.target.LoadFeatherMappings;
 import net.lenni0451.sourcegen.targets.GeneratorTarget;
 import net.lenni0451.sourcegen.targets.Requirements;
+import net.lenni0451.sourcegen.utils.remapping.TinyNamespace;
 import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 
 import javax.annotation.Nullable;
@@ -48,7 +49,7 @@ public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
                     new IterateMinecraftVersions.VersionRange(null, null),
                     version -> versionToUrl.apply(version.getString("id")) == null,
                     false,
-                    (versionSteps, versionName, releaseTime, clientUrl, clientMappingsUrl) -> {
+                    (versionSteps, versionName, releaseTime, clientUrl, serverUrl, clientMappingsUrl, serverMappingsUrl) -> {
                         Map<String, byte[]> jarEntries = new HashMap<>();
 
                         versionSteps.add(new CleanRepoStep(this.repoDir));
@@ -56,7 +57,7 @@ public class MinecraftFeatherMappingsTarget extends GeneratorTarget {
                         versionSteps.add(new UnzipSingleFileStep(this.mappingsJar, "mappings/mappings.tiny", this.mappingsFile));
                         versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
                         versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
-                        versionSteps.add(new RemapStep(new TinyV2Remapper(jarEntries, this.mappingsFile)));
+                        versionSteps.add(new RemapStep(new TinyV2Remapper(jarEntries, this.mappingsFile, new TinyNamespace("official", "named"))));
                         versionSteps.add(new FixLocalVariablesStep(jarEntries));
                         versionSteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
                         versionSteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
