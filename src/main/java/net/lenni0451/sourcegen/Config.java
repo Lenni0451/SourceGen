@@ -356,13 +356,21 @@ public class Config {
 
     @Section(name = "MinecraftNostalgiaMappings")
     public static class MinecraftNostalgiaMappings {
-        @Option("GitRepo")
-        @Description("The URL to the git repo where the decompiled files should be stored")
-        public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
+        @Option("ClientGitRepo")
+        @Description("The URL to the git repo where the decompiled client files should be stored")
+        public static String clientGitRepo = "https://github.com/ExampleDude/MinecraftSources";
 
-        @Option("RepoName")
-        @Description("The name of the local repository directory")
-        public static String repoName = "minecraft";
+        @Option("ServerGitRepo")
+        @Description("The URL to the git repo where the decompiled server files should be stored")
+        public static String serverGitRepo = "https://github.com/ExampleDude/MinecraftSources";
+
+        @Option("ClientRepoName")
+        @Description("The name of the local client repository directory")
+        public static String clientRepoName = "minecraft";
+
+        @Option("ServerRepoName")
+        @Description("The name of the local server repository directory")
+        public static String serverRepoName = "minecraft";
 
         @Option("AuthorName")
         @Description("The name of the author that should be used for the git commits")
@@ -372,9 +380,13 @@ public class Config {
         @Description("The email of the author that should be used for the git commits")
         public static String authorEmail = "noreply@mojang.com";
 
-        @Option("Branch")
-        @Description("The branch where the files should be stored")
-        public static String branch = "nostalgia";
+        @Option("ClientBranch")
+        @Description("The branch where the client files should be stored")
+        public static String clientBranch = "nostalgia_client";
+
+        @Option("ServerBranch")
+        @Description("The branch where the server files should be stored")
+        public static String serverBranch = "nostalgia_server";
     }
 
 }
