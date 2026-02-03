@@ -28,22 +28,26 @@ public class CosmicReachTarget extends GeneratorTarget {
 
     @Override
     protected void addSteps(List<GeneratorStep> steps) {
-        this.addSteps(
-                new File(Config.CosmicReach.clientRepoName),
-                new File(Main.DEFAULTS_DIR, "cosmicreach_client"),
-                Config.CosmicReach.clientGitRepo,
-                steps,
-                IterateCosmicReachVersions.VersionType.CLIENT,
-                Config.CosmicReach.clientBranch
-        );
-        this.addSteps(
-                new File(Config.CosmicReach.serverRepoName),
-                new File(Main.DEFAULTS_DIR, "cosmicreach_server"),
-                Config.CosmicReach.serverGitRepo,
-                steps,
-                IterateCosmicReachVersions.VersionType.SERVER,
-                Config.CosmicReach.serverBranch
-        );
+        if (Config.CosmicReach.Client.enabled) {
+            this.addSteps(
+                    new File(Config.CosmicReach.Client.repoName),
+                    new File(Main.DEFAULTS_DIR, "cosmicreach_client"),
+                    Config.CosmicReach.Client.gitRepo,
+                    steps,
+                    IterateCosmicReachVersions.VersionType.CLIENT,
+                    Config.CosmicReach.Client.branch
+            );
+        }
+        if (Config.CosmicReach.Server.enabled) {
+            this.addSteps(
+                    new File(Config.CosmicReach.Server.repoName),
+                    new File(Main.DEFAULTS_DIR, "cosmicreach_server"),
+                    Config.CosmicReach.Server.gitRepo,
+                    steps,
+                    IterateCosmicReachVersions.VersionType.SERVER,
+                    Config.CosmicReach.Server.branch
+            );
+        }
     }
 
     private void addSteps(final File repoDir, final File defaultsDir, final String gitRepo, final List<GeneratorStep> steps, final IterateCosmicReachVersions.VersionType type, final String branch) {

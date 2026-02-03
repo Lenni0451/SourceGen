@@ -137,22 +137,6 @@ public class Config {
 
     @Section(name = "CosmicReach")
     public static class CosmicReach {
-        @Option("ClientGitRepo")
-        @Description("The URL to the git repo where the decompiled files should be stored")
-        public static String clientGitRepo = "https://github.com/ExampleDude/CosmicReachSources";
-
-        @Option("ServerGitRepo")
-        @Description("The URL to the git repo where the decompiled files should be stored")
-        public static String serverGitRepo = "https://github.com/ExampleDude/CosmicReachSources";
-
-        @Option("ClientRepoName")
-        @Description("The name of the local repository directory")
-        public static String clientRepoName = "cosmicreach";
-
-        @Option("ServerRepoName")
-        @Description("The name of the local repository directory")
-        public static String serverRepoName = "cosmicreach";
-
         @Option("AuthorName")
         @Description("The name of the author that should be used for the git commits")
         public static String authorName = "finalforeach";
@@ -161,13 +145,43 @@ public class Config {
         @Description("The email of the author that should be used for the git commits")
         public static String authorEmail = "finalforeach@github.io";
 
-        @Option("ClientBranch")
-        @Description("The branch where the client files should be stored")
-        public static String clientBranch = "client";
+        @Section(name = "Client")
+        public static class Client {
+            @Option("Enabled")
+            @Description("Whether the client decompilation should be done or not")
+            public static boolean enabled = true;
 
-        @Option("ServerBranch")
-        @Description("The branch where the server files should be stored")
-        public static String serverBranch = "server";
+            @Option("GitRepo")
+            @Description("The URL to the git repo where the decompiled client files should be stored")
+            public static String gitRepo = "https://github.com/ExampleDude/CosmicReachSources";
+
+            @Option("RepoName")
+            @Description("The name of the local client repository directory")
+            public static String repoName = "cosmicreach";
+
+            @Option("Branch")
+            @Description("The branch where the client files should be stored")
+            public static String branch = "client";
+        }
+
+        @Section(name = "Server")
+        public static class Server {
+            @Option("Enabled")
+            @Description("Whether the server decompilation should be done or not")
+            public static boolean enabled = true;
+
+            @Option("GitRepo")
+            @Description("The URL to the git repo where the decompiled server files should be stored")
+            public static String gitRepo = "https://github.com/ExampleDude/CosmicReachSources";
+
+            @Option("RepoName")
+            @Description("The name of the local server repository directory")
+            public static String repoName = "cosmicreach";
+
+            @Option("Branch")
+            @Description("The branch where the server files should be stored")
+            public static String branch = "server";
+        }
     }
 
     @Section(name = "MinecraftFeatherMappings")
@@ -356,22 +370,6 @@ public class Config {
 
     @Section(name = "MinecraftNostalgiaMappings")
     public static class MinecraftNostalgiaMappings {
-        @Option("ClientGitRepo")
-        @Description("The URL to the git repo where the decompiled client files should be stored")
-        public static String clientGitRepo = "https://github.com/ExampleDude/MinecraftSources";
-
-        @Option("ServerGitRepo")
-        @Description("The URL to the git repo where the decompiled server files should be stored")
-        public static String serverGitRepo = "https://github.com/ExampleDude/MinecraftSources";
-
-        @Option("ClientRepoName")
-        @Description("The name of the local client repository directory")
-        public static String clientRepoName = "minecraft";
-
-        @Option("ServerRepoName")
-        @Description("The name of the local server repository directory")
-        public static String serverRepoName = "minecraft";
-
         @Option("AuthorName")
         @Description("The name of the author that should be used for the git commits")
         public static String authorName = "mojang";
@@ -380,13 +378,43 @@ public class Config {
         @Description("The email of the author that should be used for the git commits")
         public static String authorEmail = "noreply@mojang.com";
 
-        @Option("ClientBranch")
-        @Description("The branch where the client files should be stored")
-        public static String clientBranch = "nostalgia_client";
+        @Section(name = "Client")
+        public static class Client {
+            @Option("Enabled")
+            @Description("Whether the client decompilation should be done or not")
+            public static boolean enabled = true;
 
-        @Option("ServerBranch")
-        @Description("The branch where the server files should be stored")
-        public static String serverBranch = "nostalgia_server";
+            @Option("GitRepo")
+            @Description("The URL to the git repo where the decompiled client files should be stored")
+            public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
+
+            @Option("RepoName")
+            @Description("The name of the local client repository directory")
+            public static String repoName = "minecraft";
+
+            @Option("Branch")
+            @Description("The branch where the client files should be stored")
+            public static String branch = "nostalgia_client";
+        }
+
+        @Section(name = "Server")
+        public static class Server {
+            @Option("Enabled")
+            @Description("Whether the server decompilation should be done or not")
+            public static boolean enabled = true;
+
+            @Option("GitRepo")
+            @Description("The URL to the git repo where the decompiled server files should be stored")
+            public static String gitRepo = "https://github.com/ExampleDude/MinecraftSources";
+
+            @Option("RepoName")
+            @Description("The name of the local server repository directory")
+            public static String repoName = "minecraft";
+
+            @Option("Branch")
+            @Description("The branch where the server files should be stored")
+            public static String branch = "nostalgia_server";
+        }
     }
 
 }

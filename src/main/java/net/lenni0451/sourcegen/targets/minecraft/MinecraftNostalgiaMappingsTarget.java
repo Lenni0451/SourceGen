@@ -39,24 +39,28 @@ public class MinecraftNostalgiaMappingsTarget extends GeneratorTarget {
 
     @Override
     protected void addSteps(List<GeneratorStep> steps) {
-        this.addSteps(
-                new File(Config.MinecraftNostalgiaMappings.clientRepoName),
-                new File(Main.DEFAULTS_DIR, "minecraft_client_nostalgia_mappings"),
-                Config.MinecraftNostalgiaMappings.clientGitRepo,
-                Target.CLIENT,
-                new TinyNamespace("clientOfficial", "named"),
-                steps,
-                Config.MinecraftNostalgiaMappings.clientBranch
-        );
-        this.addSteps(
-                new File(Config.MinecraftNostalgiaMappings.serverRepoName),
-                new File(Main.DEFAULTS_DIR, "minecraft_server_nostalgia_mappings"),
-                Config.MinecraftNostalgiaMappings.serverGitRepo,
-                Target.SERVER,
-                new TinyNamespace("serverOfficial", "named"),
-                steps,
-                Config.MinecraftNostalgiaMappings.serverBranch
-        );
+        if (Config.MinecraftNostalgiaMappings.Client.enabled) {
+            this.addSteps(
+                    new File(Config.MinecraftNostalgiaMappings.Client.repoName),
+                    new File(Main.DEFAULTS_DIR, "minecraft_client_nostalgia_mappings"),
+                    Config.MinecraftNostalgiaMappings.Client.gitRepo,
+                    Target.CLIENT,
+                    new TinyNamespace("clientOfficial", "named"),
+                    steps,
+                    Config.MinecraftNostalgiaMappings.Client.branch
+            );
+        }
+        if (Config.MinecraftNostalgiaMappings.Server.enabled) {
+            this.addSteps(
+                    new File(Config.MinecraftNostalgiaMappings.Server.repoName),
+                    new File(Main.DEFAULTS_DIR, "minecraft_server_nostalgia_mappings"),
+                    Config.MinecraftNostalgiaMappings.Server.gitRepo,
+                    Target.SERVER,
+                    new TinyNamespace("serverOfficial", "named"),
+                    steps,
+                    Config.MinecraftNostalgiaMappings.Server.branch
+            );
+        }
     }
 
     private void addSteps(final File repoDir, final File defaultsDir, final String gitRepo, final Target target, final TinyNamespace namespace, final List<GeneratorStep> steps, final String branch) {
