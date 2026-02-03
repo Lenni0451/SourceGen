@@ -169,7 +169,9 @@ public class TinyV2MetadataMapper {
                     commentLines.add("");
                     requiresSpace = false;
                 }
-                commentLines.add("@param " + parameterMetaMapping.getName() + " " + String.join("<br>", parameterMetaMapping.getJavadoc()));
+                if (!parameterMetaMapping.getName().isBlank()) {
+                    commentLines.add("@param " + parameterMetaMapping.getName() + " " + String.join("<br>", parameterMetaMapping.getJavadoc()));
+                }
             }
         }
 
@@ -190,6 +192,7 @@ public class TinyV2MetadataMapper {
 
     private static void applyParameterNames(final MethodMetaMapping metadata, final MethodNode methodNode, final List<String[]> comments) {
         for (ParameterMetaMapping parameter : metadata.getParameters()) {
+            if (parameter.getName().isBlank()) continue;
             if (methodNode.parameters != null) {
                 int[] parameterIndices = ASMUtils.parameterIndices(methodNode);
                 if (methodNode.parameters.size() == parameterIndices.length) {
