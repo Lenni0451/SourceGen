@@ -1,7 +1,10 @@
 package net.lenni0451.sourcegen.steps.target;
 
+import net.lenni0451.commons.gson.GsonParser;
 import net.lenni0451.commons.gson.elements.GsonArray;
+import net.lenni0451.commons.gson.elements.GsonElement;
 import net.lenni0451.commons.gson.elements.GsonObject;
+import net.lenni0451.commons.unchecked.FieldInitializer;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.NetUtils;
@@ -9,11 +12,22 @@ import net.lenni0451.sourcegen.utils.NetUtils;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 
 public class IterateMinecraftVersions extends IterateVersionsStep<GsonObject> {
+
+    private static final Map<String, String> FALLBACK_SERVER_URLS = FieldInitializer.attempt(() -> {
+        try (Reader reader = new InputStreamReader(IterateMinecraftVersions.class.getClassLoader().getResourceAsStream("servers.json"))) {
+            GsonObject object = GsonParser.parse(reader).asObject();
+            Map<String, String> map = object.asMap(GsonElement::asString);
+            map.values().removeIf(String::isBlank);
+            return Collections.unmodifiableMap(map);
+        }
+    }).silent().orElse(Map.of());
 
     private final VersionRange versionRange;
     private final Predicate<GsonObject> removeVersionIf;
@@ -71,7 +85,7 @@ public class IterateMinecraftVersions extends IterateVersionsStep<GsonObject> {
                 versionName,
                 OffsetDateTime.parse(version.getString("releaseTime")),
                 downloads.getObject("client").getString("url"),
-                downloads.optObject("server").map(o -> o.getString("url")).orElse(null),
+                downloads.optObject("server").map(o -> o.getString("url")).orElse(FALLBACK_SERVER_URLS.get(versionName)),
                 downloads.optObject("client_mappings").map(o -> o.getString("url")).orElse(null),
                 downloads.optObject("server_mappings").map(o -> o.getString("url")).orElse(null)
         );
