@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import net.lenni0451.commons.asm.mappings.meta.ClassMetaMapping;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
+import net.lenni0451.sourcegen.utils.remapping.TinyNamespace;
 import net.lenni0451.sourcegen.utils.remapping.special.TinyV2MetadataMapper;
 
 import java.io.File;
@@ -13,8 +14,8 @@ import java.util.Map;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class TinyV2MetadataStep implements GeneratorStep {
 
-    public static TinyV2MetadataStep generate(final Map<String, byte[]> entries, final File mappings) {
-        return new TinyV2MetadataStep("Generating tiny v2 metadata...", () -> TinyV2MetadataMapper.generate(entries, mappings));
+    public static TinyV2MetadataStep generate(final Map<String, byte[]> entries, final File mappings, final TinyNamespace initialNamespace, final TinyNamespace... namespaces) {
+        return new TinyV2MetadataStep("Generating tiny v2 metadata...", () -> TinyV2MetadataMapper.generate(entries, mappings, initialNamespace, namespaces));
     }
 
     public static TinyV2MetadataStep generate(final Map<String, byte[]> entries, final List<ClassMetaMapping> mappings) {

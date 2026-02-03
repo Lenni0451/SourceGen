@@ -8,6 +8,7 @@ import net.lenni0451.commons.asm.mappings.meta.FieldMetaMapping;
 import net.lenni0451.commons.asm.mappings.meta.MethodMetaMapping;
 import net.lenni0451.commons.asm.mappings.meta.ParameterMetaMapping;
 import net.lenni0451.commons.io.FileUtils;
+import net.lenni0451.sourcegen.utils.remapping.TinyNamespace;
 import org.objectweb.asm.tree.*;
 
 import java.io.File;
@@ -21,8 +22,8 @@ public class TinyV2MetadataMapper {
     private static final String COMMENT_ANNOTATION_CLASS = "net.lenni0451.sourcegen.annotations.Comment";
     private static final String COMMENT_ANNOTATION_DESC = "L" + COMMENT_ANNOTATION_CLASS + ";";
 
-    public static void generate(final Map<String, byte[]> entries, final File mappings) {
-        TinyV2MappingsLoader mapper = loadMapper(mappings);
+    public static void generate(final Map<String, byte[]> entries, final File mappings, final TinyNamespace initialNamespace, final TinyNamespace... namespaces) {
+        TinyV2MappingsLoader mapper = loadMapper(mappings, TinyNamespace.merge(initialNamespace, namespaces));
         generate(entries, mapper.getMetaMappings());
     }
 
@@ -108,28 +109,16 @@ public class TinyV2MetadataMapper {
         }
     }
 
-    private static TinyV2MappingsLoader loadMapper(final File mappings) {
+    private static TinyV2MappingsLoader loadMapper(final File mappings, final TinyNamespace[] namespaces) {
         List<Throwable> tries = new ArrayList<>();
-        try {
-            TinyV2MappingsLoader mapper = new TinyV2MappingsLoader(mappings, "official", "named").enableMetaParsing();
-            mapper.load();
-            return mapper;
-        } catch (Throwable t) {
-            tries.add(t);
-        }
-        try {
-            TinyV2MappingsLoader mapper = new TinyV2MappingsLoader(mappings, "client", "named").enableMetaParsing();
-            mapper.load();
-            return mapper;
-        } catch (Throwable t) {
-            tries.add(t);
-        }
-        try {
-            TinyV2MappingsLoader mapper = new TinyV2MappingsLoader(mappings, "clientOfficial", "named").enableMetaParsing();
-            mapper.load();
-            return mapper;
-        } catch (Throwable t) {
-            tries.add(t);
+        for (TinyNamespace namespace : namespaces) {
+            try {
+                TinyV2MappingsLoader mapper = new TinyV2MappingsLoader(mappings, namespace.from(), namespace.to()).enableMetaParsing();
+                mapper.load();
+                return mapper;
+            } catch (Throwable t) {
+                tries.add(t);
+            }
         }
         IllegalStateException e = new IllegalStateException("Failed to load TinyV2 mappings with known namespaces");
         for (Throwable t : tries) {

@@ -29,6 +29,8 @@ import java.util.Map;
 
 public class MinecraftYarnMappingsTarget extends GeneratorTarget {
 
+    private static final TinyNamespace NAMESPACE = new TinyNamespace("official", "named");
+
     private final File repoDir = new File(Config.MinecraftYarnMappings.repoName);
     private final File defaultsDir = new File(Main.DEFAULTS_DIR, "minecraft_yarn_mappings");
     private final File mappingsJar = new File(Main.WORK_DIR, "mappings.jar");
@@ -61,8 +63,8 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
                         versionSteps.add(new ReadJarEntriesStep(this.clientJar, jarEntries));
                         versionSteps.add(new DetectTinyVersionStep(this.mappingsFile, (version, tinySteps) -> {
                             switch (version) {
-                                case V1 -> tinySteps.add(new RemapStep(new TinyV1Remapper(jarEntries, this.mappingsFile, new TinyNamespace("official", "named"))));
-                                case V2 -> tinySteps.add(new RemapStep(new TinyV2Remapper(jarEntries, this.mappingsFile, new TinyNamespace("official", "named"))));
+                                case V1 -> tinySteps.add(new RemapStep(new TinyV1Remapper(jarEntries, this.mappingsFile, NAMESPACE)));
+                                case V2 -> tinySteps.add(new RemapStep(new TinyV2Remapper(jarEntries, this.mappingsFile, NAMESPACE)));
                                 default -> throw new IllegalStateException("Unknown tiny mappings version: " + version);
                             }
                             tinySteps.add(new FixLocalVariablesStep(jarEntries));
@@ -72,7 +74,7 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
                                     tinySteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
                                 }
                                 case V2 -> {
-                                    tinySteps.add(TinyV2MetadataStep.generate(jarEntries, this.mappingsFile));
+                                    tinySteps.add(TinyV2MetadataStep.generate(jarEntries, this.mappingsFile, NAMESPACE));
                                     tinySteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
                                     tinySteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
                                     tinySteps.add(TinyV2MetadataStep.apply(this.repoDir));
