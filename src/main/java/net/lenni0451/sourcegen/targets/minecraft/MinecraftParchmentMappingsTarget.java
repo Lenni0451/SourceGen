@@ -20,7 +20,10 @@ import net.lenni0451.sourcegen.utils.remapping.ProguardRemapper;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
 
@@ -50,7 +53,6 @@ public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
                     (versionSteps, versionName, releaseTime, clientUrl, serverUrl, clientMappingsUrl, serverMappingsUrl) -> {
                         String metadataUrl = versionToUrl.apply(versionName);
                         Map<String, byte[]> jarEntries = new HashMap<>();
-                        List<String[]> comments = new ArrayList<>();
 
                         versionSteps.add(new CleanRepoStep(this.repoDir));
                         versionSteps.add(new DownloadStep(clientUrl, this.clientJar));
@@ -62,10 +64,10 @@ public class MinecraftParchmentMappingsTarget extends GeneratorTarget {
                             versionSteps.add(new RemapStep(new ProguardRemapper(jarEntries, this.mappingsFile)));
                             versionSteps.add(new FixLocalVariablesStep(jarEntries));
                         }
-                        versionSteps.add(new ParchmentMetadataStep(jarEntries, this.metadataFile, comments));
+                        versionSteps.add(ParchmentMetadataStep.generate(jarEntries, this.metadataFile));
                         versionSteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
                         versionSteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
-                        versionSteps.add(new ParchmentMetadataStep(this.repoDir, comments));
+                        versionSteps.add(ParchmentMetadataStep.apply(this.repoDir));
                         versionSteps.add(new RemoveResourcesStep(this.repoDir, new File(this.repoDir, "version.json")));
                         versionSteps.add(new CopyDefaultsStep(this.repoDir, this.defaultsDir));
                         versionSteps.add(new CommitChangesStep(this.repoDir, versionName, new Date(releaseTime.toInstant().toEpochMilli())));

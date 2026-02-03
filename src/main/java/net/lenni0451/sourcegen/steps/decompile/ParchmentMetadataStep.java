@@ -1,5 +1,7 @@
 package net.lenni0451.sourcegen.steps.decompile;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import net.lenni0451.commons.asm.mappings.meta.ClassMetaMapping;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.remapping.special.ParchmentMetadataConverter;
@@ -9,23 +11,23 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ParchmentMetadataStep implements GeneratorStep {
+
+    public static ParchmentMetadataStep generate(final Map<String, byte[]> entries, final File mappings) {
+        return new ParchmentMetadataStep("Generating parchment metadata...", () -> {
+            List<ClassMetaMapping> metadata = ParchmentMetadataConverter.toTinyV2Metadata(mappings);
+            TinyV2MetadataMapper.generate(entries, metadata);
+        });
+    }
+
+    public static ParchmentMetadataStep apply(final File baseDir) {
+        return new ParchmentMetadataStep("Applying parchment metadata...", () -> TinyV2MetadataMapper.apply(baseDir));
+    }
+
 
     private final String message;
     private final Runner runner;
-
-    public ParchmentMetadataStep(final Map<String, byte[]> entries, final File mappings, final List<String[]> comments) {
-        this.message = "Generating parchment metadata...";
-        this.runner = () -> {
-            List<ClassMetaMapping> metadata = ParchmentMetadataConverter.toTinyV2Metadata(mappings);
-            TinyV2MetadataMapper.generate(entries, metadata, comments);
-        };
-    }
-
-    public ParchmentMetadataStep(final File baseDir, final List<String[]> comments) {
-        this.message = "Applying parchment metadata...";
-        this.runner = () -> TinyV2MetadataMapper.apply(baseDir, comments);
-    }
 
     @Override
     public void printStep() {

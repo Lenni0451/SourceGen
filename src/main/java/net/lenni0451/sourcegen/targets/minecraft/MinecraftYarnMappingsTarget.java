@@ -22,7 +22,10 @@ import net.lenni0451.sourcegen.utils.remapping.TinyV2Remapper;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MinecraftYarnMappingsTarget extends GeneratorTarget {
 
@@ -50,7 +53,6 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
                     false,
                     (versionSteps, versionName, releaseTime, clientUrl, serverUrl, clientMappingsUrl, serverMappingsUrl) -> {
                         Map<String, byte[]> jarEntries = new HashMap<>();
-                        List<String[]> comments = new ArrayList<>();
 
                         versionSteps.add(new CleanRepoStep(this.repoDir));
                         versionSteps.add(new DownloadAlternativesStep(versionToUrl.apply(versionName), this.mappingsJar));
@@ -70,10 +72,10 @@ public class MinecraftYarnMappingsTarget extends GeneratorTarget {
                                     tinySteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
                                 }
                                 case V2 -> {
-                                    tinySteps.add(new TinyV2MetadataStep(jarEntries, this.mappingsFile, comments));
+                                    tinySteps.add(TinyV2MetadataStep.generate(jarEntries, this.mappingsFile));
                                     tinySteps.add(new WriteJarEntriesStep(jarEntries, this.remappedJar));
                                     tinySteps.add(new DecompileStandaloneStep(this.remappedJar, this.repoDir));
-                                    tinySteps.add(new TinyV2MetadataStep(this.repoDir, comments));
+                                    tinySteps.add(TinyV2MetadataStep.apply(this.repoDir));
                                 }
                                 default -> throw new IllegalStateException("Unknown tiny mappings version: " + version);
                             }

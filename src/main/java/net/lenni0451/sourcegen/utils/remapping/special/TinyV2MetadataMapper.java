@@ -12,23 +12,21 @@ import org.objectweb.asm.tree.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class TinyV2MetadataMapper {
 
     private static final String COMMENT_ANNOTATION_CLASS = "net.lenni0451.sourcegen.annotations.Comment";
     private static final String COMMENT_ANNOTATION_DESC = "L" + COMMENT_ANNOTATION_CLASS + ";";
-    private static final Pattern COMMENT_PATTERN = Pattern.compile("( *)@Comment\\((\\d+)\\)");
 
-    public static void generate(final Map<String, byte[]> entries, final File mappings, final List<String[]> comments) {
+    public static void generate(final Map<String, byte[]> entries, final File mappings) {
         TinyV2MappingsLoader mapper = loadMapper(mappings);
-        generate(entries, mapper.getMetaMappings(), comments);
+        generate(entries, mapper.getMetaMappings());
     }
 
-    public static void generate(final Map<String, byte[]> entries, final List<ClassMetaMapping> metadata, final List<String[]> comments) {
+    public static void generate(final Map<String, byte[]> entries, final List<ClassMetaMapping> metadata) {
         for (ClassMetaMapping classMetadata : metadata) {
             byte[] classBytes = entries.get(classMetadata.getName() + ".class");
             if (classBytes == null) {
@@ -37,18 +35,18 @@ public class TinyV2MetadataMapper {
             }
             ClassNode classNode = ClassIO.fromBytes(classBytes);
 
-            applyClassComment(classMetadata, classNode, comments);
+            applyClassComment(classMetadata, classNode);
             for (FieldMetaMapping fieldMetadata : classMetadata.getFields()) {
                 FieldNode fieldNode = ASMUtils.getField(classNode, fieldMetadata.getName(), fieldMetadata.getDescriptor());
                 if (fieldNode != null) {
-                    applyFieldComment(fieldMetadata, fieldNode, comments);
+                    applyFieldComment(fieldMetadata, fieldNode);
                 }
             }
             for (MethodMetaMapping methodMetadata : classMetadata.getMethods()) {
                 MethodNode methodNode = ASMUtils.getMethod(classNode, methodMetadata.getName(), methodMetadata.getDescriptor());
                 if (methodNode != null) {
-                    applyMethodComment(methodMetadata, methodNode, comments);
-                    applyParameterNames(methodMetadata, methodNode, comments);
+                    applyMethodComment(methodMetadata, methodNode);
+                    applyParameterNames(methodMetadata, methodNode);
                 }
             }
 
@@ -56,43 +54,56 @@ public class TinyV2MetadataMapper {
         }
     }
 
-    public static void apply(final File source, final List<String[]> comments) throws IOException {
+    public static void apply(final File source) throws IOException {
         for (File file : FileUtils.listFiles(source)) {
             if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".java")) continue;
             List<String> lines = Files.readAllLines(file.toPath());
-            int startSize = lines.size();
-            lines.removeIf(line -> line.contains(COMMENT_ANNOTATION_CLASS)); //Remove imports of the comment annotation
+            List<String> output = new ArrayList<>(lines.size());
+            boolean modified = false;
             for (int i = 0; i < lines.size(); i++) {
                 String line = lines.get(i);
-                Matcher matcher = COMMENT_PATTERN.matcher(line);
-                if (!matcher.find()) {
-                    if (line.contains("@Comment")) {
-                        throw new IllegalStateException("Comment annotation without value in " + file.getName() + " at line " + (i + 1));
-                    }
+                if (line.contains(COMMENT_ANNOTATION_CLASS)) {
+                    modified = true;
                     continue;
-                }
+                } else if (line.contains("@Comment")) {
+                    modified = true;
+                    if (!line.contains("@Comment(")) {
+                        throw new IllegalStateException("Invalid @Comment annotation format in file " + file.getAbsolutePath() + ": " + line);
+                    }
+                    if (line.endsWith("(")) {
+                        //Multiline annotation
+                        if (i + 2 >= lines.size()) {
+                            throw new IllegalStateException("Invalid @Comment annotation format in file " + file.getAbsolutePath() + ": " + line);
+                        }
+                        String nextLine = lines.get(i + 1).trim();
+                        String endLine = lines.get(i + 2).trim();
+                        if (!nextLine.startsWith("\"") || !nextLine.endsWith("\"") || !endLine.equals(")")) {
+                            throw new IllegalStateException("Invalid @Comment annotation format in file " + file.getAbsolutePath() + ": " + line + " " + nextLine + " " + endLine);
+                        }
 
-                String spaces = matcher.group(1);
-                int index = Integer.parseInt(matcher.group(2));
-                if (index < 0 || index >= comments.size()) {
-                    throw new IllegalStateException("Comment index out of bounds in " + file.getName() + " at line " + (i + 1));
+                        String spaces = line.substring(0, line.indexOf("@Comment"));
+                        String[] commentLines = new String(Base64.getDecoder().decode(nextLine.substring(1, nextLine.length() - 1)), StandardCharsets.UTF_8).split("\n");
+                        output.add(spaces + "/**");
+                        for (String commentLine : commentLines) {
+                            output.add(spaces + " * " + commentLine);
+                        }
+                        output.add(spaces + " */");
+                        i += 2;
+                    } else if (line.endsWith(")")) {
+                        String spaces = line.substring(0, line.indexOf("@Comment"));
+                        String[] commentLines = new String(Base64.getDecoder().decode(line.substring(line.indexOf("(\"") + 2, line.lastIndexOf("\")"))), StandardCharsets.UTF_8).split("\n");
+                        output.add(spaces + "/**");
+                        for (String commentLine : commentLines) {
+                            output.add(spaces + " * " + commentLine);
+                        }
+                        output.add(spaces + " */");
+                    }
+                } else {
+                    output.add(line);
                 }
-
-                lines.remove(i);
-                List<String> commentLines = new ArrayList<>();
-                commentLines.add(spaces + "/**");
-                for (String commentLine : comments.get(index)) {
-                    commentLines.add(spaces + " * " + commentLine);
-                }
-                commentLines.add(spaces + " */");
-                for (int j = commentLines.size() - 1; j >= 0; j--) {
-                    lines.add(i, commentLines.get(j));
-                }
-                i += commentLines.size();
             }
-            if (lines.size() != startSize) {
-                //Only write the file if it was changed
-                Files.write(file.toPath(), lines);
+            if (modified) {
+                Files.write(file.toPath(), output);
             }
         }
     }
@@ -127,39 +138,19 @@ public class TinyV2MetadataMapper {
         throw e;
     }
 
-    private static void applyClassComment(final ClassMetaMapping metadata, final ClassNode classNode, final List<String[]> comments) {
+    private static void applyClassComment(final ClassMetaMapping metadata, final ClassNode classNode) {
         if (metadata.hasJavadoc()) {
-            comments.add(metadata.getJavadoc());
-            List<AnnotationNode> visibleAnnotations = classNode.visibleAnnotations;
-            if (visibleAnnotations == null) {
-                visibleAnnotations = new ArrayList<>();
-                classNode.visibleAnnotations = visibleAnnotations;
-            }
-            AnnotationNode commentAnnotation = new AnnotationNode(COMMENT_ANNOTATION_DESC);
-            commentAnnotation.values = new ArrayList<>();
-            commentAnnotation.values.add("value");
-            commentAnnotation.values.add(comments.size() - 1);
-            visibleAnnotations.add(0, commentAnnotation);
+            classNode.visibleAnnotations = addAnnotation(classNode.visibleAnnotations, metadata.getJavadoc());
         }
     }
 
-    private static void applyFieldComment(final FieldMetaMapping metadata, final FieldNode fieldNode, final List<String[]> comments) {
+    private static void applyFieldComment(final FieldMetaMapping metadata, final FieldNode fieldNode) {
         if (metadata.hasJavadoc()) {
-            comments.add(metadata.getJavadoc());
-            List<AnnotationNode> visibleAnnotations = fieldNode.visibleAnnotations;
-            if (visibleAnnotations == null) {
-                visibleAnnotations = new ArrayList<>();
-                fieldNode.visibleAnnotations = visibleAnnotations;
-            }
-            AnnotationNode commentAnnotation = new AnnotationNode(COMMENT_ANNOTATION_DESC);
-            commentAnnotation.values = new ArrayList<>();
-            commentAnnotation.values.add("value");
-            commentAnnotation.values.add(comments.size() - 1);
-            visibleAnnotations.add(0, commentAnnotation);
+            fieldNode.visibleAnnotations = addAnnotation(fieldNode.visibleAnnotations, metadata.getJavadoc());
         }
     }
 
-    private static void applyMethodComment(final MethodMetaMapping metadata, final MethodNode methodNode, final List<String[]> comments) {
+    private static void applyMethodComment(final MethodMetaMapping metadata, final MethodNode methodNode) {
         List<String> commentLines = new ArrayList<>();
         if (metadata.hasJavadoc()) Collections.addAll(commentLines, metadata.getJavadoc());
         boolean requiresSpace = !commentLines.isEmpty();
@@ -176,21 +167,11 @@ public class TinyV2MetadataMapper {
         }
 
         if (!commentLines.isEmpty()) {
-            comments.add(commentLines.toArray(new String[0]));
-            List<AnnotationNode> visibleAnnotations = methodNode.visibleAnnotations;
-            if (visibleAnnotations == null) {
-                visibleAnnotations = new ArrayList<>();
-                methodNode.visibleAnnotations = visibleAnnotations;
-            }
-            AnnotationNode commentAnnotation = new AnnotationNode(COMMENT_ANNOTATION_DESC);
-            commentAnnotation.values = new ArrayList<>();
-            commentAnnotation.values.add("value");
-            commentAnnotation.values.add(comments.size() - 1);
-            visibleAnnotations.add(0, commentAnnotation);
+            methodNode.visibleAnnotations = addAnnotation(methodNode.visibleAnnotations, commentLines.toArray(new String[0]));
         }
     }
 
-    private static void applyParameterNames(final MethodMetaMapping metadata, final MethodNode methodNode, final List<String[]> comments) {
+    private static void applyParameterNames(final MethodMetaMapping metadata, final MethodNode methodNode) {
         for (ParameterMetaMapping parameter : metadata.getParameters()) {
             if (parameter.getName().isBlank()) continue;
             if (methodNode.parameters != null) {
@@ -213,6 +194,18 @@ public class TinyV2MetadataMapper {
                 }
             }
         }
+    }
+
+    private static List<AnnotationNode> addAnnotation(List<AnnotationNode> annotations, final String[] lines) {
+        if (annotations == null) {
+            annotations = new ArrayList<>();
+        }
+        AnnotationNode commentAnnotation = new AnnotationNode(COMMENT_ANNOTATION_DESC);
+        commentAnnotation.values = new ArrayList<>();
+        commentAnnotation.values.add("value");
+        commentAnnotation.values.add(Base64.getEncoder().encodeToString(String.join("\n", lines).getBytes(StandardCharsets.UTF_8)));
+        annotations.add(0, commentAnnotation);
+        return annotations;
     }
 
 }
