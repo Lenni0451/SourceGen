@@ -2,6 +2,7 @@ package net.lenni0451.sourcegen.steps.decompile;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.commons.asm.mappings.meta.ClassMetaMapping;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.remapping.special.ParchmentMetadataConverter;
@@ -11,6 +12,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ParchmentMetadataStep implements GeneratorStep {
 
@@ -31,7 +33,7 @@ public class ParchmentMetadataStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println(this.message);
+        log.info(this.message);
     }
 
     @Override

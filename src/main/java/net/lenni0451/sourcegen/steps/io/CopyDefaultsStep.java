@@ -1,11 +1,13 @@
 package net.lenni0451.sourcegen.steps.io;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+@Slf4j
 public class CopyDefaultsStep implements GeneratorStep {
 
     private final File repoDir;
@@ -18,7 +20,7 @@ public class CopyDefaultsStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Copying defaults from " + this.defaultsDir.getName() + "...");
+        log.info("Copying defaults from {}...", this.defaultsDir.getName());
     }
 
     @Override

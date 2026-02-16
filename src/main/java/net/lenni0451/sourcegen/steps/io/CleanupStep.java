@@ -1,10 +1,12 @@
 package net.lenni0451.sourcegen.steps.io;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 
 import java.io.File;
 
+@Slf4j
 public class CleanupStep implements GeneratorStep {
 
     private final File[] files;
@@ -15,7 +17,7 @@ public class CleanupStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Cleaning up...");
+        log.info("Cleaning up...");
     }
 
     @Override

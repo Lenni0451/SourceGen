@@ -1,8 +1,10 @@
 package net.lenni0451.sourcegen.steps.decompile;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.remapping.BaseRemapper;
 
+@Slf4j
 public class RemapStep implements GeneratorStep {
 
     private final BaseRemapper remapper;
@@ -13,7 +15,7 @@ public class RemapStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Applying mappings...");
+        log.info("Applying mappings...");
     }
 
     @Override

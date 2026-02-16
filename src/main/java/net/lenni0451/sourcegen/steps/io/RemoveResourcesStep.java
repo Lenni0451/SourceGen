@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.io;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 
 import java.io.File;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
 
+@Slf4j
 public class RemoveResourcesStep implements GeneratorStep {
 
     private final File repoDir;
@@ -25,7 +27,7 @@ public class RemoveResourcesStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Removing resources...");
+        log.info("Removing resources...");
     }
 
     @Override

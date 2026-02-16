@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.utils.external;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.commons.arrays.ArrayUtils;
 import net.lenni0451.commons.threading.ThreadUtils;
 
@@ -7,10 +8,9 @@ import java.io.*;
 import java.util.Collections;
 import java.util.Map;
 
+@Slf4j
 public class Executor {
 
-    private static final boolean PRINT_COMMANDS = System.getProperty("sourcegen.printCommands", "false").equalsIgnoreCase("true");
-    private static final boolean PRINT_PROCESS_OUTPUT = System.getProperty("sourcegen.printProcessOutput", "false").equalsIgnoreCase("true");
     private static final int[] DEFAULT_ALLOWED_EXIT_CODES = {0};
 
     public static ProcessOutput execute(final File runDir, final String[]... cmdParts) throws IOException {
@@ -34,7 +34,7 @@ public class Executor {
     }
 
     public static ProcessOutput execute(final File runDir, final Map<String, String> env, final int[] allowedExitCodes, final String... cmd) throws IOException {
-        if (PRINT_COMMANDS) System.out.println(" > " + String.join(" ", cmd));
+        log.debug(" > {}", String.join(" ", cmd));
         ProcessBuilder pb = new ProcessBuilder(cmd);
         pb.directory(runDir);
         pb.environment().putAll(env);
@@ -51,9 +51,9 @@ public class Executor {
                     //If the reader thread is still alive, interrupt it
                     //This sometimes happens and I don't know why
                     //Before I added this, the program would just hang here forever
-                    System.out.println("Reader thread is not finished after process has exited!");
-                    System.out.println("Command: " + String.join(" ", cmd));
-                    System.out.println("Interrupting thread to continue...");
+                    log.warn("Reader thread is not finished after process has exited!");
+                    log.warn("Command: {}", String.join(" ", cmd));
+                    log.warn("Interrupting thread to continue...");
                     readerThread.interrupt();
                 }
             } else {
@@ -63,36 +63,40 @@ public class Executor {
         String out = stdout.toString();
         int exitCode = process.exitValue();
         if (!ArrayUtils.contains(allowedExitCodes, exitCode)) {
-            System.out.println();
-            System.out.println("Process exited with error code " + exitCode);
-            System.out.println("Command: " + String.join(" ", cmd));
-            if (!PRINT_PROCESS_OUTPUT) {
-                System.out.println("Output:");
-                System.out.println(out);
-            }
+            log.error("Process exited with error code {}", exitCode);
+            log.info("Command: {}", String.join(" ", cmd));
+            log.debug("Output:");
+            log.debug(out);
             System.exit(exitCode);
         }
         return new ProcessOutput(exitCode, out);
     }
 
     private static Thread readStream(final InputStream stdin, final InputStream stderr, final OutputStream os) {
+        DebugLogCollector stdoutCollector = new DebugLogCollector();
+        DebugLogCollector stderrCollector = new DebugLogCollector();
         Thread reader = new Thread(() -> {
             try {
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = stdin.read(buffer)) != -1) {
-                    os.write(buffer, 0, length);
-                    if (PRINT_PROCESS_OUTPUT) System.out.write(buffer, 0, length);
-                }
-                while ((length = stderr.read(buffer)) != -1) {
-                    os.write(buffer, 0, length);
-                    if (PRINT_PROCESS_OUTPUT) System.err.write(buffer, 0, length);
+                try {
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = stdin.read(buffer)) != -1) {
+                        os.write(buffer, 0, length);
+                        stdoutCollector.append(buffer, length);
+                    }
+                    while ((length = stderr.read(buffer)) != -1) {
+                        os.write(buffer, 0, length);
+                        stderrCollector.append(buffer, length);
+                    }
+                } finally {
+                    stdoutCollector.flush();
+                    stderrCollector.flush();
                 }
             } catch (Throwable t) {
-                t.printStackTrace();
+                log.error("Error while reading process output", t);
                 System.exit(-1);
             }
-        });
+        }, "ProcessOutputReader");
         reader.setDaemon(true);
         reader.start();
         return reader;
@@ -100,6 +104,27 @@ public class Executor {
 
 
     public record ProcessOutput(int exitCode, String output) {
+    }
+
+    private static class DebugLogCollector {
+        private final StringBuilder currentLine = new StringBuilder();
+
+        public void append(final byte[] buffer, final int length) {
+            this.currentLine.append(new String(buffer, 0, length));
+            int index;
+            while ((index = this.currentLine.indexOf("\n")) != -1) {
+                String line = this.currentLine.substring(0, index);
+                log.debug(line);
+                this.currentLine.delete(0, index + 1);
+            }
+        }
+
+        public void flush() {
+            if (!this.currentLine.isEmpty()) {
+                log.debug(this.currentLine.toString());
+                this.currentLine.setLength(0);
+            }
+        }
     }
 
 }

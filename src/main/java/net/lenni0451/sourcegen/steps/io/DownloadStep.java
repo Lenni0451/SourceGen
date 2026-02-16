@@ -1,10 +1,12 @@
 package net.lenni0451.sourcegen.steps.io;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.NetUtils;
 
 import java.io.File;
 
+@Slf4j
 public class DownloadStep implements GeneratorStep {
 
     private final String url;
@@ -17,7 +19,7 @@ public class DownloadStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Downloading file from " + this.url + "...");
+        log.info("Downloading file from " + this.url + "...");
     }
 
     @Override
@@ -27,7 +29,7 @@ public class DownloadStep implements GeneratorStep {
                 NetUtils.download(this.url, this.output);
                 break;
             } catch (Throwable t) {
-                System.out.println("Failed to download file from " + this.url + " (Attempt " + (i + 1) + "/5): " + t.getMessage());
+                log.error("Failed to download file from {} (Attempt {}/5): {}", this.url, i + 1, t.getMessage());
                 if (i == 4) throw t;
                 Thread.sleep(1000);
             }

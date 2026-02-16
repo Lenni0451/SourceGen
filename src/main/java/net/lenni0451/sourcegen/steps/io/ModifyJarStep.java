@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.io;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.JarUtils;
 
@@ -7,6 +8,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.function.Predicate;
 
+@Slf4j
 public class ModifyJarStep implements GeneratorStep {
 
     private final File input;
@@ -21,7 +23,7 @@ public class ModifyJarStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Modifying jar file " + this.output.getName() + "...");
+        log.info("Modifying jar file {}...", this.output.getName());
     }
 
     @Override

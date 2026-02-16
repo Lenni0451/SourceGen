@@ -1,11 +1,13 @@
 package net.lenni0451.sourcegen.steps.io;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.JarUtils;
 
 import java.io.File;
 import java.util.Map;
 
+@Slf4j
 public class ReadJarEntriesStep implements GeneratorStep {
 
     private final File input;
@@ -18,7 +20,7 @@ public class ReadJarEntriesStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Reading jar entries from " + this.input.getName() + "...");
+        log.info("Reading jar entries from {}...", this.input.getName());
     }
 
     @Override

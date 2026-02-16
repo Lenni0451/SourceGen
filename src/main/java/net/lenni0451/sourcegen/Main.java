@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.commons.io.FileUtils;
 import net.lenni0451.optconfig.ConfigLoader;
 import net.lenni0451.optconfig.provider.ConfigProvider;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class Main {
 
     public static final File WORK_DIR = new File("work");
@@ -24,7 +26,7 @@ public class Main {
         loadConfig();
         loadGenerators();
         if (args.length != 1) {
-            System.out.println("Please specify a target to generate!");
+            log.info("Please specify a target to generate!");
             printTargets();
             return;
         }
@@ -33,12 +35,12 @@ public class Main {
         try {
             targetIndex = Integer.parseInt(args[0]);
         } catch (NumberFormatException e) {
-            System.out.println("Invalid target index: " + args[0]);
+            log.error("Invalid target index: {}", args[0]);
             printTargets();
             return;
         }
         if (targetIndex < 1 || targetIndex > TARGETS.size() || TARGETS.get(targetIndex - 1) == null) {
-            System.out.println("Invalid target index: " + targetIndex);
+            log.error("Invalid target index: {}", targetIndex);
             printTargets();
             return;
         }
@@ -49,13 +51,13 @@ public class Main {
         GeneratorTarget target = TARGETS.get(targetIndex - 1);
         for (Requirements requirement : target.getRequirements()) {
             if (!requirement.isPresent()) {
-                System.out.println(requirement.getMessage());
+                log.info(requirement.getMessage());
                 return;
             }
         }
-        System.out.println("Generating target: " + target.getName());
+        log.info("Generating target: {}", target.getName());
         target.execute();
-        System.out.println("Done!");
+        log.info("Done!");
     }
 
     /**
@@ -78,11 +80,11 @@ public class Main {
     }
 
     private static void printTargets() {
-        System.out.println("Available targets:");
+        log.info("Available targets:");
         for (int i = 0; i < TARGETS.size(); i++) {
             GeneratorTarget target = TARGETS.get(i);
             if (target == null) continue;
-            System.out.println((i + 1) + ". " + target.getName());
+            log.info("{}. {}", i + 1, target.getName());
         }
     }
 

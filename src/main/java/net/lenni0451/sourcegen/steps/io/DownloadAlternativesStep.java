@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.io;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.NetUtils;
 
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class DownloadAlternativesStep implements GeneratorStep {
 
     private final String[] urls;
@@ -20,7 +22,7 @@ public class DownloadAlternativesStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Downloading file from alternatives...");
+        log.info("Downloading file from alternatives...");
     }
 
     @Override
@@ -29,7 +31,7 @@ public class DownloadAlternativesStep implements GeneratorStep {
         for (String url : this.urls) {
             try {
                 NetUtils.download(url, this.output);
-                System.out.println("Downloaded file from " + url);
+                log.info("Downloaded file from {}", url);
                 return;
             } catch (Throwable t) {
                 errors.add(t);

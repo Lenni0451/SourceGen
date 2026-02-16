@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.io;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+@Slf4j
 public class DetectTinyVersionStep implements GeneratorStep {
 
     private final File mappings;
@@ -21,7 +23,7 @@ public class DetectTinyVersionStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Detecting tiny mappings version...");
+        log.info("Detecting tiny mappings version...");
     }
 
     @Override
@@ -29,10 +31,10 @@ public class DetectTinyVersionStep implements GeneratorStep {
         String mappingsContent = Files.readString(this.mappings.toPath());
         List<GeneratorStep> steps = new ArrayList<>();
         if (mappingsContent.startsWith("v1\t")) {
-            System.out.println("Mappings version is v1");
+            log.info("Mappings version is v1");
             this.stepSupplier.accept(Version.V1, steps);
         } else if (mappingsContent.startsWith("tiny\t2\t0\t")) {
-            System.out.println("Mappings version is v2");
+            log.info("Mappings version is v2");
             this.stepSupplier.accept(Version.V2, steps);
         } else {
             throw new IllegalStateException("Unknown tiny mappings version");

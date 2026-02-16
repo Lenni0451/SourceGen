@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.target;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 import net.lenni0451.sourcegen.utils.ETA;
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+@Slf4j
 public abstract class IterateVersionsStep<V> implements GeneratorStep {
 
     private final File repoDir;
@@ -33,7 +35,7 @@ public abstract class IterateVersionsStep<V> implements GeneratorStep {
 
     @Override
     public final void printStep() {
-        System.out.println("Searching for " + this.getName() + " versions...");
+        log.info("Searching for {} versions...", this.getName());
     }
 
     @Override
@@ -48,12 +50,12 @@ public abstract class IterateVersionsStep<V> implements GeneratorStep {
             List<GeneratorStep> steps = new ArrayList<>();
             this.provideSteps(steps, version);
 
-            System.out.println("Running steps for version " + versionName + " (" + (++i) + "/" + versions.size() + (eta.canEstimate() ? (" ETA: " + ETA.format(eta.getNextEstimation()) + "/" + ETA.format(eta.getEstimation(versions.size() - (i - 1)))) : "") + ")...");
+            log.info("Running steps for version {} ({}/{}{})...", versionName, ++i, versions.size(), eta.canEstimate() ? (" ETA: " + ETA.format(eta.getNextEstimation()) + "/" + ETA.format(eta.getEstimation(versions.size() - (i - 1)))) : "");
             eta.start();
             StepExecutor executor = new StepExecutor(steps);
             executor.run();
             eta.stop();
-            System.out.println("Finished steps for version " + versionName + " in " + ETA.format(eta.getLastDuration()));
+            log.info("Finished steps for version {} in {}", versionName, ETA.format(eta.getLastDuration()));
         }
     }
 

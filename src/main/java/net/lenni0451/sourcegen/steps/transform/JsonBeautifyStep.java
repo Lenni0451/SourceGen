@@ -3,6 +3,7 @@ package net.lenni0451.sourcegen.steps.transform;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonWriter;
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.commons.gson.GsonParser;
 import net.lenni0451.commons.gson.elements.GsonElement;
 import net.lenni0451.commons.io.FileUtils;
@@ -13,6 +14,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.util.Locale;
 
+@Slf4j
 public class JsonBeautifyStep implements GeneratorStep {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -25,7 +27,7 @@ public class JsonBeautifyStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Beautifying json files...");
+        log.info("Beautifying json files...");
     }
 
     @Override
@@ -41,7 +43,7 @@ public class JsonBeautifyStep implements GeneratorStep {
                 jsonWriter.close();
                 Files.writeString(file.toPath(), stringWriter.toString());
             } catch (Throwable t) {
-                System.out.println("Failed to beautify json file " + file.getAbsolutePath() + ": " + t.getMessage());
+                log.error("Failed to beautify json file {}: {}", file.getAbsolutePath(), t.getMessage());
             }
         }
     }

@@ -1,11 +1,13 @@
 package net.lenni0451.sourcegen.steps.decompile;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.remapping.special.ExceptionFiller;
 
 import java.io.File;
 import java.util.Map;
 
+@Slf4j
 public class FillExceptionsStep implements GeneratorStep {
 
     private final Map<String, byte[]> entries;
@@ -18,7 +20,7 @@ public class FillExceptionsStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Filling exceptions...");
+        log.info("Filling exceptions...");
     }
 
     @Override

@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.utils.remapping.special;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.commons.asm.ASMUtils;
 import net.lenni0451.commons.asm.io.ClassIO;
 import net.lenni0451.commons.asm.mappings.loader.formats.TinyV2MappingsLoader;
@@ -18,6 +19,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class TinyV2MetadataMapper {
 
     private static final String COMMENT_ANNOTATION_CLASS = "net.lenni0451.sourcegen.annotations.Comment";
@@ -33,7 +35,7 @@ public class TinyV2MetadataMapper {
         for (ClassMetaMapping classMetadata : metadata) {
             byte[] classBytes = entries.get(classMetadata.getName() + ".class");
             if (classBytes == null) {
-                System.err.println("Class " + classMetadata.getName() + " not found in input jar");
+                log.warn("Class {} not found in input jar", classMetadata.getName());
                 continue;
             }
             ClassNode classNode = ClassIO.fromBytes(classBytes);

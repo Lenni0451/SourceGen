@@ -1,10 +1,12 @@
 package net.lenni0451.sourcegen.steps.decompile;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
 
+@Slf4j
 public class DecompileWithLibStep implements GeneratorStep {
 
     private final File input;
@@ -19,7 +21,7 @@ public class DecompileWithLibStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Decompiling " + this.input.getName() + " using VineFlower...");
+        log.info("Decompiling {} using VineFlower...", this.input.getName());
     }
 
     @Override

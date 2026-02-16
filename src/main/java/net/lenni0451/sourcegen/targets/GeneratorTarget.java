@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.targets;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.steps.StepExecutor;
 
@@ -7,6 +8,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public abstract class GeneratorTarget {
 
     private final String name;
@@ -47,7 +49,7 @@ public abstract class GeneratorTarget {
         Runtime.getRuntime().addShutdownHook(errorStepExecutor);
         new StepExecutor(steps).run(); //Execute all steps
         if (!Runtime.getRuntime().removeShutdownHook(errorStepExecutor)) { //If execution reaches this point, the generator finished successfully
-            System.out.println("Failed to remove error step executor from shutdown hook!");
+            log.error("Failed to remove error step executor from shutdown hook!");
         }
     }
 
@@ -58,13 +60,12 @@ public abstract class GeneratorTarget {
             GeneratorStep errorStep = GeneratorTarget.this.getErrorStep();
             if (errorStep == null) return;
 
-            System.out.println("The generator exited abnormally, executing error step...");
+            log.warn("The generator exited abnormally, executing error step...");
             errorStep.printStep();
             try {
                 errorStep.run();
             } catch (Throwable t) {
-                System.out.println("Error while executing error step");
-                t.printStackTrace();
+                log.error("Error while executing error step", t);
             }
         }
     }

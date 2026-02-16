@@ -1,6 +1,7 @@
 package net.lenni0451.sourcegen.steps.target;
 
 import com.google.common.net.UrlEscapers;
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.NetUtils;
@@ -13,6 +14,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class LoadNostalgiaMappings extends LoadContextStep<Function<String, String[]>> {
 
     private static final Pattern BUILD_PATTERN = Pattern.compile("(.*)\\+build\\.(\\d+)$");
@@ -25,7 +27,7 @@ public class LoadNostalgiaMappings extends LoadContextStep<Function<String, Stri
 
     @Override
     public void printStep() {
-        System.out.println("Loading Nostalgia mappings...");
+        log.info("Loading Nostalgia mappings...");
     }
 
     @Override
@@ -44,7 +46,9 @@ public class LoadNostalgiaMappings extends LoadContextStep<Function<String, Stri
         Map<String, MavenVersion> parsedVersions = new HashMap<>();
         for (String version : versions) {
             Matcher matcher = BUILD_PATTERN.matcher(version);
-            if (!matcher.find()) throw new IllegalStateException("Invalid version: " + version);
+            if (!matcher.find()) {
+                throw new IllegalStateException("Invalid version: " + version);
+            }
 
             String minecraftVersion = matcher.group(1);
             int build = Integer.parseInt(matcher.group(2));

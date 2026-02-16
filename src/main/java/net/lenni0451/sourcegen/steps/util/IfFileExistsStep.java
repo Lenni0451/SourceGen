@@ -1,11 +1,13 @@
 package net.lenni0451.sourcegen.steps.util;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 
 import java.io.File;
 import java.util.function.Function;
 
+@Slf4j
 @RequiredArgsConstructor
 public class IfFileExistsStep implements GeneratorStep {
 
@@ -14,7 +16,7 @@ public class IfFileExistsStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Checking if file '" + this.file.getName() + "' exist...");
+        log.info("Checking if file '{}' exist...", this.file.getName());
     }
 
     @Override

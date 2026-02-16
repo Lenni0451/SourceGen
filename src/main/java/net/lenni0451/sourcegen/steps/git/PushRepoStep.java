@@ -1,10 +1,12 @@
 package net.lenni0451.sourcegen.steps.git;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
 
+@Slf4j
 public class PushRepoStep implements GeneratorStep {
 
     private final File repoDir;
@@ -17,7 +19,7 @@ public class PushRepoStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Pushing repository...");
+        log.info("Pushing repository...");
     }
 
     @Override

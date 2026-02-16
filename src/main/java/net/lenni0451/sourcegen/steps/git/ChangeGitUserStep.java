@@ -1,10 +1,12 @@
 package net.lenni0451.sourcegen.steps.git;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
 
+@Slf4j
 public class ChangeGitUserStep implements GeneratorStep {
 
     private final File repoDir;
@@ -19,7 +21,7 @@ public class ChangeGitUserStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Changing git user to: " + this.name + " <" + this.email + ">");
+        log.info("Changing git user to: {} <{}>", this.name, this.email);
     }
 
     @Override

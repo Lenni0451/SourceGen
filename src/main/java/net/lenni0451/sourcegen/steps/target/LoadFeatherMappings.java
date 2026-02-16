@@ -1,6 +1,7 @@
 package net.lenni0451.sourcegen.steps.target;
 
 import com.google.common.net.UrlEscapers;
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.NetUtils;
@@ -12,6 +13,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class LoadFeatherMappings extends LoadContextStep<Function<String, String>> {
 
     private static final Pattern BUILD_PATTERN = Pattern.compile("(.*)\\+build\\.(\\d+)$");
@@ -25,7 +27,7 @@ public class LoadFeatherMappings extends LoadContextStep<Function<String, String
 
     @Override
     public void printStep() {
-        System.out.println("Loading Feather mappings...");
+        log.info("Loading Feather mappings...");
     }
 
     @Override

@@ -1,11 +1,13 @@
 package net.lenni0451.sourcegen.steps.git;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 import net.lenni0451.sourcegen.utils.external.Commands;
 
 import java.io.File;
 import java.util.Date;
 
+@Slf4j
 public class CommitChangesStep implements GeneratorStep {
 
     private final File repoDir;
@@ -20,7 +22,7 @@ public class CommitChangesStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Committing changes to git repository...");
+        log.info("Committing changes to git repository...");
     }
 
     @Override

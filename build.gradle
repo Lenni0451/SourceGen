@@ -20,6 +20,7 @@ dependencies {
     include libs.gson
     include libs.bundles.asm
     include libs.bundles.commons
+    include libs.log4j
 
     compileOnly libs.findbugs
     compileOnly libs.jetbrainsAnnotations

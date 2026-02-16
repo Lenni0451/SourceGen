@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.io;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
 
 import java.io.File;
@@ -8,6 +9,7 @@ import java.io.FileOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+@Slf4j
 public class UnzipSingleFileStep implements GeneratorStep {
 
     private final File zipFile;
@@ -22,7 +24,7 @@ public class UnzipSingleFileStep implements GeneratorStep {
 
     @Override
     public void printStep() {
-        System.out.println("Unzipping " + this.file + " from " + this.zipFile.getName() + " to " + this.targetFile.getName() + "...");
+        log.info("Unzipping {} from {} to {}...", this.file, this.zipFile.getName(), this.targetFile.getName());
     }
 
     @Override

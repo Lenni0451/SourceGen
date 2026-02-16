@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.steps.target;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.commons.gson.elements.GsonArray;
 import net.lenni0451.commons.gson.elements.GsonObject;
 import net.lenni0451.sourcegen.Config;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+@Slf4j
 public class LoadParchmentVersions extends LoadContextStep<Function<String, String>> {
 
     private final VersionStepProvider stepProvider;
@@ -22,7 +24,7 @@ public class LoadParchmentVersions extends LoadContextStep<Function<String, Stri
 
     @Override
     public void printStep() {
-        System.out.println("Loading Parchment mappings...");
+        log.info("Loading Parchment mappings...");
     }
 
     @Override
