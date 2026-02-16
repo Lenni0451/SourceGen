@@ -66,7 +66,7 @@ public class TinyV2MetadataMapper {
             content = content.replace("import " + COMMENT_ANNOTATION_CLASS + ";\n", "");
             content = COMMENT_ANNOTATION_PATTERN.matcher(content).replaceAll(result -> {
                 String spaces = result.group(1);
-                String[] commentLines = new String(Base64.getDecoder().decode(result.group(2).replaceAll("\\s","")), StandardCharsets.UTF_8).split("\n");
+                String[] commentLines = new String(Base64.getDecoder().decode(result.group(2).replaceAll("\\s", "")), StandardCharsets.UTF_8).split("\n");
                 StringBuilder sb = new StringBuilder();
                 sb.append(spaces).append("/**\n");
                 for (String commentLine : commentLines) {
