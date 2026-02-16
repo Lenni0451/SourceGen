@@ -7,7 +7,6 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
-import javax.lang.model.SourceVersion;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
@@ -28,7 +27,7 @@ public class LocalVariableFixer {
                             if (!Modifier.isStatic(method.access) && localVariable.index == 0) {
                                 localVariable.name = "this";
                             } else {
-                                localVariable.name = generateNewName(Type.getType(localVariable.desc), names);
+                                localVariable.name = ASMUtils.generateVariableName(Type.getType(localVariable.desc), name -> !names.add(name));
                                 for (int j = 0; j < parameterIndices.length; j++) {
                                     if (parameterIndices[j] == localVariable.index) {
                                         method.parameters.get(j).name = localVariable.name;
@@ -40,7 +39,7 @@ public class LocalVariableFixer {
                         Type[] parameterTypes = Types.argumentTypes(method);
                         for (int i = 0; i < method.parameters.size(); i++) {
                             ParameterNode parameter = method.parameters.get(i);
-                            parameter.name = generateNewName(parameterTypes[i], names);
+                            parameter.name = ASMUtils.generateVariableName(parameterTypes[i], name -> !names.add(name));
                         }
                     }
                 }
@@ -112,31 +111,6 @@ public class LocalVariableFixer {
             methodNode.localVariables.add(new LocalVariableNode("arg" + i, parameterTypes[i].getDescriptor(), null, start, end, parameterIndices[i]));
         }
         methodNode.localVariables.sort(Comparator.comparingInt(o -> o.index));
-    }
-
-    private static String generateNewName(final Type type, final Set<String> alreadyGeneratedNames) {
-        String newName = type.getClassName();
-        if (type.getSort() == Type.ARRAY) {
-            newName = type.getElementType().getClassName();
-            for (int j = 0; j < type.getDimensions(); j++) newName += "Array";
-        }
-        if (type.getDescriptor().length() == 1) {
-            newName = type.getDescriptor().toLowerCase(Locale.ROOT);
-        } else {
-            newName = newName.substring(newName.lastIndexOf('.') + 1);
-            newName = newName.substring(newName.lastIndexOf('$') + 1);
-            if (newName.toUpperCase(Locale.ROOT).equals(newName)) {
-                newName = newName.toLowerCase(Locale.ROOT);
-            } else {
-                newName = newName.substring(0, 1).toLowerCase(Locale.ROOT) + newName.substring(1);
-            }
-        }
-        if (SourceVersion.isKeyword(newName)) newName = "_" + newName;
-
-        int index = 2;
-        String name = newName;
-        while (!alreadyGeneratedNames.add(name)) name = newName + index++;
-        return name;
     }
 
     private static void fixRecordComponents(final ClassNode node) {
