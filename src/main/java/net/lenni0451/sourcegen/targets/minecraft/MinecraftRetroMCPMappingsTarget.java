@@ -59,7 +59,7 @@ public class MinecraftRetroMCPMappingsTarget extends GeneratorTarget {
                         versionSteps.add(new IfFileExistsStep(
                                 new File(this.resourcesDir, versionData.mappingsName()),
                                 file -> new StepExecutor(
-                                        new RemapStep(new TinyV2Remapper(jarEntries, file, new TinyNamespace("client", "named"))),
+                                        new RemapStep(new TinyV2Remapper(jarEntries, file, new TinyNamespace("client", "named"), new TinyNamespace("official", "named"))),
                                         new FixLocalVariablesStep(jarEntries)
                                 )
                         ));
