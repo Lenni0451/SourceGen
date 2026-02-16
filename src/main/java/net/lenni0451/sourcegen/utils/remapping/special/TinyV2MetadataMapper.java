@@ -16,11 +16,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class TinyV2MetadataMapper {
 
     private static final String COMMENT_ANNOTATION_CLASS = "net.lenni0451.sourcegen.annotations.Comment";
     private static final String COMMENT_ANNOTATION_DESC = "L" + COMMENT_ANNOTATION_CLASS + ";";
+    private static final Pattern COMMENT_ANNOTATION_PATTERN = Pattern.compile("([ \\t]*)@Comment\\s*\\(\\s*\"([^\"]+)\"\\s*\\)");
 
     public static void generate(final Map<String, byte[]> entries, final File mappings, final TinyNamespace initialNamespace, final TinyNamespace... namespaces) {
         TinyV2MappingsLoader mapper = loadMapper(mappings, TinyNamespace.merge(initialNamespace, namespaces));
@@ -58,54 +60,25 @@ public class TinyV2MetadataMapper {
     public static void apply(final File source) throws IOException {
         for (File file : FileUtils.listFiles(source)) {
             if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".java")) continue;
-            List<String> lines = Files.readAllLines(file.toPath());
-            List<String> output = new ArrayList<>(lines.size());
-            boolean modified = false;
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i);
-                if (line.contains(COMMENT_ANNOTATION_CLASS)) {
-                    modified = true;
-                    continue;
-                } else if (line.contains("@Comment")) {
-                    modified = true;
-                    if (!line.contains("@Comment(")) {
-                        throw new IllegalStateException("Invalid @Comment annotation format in file " + file.getAbsolutePath() + ": " + line);
-                    }
-                    if (line.endsWith("(")) {
-                        //Multiline annotation
-                        if (i + 2 >= lines.size()) {
-                            throw new IllegalStateException("Invalid @Comment annotation format in file " + file.getAbsolutePath() + ": " + line);
-                        }
-                        String nextLine = lines.get(i + 1).trim();
-                        String endLine = lines.get(i + 2).trim();
-                        if (!nextLine.startsWith("\"") || !nextLine.endsWith("\"") || !endLine.equals(")")) {
-                            throw new IllegalStateException("Invalid @Comment annotation format in file " + file.getAbsolutePath() + ": " + line + " " + nextLine + " " + endLine);
-                        }
+            String content = Files.readString(file.toPath());
+            if (!content.contains(COMMENT_ANNOTATION_CLASS)) continue;
 
-                        String spaces = line.substring(0, line.indexOf("@Comment"));
-                        String[] commentLines = new String(Base64.getDecoder().decode(nextLine.substring(1, nextLine.length() - 1)), StandardCharsets.UTF_8).split("\n");
-                        output.add(spaces + "/**");
-                        for (String commentLine : commentLines) {
-                            output.add(spaces + " * " + commentLine);
-                        }
-                        output.add(spaces + " */");
-                        i += 2;
-                    } else if (line.endsWith(")")) {
-                        String spaces = line.substring(0, line.indexOf("@Comment"));
-                        String[] commentLines = new String(Base64.getDecoder().decode(line.substring(line.indexOf("(\"") + 2, line.lastIndexOf("\")"))), StandardCharsets.UTF_8).split("\n");
-                        output.add(spaces + "/**");
-                        for (String commentLine : commentLines) {
-                            output.add(spaces + " * " + commentLine);
-                        }
-                        output.add(spaces + " */");
-                    }
-                } else {
-                    output.add(line);
+            content = content.replace("import " + COMMENT_ANNOTATION_CLASS + ";\n", "");
+            content = COMMENT_ANNOTATION_PATTERN.matcher(content).replaceAll(result -> {
+                String spaces = result.group(1);
+                String[] commentLines = new String(Base64.getDecoder().decode(result.group(2).replaceAll("\\s","")), StandardCharsets.UTF_8).split("\n");
+                StringBuilder sb = new StringBuilder();
+                sb.append(spaces).append("/**\n");
+                for (String commentLine : commentLines) {
+                    sb.append(spaces).append(" * ").append(commentLine).append("\n");
                 }
+                sb.append(spaces).append(" */");
+                return sb.toString();
+            });
+            if (content.contains("@Comment")) {
+                throw new IllegalStateException("Invalid @Comment annotation format in file " + file.getAbsolutePath() + ": " + content);
             }
-            if (modified) {
-                Files.write(file.toPath(), output);
-            }
+            Files.writeString(file.toPath(), content);
         }
     }
 
