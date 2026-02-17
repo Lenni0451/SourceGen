@@ -66,22 +66,27 @@ public class TinyV2MetadataMapper {
             String content = Files.readString(file.toPath());
             if (!content.contains(COMMENT_ANNOTATION_CLASS)) continue;
 
-            content = content.replace("import " + COMMENT_ANNOTATION_CLASS + ";\n", "");
-            content = COMMENT_ANNOTATION_PATTERN.matcher(content).replaceAll(result -> {
-                String spaces = result.group(1);
-                String[] commentLines = new String(Base64.getDecoder().decode(result.group(2).replaceAll("\\s", "")), StandardCharsets.UTF_8).split("\n");
-                StringBuilder sb = new StringBuilder();
-                sb.append(spaces).append("/**\n");
-                for (String commentLine : commentLines) {
-                    sb.append(spaces).append(" * ").append(commentLine).append("\n");
+            try {
+                content = content.replace("import " + COMMENT_ANNOTATION_CLASS + ";\n", "");
+                content = COMMENT_ANNOTATION_PATTERN.matcher(content).replaceAll(result -> {
+                    String spaces = result.group(1);
+                    String[] commentLines = new String(Base64.getDecoder().decode(result.group(2).replaceAll("\\s", "")), StandardCharsets.UTF_8).split("\n");
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(spaces).append("/**\n");
+                    for (String commentLine : commentLines) {
+                        sb.append(spaces).append(" * ").append(commentLine).append("\n");
+                    }
+                    sb.append(spaces).append(" */");
+                    return Matcher.quoteReplacement(sb.toString());
+                });
+                if (content.contains("@Comment")) {
+                    throw new IllegalStateException("Invalid @Comment annotation format in file " + file.getAbsolutePath() + ": " + content);
                 }
-                sb.append(spaces).append(" */");
-                return Matcher.quoteReplacement(sb.toString());
-            });
-            if (content.contains("@Comment")) {
-                throw new IllegalStateException("Invalid @Comment annotation format in file " + file.getAbsolutePath() + ": " + content);
+                Files.writeString(file.toPath(), content);
+            } catch (Throwable t) {
+                log.error("Failed to apply comments in file {}", file.getAbsolutePath(), t);
+                throw t; //Make sure execution stops if something goes wrong
             }
-            Files.writeString(file.toPath(), content);
         }
     }
 
