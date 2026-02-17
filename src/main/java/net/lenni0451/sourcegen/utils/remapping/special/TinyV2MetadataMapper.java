@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -75,7 +76,7 @@ public class TinyV2MetadataMapper {
                     sb.append(spaces).append(" * ").append(commentLine).append("\n");
                 }
                 sb.append(spaces).append(" */");
-                return sb.toString();
+                return Matcher.quoteReplacement(sb.toString());
             });
             if (content.contains("@Comment")) {
                 throw new IllegalStateException("Invalid @Comment annotation format in file " + file.getAbsolutePath() + ": " + content);
