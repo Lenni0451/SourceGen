@@ -3,15 +3,17 @@ Generator for source diff repos.\
 <b>The generator has only been tested on Linux. While I didn't intentionally break compatibility with other OSes, I can't guarantee that it will work on them.</b>
 
 ## Supported Targets
-- Minecraft Mojang mappings
-- Minecraft assets
-- Minecraft Mojang + Parchment mappings
-- Minecraft Yarn mappings
-- Minecraft Feather mappings
-- Minecraft RetroMCP mappings
-- Minecraft MCP mappings
-- CosmicReach
-- Hytale Server
+1. Minecraft Mojang mappings
+2. CosmicReach
+3. Minecraft RetroMCP mappings
+4. Minecraft Feather mappings
+5. Minecraft Yarn mappings
+6. Minecraft Mojang + Parchment mappings
+7. Minecraft assets
+8. ~~Minecraft Bedrock Edition mappings~~ _no longer supported_
+9. Minecraft MCP mappings
+10. Hytale Server
+11. Minecraft Nostalgia mappings
 
 ## Prerequisites
 To use this generator, you need to have the following installed:
@@ -41,12 +43,18 @@ Purely local repositories are not supported at the moment.
 If you want the generator to automatically add files to the repository, you can add them to the corresponding folder in the `defaults` directory.\
 The files in the repository will be overwritten if they already exist.\
 Default folders:
-- `defaults/cosmicreach`
-- `defaults/minecraft_feather_mappings`
 - `defaults/minecraft_mojang_mappings`
-- `defaults/minecraft_parchment_mappings`
-- `defaults/minecraft_retromcp_mappings`
+- `defaults/cosmicreach_client`
+- `defaults/cosmicreach_server`
+- `defaults/retromcp`
+- `defaults/minecraft_feather_mappings`
 - `defaults/minecraft_yarn_mappings`
+- `defaults/minecraft_parchment_mappings`
+- `defaults/minecraft_assets`
+- `defaults/minecraft_mcp_mappings`
+- `defaults/hytale_server`
+- `defaults/minecraft_client_nostalgia_mappings`
+- `defaults/minecraft_server_nostalgia_mappings`
 
 ## Recreating branches
 From time to time, you might want to recreate the branches in the repository because of changes in the mappings or updates to the decompiler.\
