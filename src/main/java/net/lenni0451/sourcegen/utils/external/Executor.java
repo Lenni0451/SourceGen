@@ -65,8 +65,8 @@ public class Executor {
         if (!ArrayUtils.contains(allowedExitCodes, exitCode)) {
             log.error("Process exited with error code {}", exitCode);
             log.info("Command: {}", String.join(" ", cmd));
-            log.debug("Output:");
-            log.debug(out);
+            log.info("Output:");
+            log.info(out);
             System.exit(exitCode);
         }
         return new ProcessOutput(exitCode, out);
