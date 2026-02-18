@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.utils.remapping.special;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.commons.asm.info.MemberDeclaration;
 import net.lenni0451.commons.asm.io.ClassIO;
 import org.objectweb.asm.tree.ClassNode;
@@ -12,6 +13,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class ExceptionFiller {
 
     private static final Pattern EXCEPTION_PATTERN1 = Pattern.compile("^([^.]+)\\.([^(]+)([^=]+)=(.*)$");
@@ -23,10 +25,14 @@ public class ExceptionFiller {
         Map<MemberDeclaration, String[]> exceptions = new HashMap<>();
         for (String line : lines) {
             if (line.isBlank()) continue;
+            if (line.startsWith("#")) continue;
             Matcher matcher = EXCEPTION_PATTERN1.matcher(line);
             if (!matcher.matches()) {
                 matcher = EXCEPTION_PATTERN2.matcher(line);
-                if (!matcher.matches()) throw new IllegalArgumentException("Invalid exception line: " + line);
+                if (!matcher.matches()) {
+                    log.warn("Invalid exception file line: {}", line);
+                    continue;
+                }
             }
             String className = matcher.group(1);
             String methodName = matcher.group(2);
