@@ -27,6 +27,8 @@ import java.util.Map;
 
 public class MinecraftMojangMappingsTarget extends GeneratorTarget {
 
+    @Nullable
+    private final String targetVersion;
     private final File repoDir = new File(Config.MinecraftMojangMappings.repoName);
     private final File defaultsDir = new File(Main.DEFAULTS_DIR, "minecraft_mojang_mappings");
     private final File mappingsFile = new File(Main.WORK_DIR, "mappings");
@@ -34,7 +36,12 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
     private final File remappedJar = new File(Main.WORK_DIR, "remapped.jar");
 
     public MinecraftMojangMappingsTarget() {
+        this(null);
+    }
+
+    public MinecraftMojangMappingsTarget(final String targetVersion) {
         super("Minecraft (Mojang Mappings)", Requirements.VINEFLOWER);
+        this.targetVersion = targetVersion;
     }
 
     @Override
@@ -44,7 +51,7 @@ public class MinecraftMojangMappingsTarget extends GeneratorTarget {
         steps.add(new IterateMinecraftVersions(
                 this.repoDir,
                 Config.MinecraftMojangMappings.branch,
-                new VersionRange("1.14.4", null), //First version with official mappings
+                new VersionRange(this.targetVersion == null ? "1.14.4" : this.targetVersion, this.targetVersion),
                 version -> Config.Exclusions.minecraftOfficial.contains(version.getString("id")),
                 false,
                 (versionSteps, versionName, releaseTime, clientUrl, serverUrl, clientMappingsUrl, serverMappingsUrl) -> {
