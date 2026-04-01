@@ -48,7 +48,7 @@ public class Config {
         @Hidden
         @Option("Minecraft")
         @Description("This list is for Mojang mappings, Feather mappings, Yarn mappings and Parchment mappings")
-        public static List<String> minecraft = List.of("15w14a", "1.RV-Pre1", "3D Shareware v1.34", "20w14infinite", "22w13oneblockatatime", "23w13a_or_b", "24w14potato", "25w14craftmine");
+        public static List<String> minecraft = List.of("15w14a", "1.RV-Pre1", "3D Shareware v1.34", "20w14infinite", "22w13oneblockatatime", "23w13a_or_b", "24w14potato", "25w14craftmine", "26w14a");
 
         @Hidden
         @Option("MinecraftOfficial")
