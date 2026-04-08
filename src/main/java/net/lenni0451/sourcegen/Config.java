@@ -3,6 +3,7 @@ package net.lenni0451.sourcegen;
 import net.lenni0451.optconfig.annotations.*;
 
 import java.util.List;
+import java.util.Map;
 
 @OptConfig
 public class Config {
@@ -73,6 +74,12 @@ public class Config {
         @Option("MinecraftVersionManifest")
         @Description("The URL to the minecraft version manifest")
         public static String minecraftVersionManifest = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
+
+        @Option("MinecraftVersionDateOverrides")
+        @Description("Override the release date for specific versions")
+        public static Map<String, String> minecraftVersionDateOverrides = Map.of(
+                "26.1.2-rc-1", "2026-04-01T09:06:37+00:00"
+        );
 
         @Option("RetroMCPVersions")
         @Description("The URL to the retro mcp versions json file")

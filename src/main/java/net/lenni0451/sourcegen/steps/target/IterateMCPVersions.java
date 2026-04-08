@@ -76,7 +76,7 @@ public class IterateMCPVersions extends IterateVersionsStep<GsonObject> {
         for (int i = 0; i < versionManifests.size(); i++) {
             GsonObject versionManifest = versionManifests.getObject(i);
             String id = versionManifest.getString("id");
-            String releaseTime = versionManifest.getString("releaseTime");
+            String releaseTime = Config.OnlineResources.minecraftVersionDateOverrides.getOrDefault(id, versionManifest.getString("releaseTime"));
             String url = versionManifest.getString("url");
             versionManifestURLs.put(id, new VersionInfo(releaseTime, url));
         }

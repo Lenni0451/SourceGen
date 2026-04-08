@@ -54,9 +54,10 @@ public class IterateMinecraftVersions extends IterateVersionsStep<GsonObject> {
         Map<OffsetDateTime, GsonObject> sortedVersions = new TreeMap<>();
         for (int i = 0; i < versions.size(); i++) {
             GsonObject version = versions.getObject(i);
-            if (!this.ignoreExclusions && Config.Exclusions.minecraft.contains(version.getString("id"))) continue;
+            String id = version.getString("id");
+            if (!this.ignoreExclusions && Config.Exclusions.minecraft.contains(id)) continue;
 
-            String time = version.getString("releaseTime");
+            String time = Config.OnlineResources.minecraftVersionDateOverrides.getOrDefault(id, version.getString("releaseTime"));
             sortedVersions.put(OffsetDateTime.parse(time), version);
         }
         return sortedVersions.values();
