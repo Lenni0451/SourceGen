@@ -75,10 +75,12 @@ public class Config {
         @Description("The URL to the minecraft version manifest")
         public static String minecraftVersionManifest = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
+        @Hidden
         @Option("MinecraftVersionDateOverrides")
         @Description("Override the release date for specific versions")
         public static Map<String, String> minecraftVersionDateOverrides = Map.of(
-                "26.1.2-rc-1", "2026-04-01T09:06:37+00:00"
+                "26.1.2-rc-1", "2026-04-01T09:06:37+00:00",
+                "26.1.2", "2026-04-01T09:07:37+00:00"
         );
 
         @Option("RetroMCPVersions")
