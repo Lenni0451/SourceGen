@@ -28,7 +28,7 @@ public class Config {
 
         @Option("VineflowerArgs")
         @Description("The arguments that should be passed to vineflower")
-        public static String[] vineflowerArgs = {"-dgs=1", "-asc=1", "-ump=0", "-rsy=1", "-aoa=1"};
+        public static String[] vineflowerArgs = {"--decompile-generics=1", "--ascii-strings=1", "--use-method-parameters=1", "--remove-synthetic=1"};
 
         @Option("HytaleDownloaderExecutable")
         @Description("The name of the Hytale downloader executable")
