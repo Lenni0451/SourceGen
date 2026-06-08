@@ -1,5 +1,6 @@
 package net.lenni0451.sourcegen.targets.minecraft;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lenni0451.sourcegen.Config;
 import net.lenni0451.sourcegen.Main;
 import net.lenni0451.sourcegen.steps.GeneratorStep;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class MinecraftNostalgiaMappingsTarget extends GeneratorTarget {
 
     private final File mappingsJar = new File(Main.WORK_DIR, "mappings.jar");
@@ -74,12 +76,17 @@ public class MinecraftNostalgiaMappingsTarget extends GeneratorTarget {
                     version -> versionToUrl.apply(version.getString("id")) == null,
                     false,
                     (versionSteps, versionName, releaseTime, clientUrl, serverUrl, clientMappingsUrl, serverMappingsUrl) -> {
+                        String downloadUrl = target.getDownloadUrl(clientUrl, serverUrl);
+                        if (downloadUrl == null) {
+                            log.warn("No download URL for version '{}' and target '{}', skipping", versionName, target);
+                            return;
+                        }
                         Map<String, byte[]> jarEntries = new HashMap<>();
 
                         versionSteps.add(new CleanRepoStep(repoDir));
                         versionSteps.add(new DownloadAlternativesStep(versionToUrl.apply(versionName), this.mappingsJar));
                         versionSteps.add(new UnzipSingleFileStep(this.mappingsJar, "mappings/mappings.tiny", this.mappingsFile));
-                        versionSteps.add(new DownloadStep(target.getDownloadUrl(clientUrl, serverUrl), this.targetJar));
+                        versionSteps.add(new DownloadStep(downloadUrl, this.targetJar));
                         versionSteps.add(new ReadJarEntriesStep(this.targetJar, jarEntries));
                         versionSteps.add(new DetectTinyVersionStep(this.mappingsFile, (version, tinySteps) -> {
                             switch (version) {
