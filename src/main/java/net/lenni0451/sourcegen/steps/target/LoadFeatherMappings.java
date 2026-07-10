@@ -40,7 +40,7 @@ public class LoadFeatherMappings extends LoadContextStep<Function<String, String
             if (ver == null) {
                 Matcher matcher = Pattern.compile(PRE_RELEASE_PATTERN).matcher(version);
                 if (!matcher.find()) return null;
-                ver = parsedVersions.get(matcher.group(1));
+                ver = parsedVersions.get(matcher.group(1) + "-pre" + matcher.group(2));
             }
             if (ver == null) return null;
             return ver.url();
